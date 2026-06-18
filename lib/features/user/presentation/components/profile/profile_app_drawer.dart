@@ -1,17 +1,16 @@
-import 'package:fitness_social_app/features/user/presentation/components/feed/feed_theme.dart';
-import 'package:fitness_social_app/features/user/presentation/components/feed/shared/avatar.dart';
-import 'package:fitness_social_app/features/user/presentation/pages/profile_page.dart';
+import 'package:fitness_social_app/features/user/presentation/components/profile/profile_theme.dart';
+import 'package:fitness_social_app/features/user/presentation/pages/feed_page.dart';
 import 'package:fitness_social_app/features/user/presentation/pages/run_page.dart';
 import 'package:fitness_social_app/features/user/presentation/pages/workout_page.dart';
 import 'package:flutter/material.dart';
 
-class FeedAppDrawer extends StatelessWidget {
-  const FeedAppDrawer({super.key});
+class ProfileAppDrawer extends StatelessWidget {
+  const ProfileAppDrawer({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      backgroundColor: FeedTheme.background,
+      backgroundColor: ProfileTheme.background,
       child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(22, 20, 16, 18),
@@ -20,11 +19,13 @@ class FeedAppDrawer extends StatelessWidget {
             children: [
               const _DrawerLogo(),
               const SizedBox(height: 42),
-              // الصورة: side_bar.png لكن هنا كـ Drawer مناسب للموبايل.
-              const _DrawerItem(
+              _DrawerItem(
                 icon: Icons.home_outlined,
                 label: 'Feed',
-                active: true,
+                onTap: () => Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => const FeedPage()),
+                ),
               ),
               _DrawerItem(
                 icon: Icons.fitness_center,
@@ -42,13 +43,10 @@ class FeedAppDrawer extends StatelessWidget {
                   MaterialPageRoute(builder: (_) => const RunPage()),
                 ),
               ),
-              _DrawerItem(
+              const _DrawerItem(
                 icon: Icons.person_outline,
                 label: 'Profile',
-                onTap: () => Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (_) => const ProfilePage()),
-                ),
+                active: true,
               ),
               const _DrawerItem(icon: Icons.search, label: 'Search'),
               const _DrawerItem(
@@ -61,7 +59,7 @@ class FeedAppDrawer extends StatelessWidget {
                 height: 56,
                 child: FilledButton(
                   style: FilledButton.styleFrom(
-                    backgroundColor: FeedTheme.lime,
+                    backgroundColor: ProfileTheme.lime,
                     foregroundColor: Colors.black,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(28),
@@ -108,14 +106,14 @@ class _DrawerItem extends StatelessWidget {
           children: [
             Icon(
               icon,
-              color: active ? Colors.white : FeedTheme.muted,
+              color: active ? Colors.white : ProfileTheme.muted,
               size: 27,
             ),
             const SizedBox(width: 18),
             Text(
               label,
               style: TextStyle(
-                color: active ? Colors.white : FeedTheme.muted,
+                color: active ? Colors.white : ProfileTheme.muted,
                 fontSize: 18,
                 fontWeight: active ? FontWeight.w900 : FontWeight.w500,
               ),
@@ -138,7 +136,7 @@ class _DrawerLogo extends StatelessWidget {
           TextSpan(
             text: 'REP',
             style: TextStyle(
-              color: FeedTheme.lime,
+              color: ProfileTheme.lime,
               fontSize: 18,
               fontWeight: FontWeight.w900,
             ),
@@ -164,7 +162,11 @@ class _CurrentUserTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Row(
       children: [
-        FeedAvatar(size: 42),
+        CircleAvatar(
+          radius: 21,
+          backgroundColor: Color(0xFF151515),
+          child: Icon(Icons.person, color: ProfileTheme.muted),
+        ),
         SizedBox(width: 12),
         Expanded(
           child: Column(
@@ -181,12 +183,12 @@ class _CurrentUserTile extends StatelessWidget {
               Text(
                 '@Michel jarjoura',
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: FeedTheme.muted, fontSize: 12),
+                style: TextStyle(color: ProfileTheme.muted, fontSize: 12),
               ),
             ],
           ),
         ),
-        Icon(Icons.more_horiz, color: FeedTheme.muted),
+        Icon(Icons.more_horiz, color: ProfileTheme.muted),
       ],
     );
   }

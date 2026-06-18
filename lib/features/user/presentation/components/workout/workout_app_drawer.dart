@@ -1,5 +1,6 @@
 import 'package:fitness_social_app/features/user/presentation/components/workout/workout_theme.dart';
 import 'package:fitness_social_app/features/user/presentation/pages/feed_page.dart';
+import 'package:fitness_social_app/features/user/presentation/pages/profile_page.dart';
 import 'package:fitness_social_app/features/user/presentation/pages/run_page.dart';
 import 'package:flutter/material.dart';
 
@@ -39,7 +40,14 @@ class WorkoutAppDrawer extends StatelessWidget {
                   MaterialPageRoute(builder: (_) => const RunPage()),
                 ),
               ),
-              const _DrawerItem(icon: Icons.person_outline, label: 'Profile'),
+              _DrawerItem(
+                icon: Icons.person_outline,
+                label: 'Profile',
+                onTap: () => Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ProfilePage()),
+                ),
+              ),
               const _DrawerItem(icon: Icons.search, label: 'Search'),
               const _DrawerItem(
                 icon: Icons.notifications_none,

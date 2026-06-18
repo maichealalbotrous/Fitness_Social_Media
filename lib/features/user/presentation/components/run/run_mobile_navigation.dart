@@ -1,5 +1,6 @@
 import 'package:fitness_social_app/features/user/presentation/components/run/run_theme.dart';
 import 'package:fitness_social_app/features/user/presentation/pages/feed_page.dart';
+import 'package:fitness_social_app/features/user/presentation/pages/profile_page.dart';
 import 'package:fitness_social_app/features/user/presentation/pages/workout_page.dart';
 import 'package:flutter/material.dart';
 
@@ -24,6 +25,12 @@ class RunMobileNavigation extends StatelessWidget {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (_) => const WorkoutPage()),
+          );
+        }
+        if (index == 3) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const ProfilePage()),
           );
         }
       },
