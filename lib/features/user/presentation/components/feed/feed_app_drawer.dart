@@ -1,5 +1,6 @@
 import 'package:fitness_social_app/features/user/presentation/components/feed/feed_theme.dart';
 import 'package:fitness_social_app/features/user/presentation/components/feed/shared/avatar.dart';
+import 'package:fitness_social_app/features/user/presentation/pages/run_page.dart';
 import 'package:fitness_social_app/features/user/presentation/pages/workout_page.dart';
 import 'package:flutter/material.dart';
 
@@ -32,9 +33,13 @@ class FeedAppDrawer extends StatelessWidget {
                   MaterialPageRoute(builder: (_) => const WorkoutPage()),
                 ),
               ),
-              const _DrawerItem(
+              _DrawerItem(
                 icon: Icons.monitor_heart_outlined,
                 label: 'Runs',
+                onTap: () => Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => const RunPage()),
+                ),
               ),
               const _DrawerItem(icon: Icons.person_outline, label: 'Profile'),
               const _DrawerItem(icon: Icons.search, label: 'Search'),

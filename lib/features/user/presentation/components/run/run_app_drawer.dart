@@ -1,15 +1,16 @@
-import 'package:fitness_social_app/features/user/presentation/components/workout/workout_theme.dart';
+import 'package:fitness_social_app/features/user/presentation/components/run/run_theme.dart';
+import 'package:fitness_social_app/features/user/presentation/components/run/shared/run_avatar.dart';
 import 'package:fitness_social_app/features/user/presentation/pages/feed_page.dart';
-import 'package:fitness_social_app/features/user/presentation/pages/run_page.dart';
+import 'package:fitness_social_app/features/user/presentation/pages/workout_page.dart';
 import 'package:flutter/material.dart';
 
-class WorkoutAppDrawer extends StatelessWidget {
-  const WorkoutAppDrawer({super.key});
+class RunAppDrawer extends StatelessWidget {
+  const RunAppDrawer({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      backgroundColor: WorkoutTheme.background,
+      backgroundColor: RunTheme.background,
       child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(22, 20, 16, 18),
@@ -26,18 +27,18 @@ class WorkoutAppDrawer extends StatelessWidget {
                   MaterialPageRoute(builder: (_) => const FeedPage()),
                 ),
               ),
-              const _DrawerItem(
+              _DrawerItem(
                 icon: Icons.fitness_center,
                 label: 'Workouts',
-                active: true,
-              ),
-              _DrawerItem(
-                icon: Icons.monitor_heart_outlined,
-                label: 'Runs',
                 onTap: () => Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (_) => const RunPage()),
+                  MaterialPageRoute(builder: (_) => const WorkoutPage()),
                 ),
+              ),
+              const _DrawerItem(
+                icon: Icons.monitor_heart_outlined,
+                label: 'Runs',
+                active: true,
               ),
               const _DrawerItem(icon: Icons.person_outline, label: 'Profile'),
               const _DrawerItem(icon: Icons.search, label: 'Search'),
@@ -51,7 +52,7 @@ class WorkoutAppDrawer extends StatelessWidget {
                 height: 56,
                 child: FilledButton(
                   style: FilledButton.styleFrom(
-                    backgroundColor: WorkoutTheme.lime,
+                    backgroundColor: RunTheme.lime,
                     foregroundColor: Colors.black,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(28),
@@ -96,16 +97,12 @@ class _DrawerItem extends StatelessWidget {
         padding: const EdgeInsets.only(bottom: 26),
         child: Row(
           children: [
-            Icon(
-              icon,
-              color: active ? Colors.white : WorkoutTheme.muted,
-              size: 27,
-            ),
+            Icon(icon, color: active ? Colors.white : RunTheme.muted, size: 27),
             const SizedBox(width: 18),
             Text(
               label,
               style: TextStyle(
-                color: active ? Colors.white : WorkoutTheme.muted,
+                color: active ? Colors.white : RunTheme.muted,
                 fontSize: 18,
                 fontWeight: active ? FontWeight.w900 : FontWeight.w500,
               ),
@@ -128,7 +125,7 @@ class _DrawerLogo extends StatelessWidget {
           TextSpan(
             text: 'REP',
             style: TextStyle(
-              color: WorkoutTheme.lime,
+              color: RunTheme.lime,
               fontSize: 18,
               fontWeight: FontWeight.w900,
             ),
@@ -154,11 +151,7 @@ class _CurrentUserTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Row(
       children: [
-        CircleAvatar(
-          radius: 21,
-          backgroundColor: Color(0xFF151515),
-          child: Icon(Icons.person, color: WorkoutTheme.muted),
-        ),
+        RunAvatar(size: 42),
         SizedBox(width: 12),
         Expanded(
           child: Column(
@@ -175,12 +168,12 @@ class _CurrentUserTile extends StatelessWidget {
               Text(
                 '@Michel jarjoura',
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: WorkoutTheme.muted, fontSize: 12),
+                style: TextStyle(color: RunTheme.muted, fontSize: 12),
               ),
             ],
           ),
         ),
-        Icon(Icons.more_horiz, color: WorkoutTheme.muted),
+        Icon(Icons.more_horiz, color: RunTheme.muted),
       ],
     );
   }

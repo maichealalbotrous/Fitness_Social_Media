@@ -1,4 +1,5 @@
 import 'package:fitness_social_app/features/user/presentation/components/feed/feed_theme.dart';
+import 'package:fitness_social_app/features/user/presentation/pages/run_page.dart';
 import 'package:fitness_social_app/features/user/presentation/pages/workout_page.dart';
 import 'package:flutter/material.dart';
 
@@ -17,6 +18,12 @@ class FeedMobileNavigation extends StatelessWidget {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (_) => const WorkoutPage()),
+          );
+        }
+        if (index == 2) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const RunPage()),
           );
         }
       },
