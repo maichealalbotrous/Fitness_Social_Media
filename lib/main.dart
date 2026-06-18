@@ -1,4 +1,8 @@
+import 'package:fitness_social_app/features/user/presentation/components/shared/app_routes.dart';
 import 'package:fitness_social_app/features/user/presentation/pages/feed_page.dart';
+import 'package:fitness_social_app/features/user/presentation/pages/profile_page.dart';
+import 'package:fitness_social_app/features/user/presentation/pages/run_page.dart';
+import 'package:fitness_social_app/features/user/presentation/pages/workout_page.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
@@ -20,7 +24,13 @@ class FitnessSocialApp extends StatelessWidget {
         scaffoldBackgroundColor: const Color(0xFF030403),
         fontFamily: 'Arial',
       ),
-      home: const FeedPage(),
+      initialRoute: AppRoutes.feed,
+      routes: {
+        AppRoutes.feed: (_) => const FeedPage(),
+        AppRoutes.workouts: (_) => const WorkoutPage(),
+        AppRoutes.runs: (_) => const RunPage(),
+        AppRoutes.profile: (_) => const ProfilePage(),
+      },
     );
   }
 }

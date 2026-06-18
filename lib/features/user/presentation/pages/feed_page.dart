@@ -1,11 +1,11 @@
 import 'package:fitness_social_app/features/user/presentation/components/feed/activity_post_card.dart';
-import 'package:fitness_social_app/features/user/presentation/components/feed/feed_app_drawer.dart';
 import 'package:fitness_social_app/features/user/presentation/components/feed/feed_header.dart';
 import 'package:fitness_social_app/features/user/presentation/components/feed/feed_mobile_navigation.dart';
 import 'package:fitness_social_app/features/user/presentation/components/feed/feed_theme.dart';
 import 'package:fitness_social_app/features/user/presentation/components/feed/identity_card.dart';
 import 'package:fitness_social_app/features/user/presentation/components/feed/pr_post_card.dart';
 import 'package:fitness_social_app/features/user/presentation/components/feed/weekly_challenge_card.dart';
+import 'package:fitness_social_app/features/user/presentation/components/shared/app_sidebar.dart';
 import 'package:flutter/material.dart';
 
 class FeedPage extends StatelessWidget {
@@ -15,7 +15,7 @@ class FeedPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: FeedTheme.background,
-      drawer: const FeedAppDrawer(),
+      drawer: const AppSidebar(activeSection: AppSidebarSection.feed),
       bottomNavigationBar: const FeedMobileNavigation(),
       body: SafeArea(
         child: Scrollbar(

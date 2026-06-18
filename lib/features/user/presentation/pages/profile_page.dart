@@ -1,7 +1,7 @@
-import 'package:fitness_social_app/features/user/presentation/components/profile/profile_app_drawer.dart';
 import 'package:fitness_social_app/features/user/presentation/components/profile/profile_header_card.dart';
 import 'package:fitness_social_app/features/user/presentation/components/profile/profile_mobile_navigation.dart';
 import 'package:fitness_social_app/features/user/presentation/components/profile/profile_theme.dart';
+import 'package:fitness_social_app/features/user/presentation/components/shared/app_sidebar.dart';
 import 'package:flutter/material.dart';
 
 class ProfilePage extends StatelessWidget {
@@ -11,7 +11,7 @@ class ProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ProfileTheme.background,
-      drawer: const ProfileAppDrawer(),
+      drawer: const AppSidebar(activeSection: AppSidebarSection.profile),
       bottomNavigationBar: const ProfileMobileNavigation(),
       body: SafeArea(
         child: Scrollbar(

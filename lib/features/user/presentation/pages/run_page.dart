@@ -1,9 +1,9 @@
-import 'package:fitness_social_app/features/user/presentation/components/run/run_app_drawer.dart';
 import 'package:fitness_social_app/features/user/presentation/components/run/run_header.dart';
 import 'package:fitness_social_app/features/user/presentation/components/run/run_mobile_navigation.dart';
 import 'package:fitness_social_app/features/user/presentation/components/run/run_post_card.dart';
 import 'package:fitness_social_app/features/user/presentation/components/run/run_stats_grid.dart';
 import 'package:fitness_social_app/features/user/presentation/components/run/run_theme.dart';
+import 'package:fitness_social_app/features/user/presentation/components/shared/app_sidebar.dart';
 import 'package:flutter/material.dart';
 
 class RunPage extends StatelessWidget {
@@ -13,7 +13,7 @@ class RunPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: RunTheme.background,
-      drawer: const RunAppDrawer(),
+      drawer: const AppSidebar(activeSection: AppSidebarSection.runs),
       bottomNavigationBar: const RunMobileNavigation(),
       body: SafeArea(
         child: Scrollbar(

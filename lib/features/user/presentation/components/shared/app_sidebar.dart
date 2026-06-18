@@ -1,57 +1,55 @@
-import 'package:fitness_social_app/features/user/presentation/components/feed/feed_theme.dart';
-import 'package:fitness_social_app/features/user/presentation/components/feed/shared/avatar.dart';
-import 'package:fitness_social_app/features/user/presentation/pages/profile_page.dart';
-import 'package:fitness_social_app/features/user/presentation/pages/run_page.dart';
-import 'package:fitness_social_app/features/user/presentation/pages/workout_page.dart';
+import 'package:fitness_social_app/features/user/presentation/components/shared/app_routes.dart';
 import 'package:flutter/material.dart';
 
-class FeedAppDrawer extends StatelessWidget {
-  const FeedAppDrawer({super.key});
+enum AppSidebarSection { feed, workouts, runs, profile }
+
+class AppSidebar extends StatelessWidget {
+  const AppSidebar({required this.activeSection, super.key});
+
+  final AppSidebarSection activeSection;
+
+  static const _background = Color(0xFF030403);
+  static const _lime = Color(0xFFDFFF00);
+  static const _muted = Color(0xFF858585);
 
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      backgroundColor: FeedTheme.background,
+      backgroundColor: _background,
       child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(22, 20, 16, 18),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const _DrawerLogo(),
+              const _SidebarLogo(),
               const SizedBox(height: 42),
-              // الصورة: side_bar.png لكن هنا كـ Drawer مناسب للموبايل.
-              const _DrawerItem(
+              _SidebarItem(
                 icon: Icons.home_outlined,
                 label: 'Feed',
-                active: true,
+                active: activeSection == AppSidebarSection.feed,
+                routeName: AppRoutes.feed,
               ),
-              _DrawerItem(
+              _SidebarItem(
                 icon: Icons.fitness_center,
                 label: 'Workouts',
-                onTap: () => Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (_) => const WorkoutPage()),
-                ),
+                active: activeSection == AppSidebarSection.workouts,
+                routeName: AppRoutes.workouts,
               ),
-              _DrawerItem(
+              _SidebarItem(
                 icon: Icons.monitor_heart_outlined,
                 label: 'Runs',
-                onTap: () => Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (_) => const RunPage()),
-                ),
+                active: activeSection == AppSidebarSection.runs,
+                routeName: AppRoutes.runs,
               ),
-              _DrawerItem(
+              _SidebarItem(
                 icon: Icons.person_outline,
                 label: 'Profile',
-                onTap: () => Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (_) => const ProfilePage()),
-                ),
+                active: activeSection == AppSidebarSection.profile,
+                routeName: AppRoutes.profile,
               ),
-              const _DrawerItem(icon: Icons.search, label: 'Search'),
-              const _DrawerItem(
+              const _StaticSidebarItem(icon: Icons.search, label: 'Search'),
+              const _StaticSidebarItem(
                 icon: Icons.notifications_none,
                 label: 'Notifications',
               ),
@@ -61,7 +59,7 @@ class FeedAppDrawer extends StatelessWidget {
                 height: 56,
                 child: FilledButton(
                   style: FilledButton.styleFrom(
-                    backgroundColor: FeedTheme.lime,
+                    backgroundColor: _lime,
                     foregroundColor: Colors.black,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(28),
@@ -84,8 +82,51 @@ class FeedAppDrawer extends StatelessWidget {
   }
 }
 
-class _DrawerItem extends StatelessWidget {
-  const _DrawerItem({
+class _SidebarItem extends StatelessWidget {
+  const _SidebarItem({
+    required this.icon,
+    required this.label,
+    required this.active,
+    required this.routeName,
+  });
+
+  final IconData icon;
+  final String label;
+  final bool active;
+  final String routeName;
+
+  @override
+  Widget build(BuildContext context) {
+    return _SidebarItemShell(
+      icon: icon,
+      label: label,
+      active: active,
+      onTap: () {
+        if (active) {
+          Navigator.pop(context);
+          return;
+        }
+
+        Navigator.pushReplacementNamed(context, routeName);
+      },
+    );
+  }
+}
+
+class _StaticSidebarItem extends StatelessWidget {
+  const _StaticSidebarItem({required this.icon, required this.label});
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return _SidebarItemShell(icon: icon, label: label);
+  }
+}
+
+class _SidebarItemShell extends StatelessWidget {
+  const _SidebarItemShell({
     required this.icon,
     required this.label,
     this.active = false,
@@ -108,14 +149,14 @@ class _DrawerItem extends StatelessWidget {
           children: [
             Icon(
               icon,
-              color: active ? Colors.white : FeedTheme.muted,
+              color: active ? Colors.white : AppSidebar._muted,
               size: 27,
             ),
             const SizedBox(width: 18),
             Text(
               label,
               style: TextStyle(
-                color: active ? Colors.white : FeedTheme.muted,
+                color: active ? Colors.white : AppSidebar._muted,
                 fontSize: 18,
                 fontWeight: active ? FontWeight.w900 : FontWeight.w500,
               ),
@@ -127,8 +168,8 @@ class _DrawerItem extends StatelessWidget {
   }
 }
 
-class _DrawerLogo extends StatelessWidget {
-  const _DrawerLogo();
+class _SidebarLogo extends StatelessWidget {
+  const _SidebarLogo();
 
   @override
   Widget build(BuildContext context) {
@@ -138,7 +179,7 @@ class _DrawerLogo extends StatelessWidget {
           TextSpan(
             text: 'REP',
             style: TextStyle(
-              color: FeedTheme.lime,
+              color: AppSidebar._lime,
               fontSize: 18,
               fontWeight: FontWeight.w900,
             ),
@@ -164,14 +205,18 @@ class _CurrentUserTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Row(
       children: [
-        FeedAvatar(size: 42),
+        CircleAvatar(
+          radius: 21,
+          backgroundColor: Color(0xFF151515),
+          child: Icon(Icons.person, color: AppSidebar._muted),
+        ),
         SizedBox(width: 12),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Michel Jarjoura',
+                'Michael alboutros',
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   color: Colors.white,
@@ -179,14 +224,14 @@ class _CurrentUserTile extends StatelessWidget {
                 ),
               ),
               Text(
-                '@Michel jarjoura',
+                '@Michael alboutros',
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: FeedTheme.muted, fontSize: 12),
+                style: TextStyle(color: AppSidebar._muted, fontSize: 12),
               ),
             ],
           ),
         ),
-        Icon(Icons.more_horiz, color: FeedTheme.muted),
+        Icon(Icons.more_horiz, color: AppSidebar._muted),
       ],
     );
   }

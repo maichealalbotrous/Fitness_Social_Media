@@ -4,9 +4,9 @@ import 'package:fitness_social_app/features/user/presentation/components/workout
 import 'package:fitness_social_app/features/user/presentation/components/workout/progression_card.dart';
 import 'package:fitness_social_app/features/user/presentation/components/workout/training_consistency_card.dart';
 import 'package:fitness_social_app/features/user/presentation/components/workout/volume_intensity_card.dart';
-import 'package:fitness_social_app/features/user/presentation/components/workout/workout_app_drawer.dart';
 import 'package:fitness_social_app/features/user/presentation/components/workout/workout_mobile_navigation.dart';
 import 'package:fitness_social_app/features/user/presentation/components/workout/workout_theme.dart';
+import 'package:fitness_social_app/features/user/presentation/components/shared/app_sidebar.dart';
 import 'package:flutter/material.dart';
 
 class WorkoutPage extends StatelessWidget {
@@ -16,7 +16,7 @@ class WorkoutPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: WorkoutTheme.background,
-      drawer: const WorkoutAppDrawer(),
+      drawer: const AppSidebar(activeSection: AppSidebarSection.workouts),
       bottomNavigationBar: const WorkoutMobileNavigation(),
       body: SafeArea(
         child: Scrollbar(
