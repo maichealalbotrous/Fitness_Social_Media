@@ -1,22 +1,22 @@
-import 'package:fitness_social_app/features/user/presentation/components/feed/feed_theme.dart';
-import 'package:fitness_social_app/features/user/presentation/pages/workout_page.dart';
+import 'package:fitness_social_app/features/user/presentation/components/workout/workout_theme.dart';
+import 'package:fitness_social_app/features/user/presentation/pages/feed_page.dart';
 import 'package:flutter/material.dart';
 
-class FeedMobileNavigation extends StatelessWidget {
-  const FeedMobileNavigation({super.key});
+class WorkoutMobileNavigation extends StatelessWidget {
+  const WorkoutMobileNavigation({super.key});
 
   @override
   Widget build(BuildContext context) {
     return NavigationBar(
       height: 68,
-      backgroundColor: FeedTheme.panelDark,
-      indicatorColor: FeedTheme.lime.withValues(alpha: 0.16),
-      selectedIndex: 0,
+      backgroundColor: WorkoutTheme.panelDark,
+      indicatorColor: WorkoutTheme.lime.withValues(alpha: 0.16),
+      selectedIndex: 1,
       onDestinationSelected: (index) {
-        if (index == 1) {
+        if (index == 0) {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (_) => const WorkoutPage()),
+            MaterialPageRoute(builder: (_) => const FeedPage()),
           );
         }
       },

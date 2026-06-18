@@ -18,26 +18,29 @@ class FeedPage extends StatelessWidget {
       drawer: const FeedAppDrawer(),
       bottomNavigationBar: const FeedMobileNavigation(),
       body: SafeArea(
-        child: CustomScrollView(
-          slivers: [
-            SliverAppBar(
-              pinned: true,
-              backgroundColor: FeedTheme.background,
-              surfaceTintColor: Colors.transparent,
-              leading: Builder(
-                builder: (context) => IconButton(
-                  icon: const Icon(Icons.menu, color: Colors.white),
-                  onPressed: () => Scaffold.of(context).openDrawer(),
+        child: Scrollbar(
+          child: CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            slivers: [
+              SliverAppBar(
+                pinned: true,
+                backgroundColor: FeedTheme.background,
+                surfaceTintColor: Colors.transparent,
+                leading: Builder(
+                  builder: (context) => IconButton(
+                    icon: const Icon(Icons.menu, color: Colors.white),
+                    onPressed: () => Scaffold.of(context).openDrawer(),
+                  ),
                 ),
+                title: const _MobileLogo(),
+                centerTitle: false,
               ),
-              title: const _MobileLogo(),
-              centerTitle: false,
-            ),
-            const SliverPadding(
-              padding: EdgeInsets.fromLTRB(18, 18, 18, 28),
-              sliver: SliverToBoxAdapter(child: _FeedContent()),
-            ),
-          ],
+              const SliverPadding(
+                padding: EdgeInsets.fromLTRB(18, 18, 18, 120),
+                sliver: SliverToBoxAdapter(child: _FeedContent()),
+              ),
+            ],
+          ),
         ),
       ),
     );
