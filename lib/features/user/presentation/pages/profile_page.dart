@@ -1,45 +1,118 @@
+import 'package:flutter/material.dart';
+
+import 'package:fitness_social_app/features/follows/presentation/controllers/follow_controller.dart';
+import 'package:fitness_social_app/features/follows/presentation/follows_dependencies.dart';
+import 'package:fitness_social_app/features/follows/presentation/pages/follow_list_page.dart';
 import 'package:fitness_social_app/features/user/presentation/components/profile/profile_header_card.dart';
 import 'package:fitness_social_app/features/user/presentation/components/profile/profile_mobile_navigation.dart';
 import 'package:fitness_social_app/features/user/presentation/components/profile/profile_theme.dart';
 import 'package:fitness_social_app/features/user/presentation/components/shared/app_sidebar.dart';
-import 'package:flutter/material.dart';
 
-class ProfilePage extends StatelessWidget {
-  const ProfilePage({super.key});
+class ProfilePage extends StatefulWidget {
+  const ProfilePage({this.targetUserId, super.key});
+
+  final String? targetUserId;
+
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  late final FollowController _followController;
+  bool _isFollowing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _followController = FollowsDependencies.createController();
+    _followController.loadFollowers();
+    _followController.loadFollowing();
+  }
+
+  @override
+  void dispose() {
+    _followController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: ProfileTheme.background,
-      drawer: const AppSidebar(activeSection: AppSidebarSection.profile),
-      bottomNavigationBar: const ProfileMobileNavigation(),
-      body: SafeArea(
-        child: Scrollbar(
-          child: CustomScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            slivers: [
-              SliverAppBar(
-                pinned: true,
-                backgroundColor: ProfileTheme.background,
-                surfaceTintColor: Colors.transparent,
-                leading: Builder(
-                  builder: (context) => IconButton(
-                    icon: const Icon(Icons.menu, color: Colors.white),
-                    onPressed: () => Scaffold.of(context).openDrawer(),
+    return AnimatedBuilder(
+      animation: _followController,
+      builder: (context, _) {
+        return Scaffold(
+          backgroundColor: ProfileTheme.background,
+          drawer: const AppSidebar(activeSection: AppSidebarSection.profile),
+          bottomNavigationBar: const ProfileMobileNavigation(),
+          body: SafeArea(
+            child: RefreshIndicator(
+              color: ProfileTheme.lime,
+              onRefresh: _reload,
+              child: CustomScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                slivers: [
+                  SliverAppBar(
+                    pinned: true,
+                    backgroundColor: ProfileTheme.background,
+                    surfaceTintColor: Colors.transparent,
+                    leading: Builder(
+                      builder: (context) => IconButton(
+                        icon: const Icon(Icons.menu, color: Colors.white),
+                        onPressed: () => Scaffold.of(context).openDrawer(),
+                      ),
+                    ),
+                    title: const _ProfileLogo(),
+                    centerTitle: false,
                   ),
-                ),
-                title: const _ProfileLogo(),
-                centerTitle: false,
+                  SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(18, 0, 18, 120),
+                    sliver: SliverToBoxAdapter(
+                      child: ProfileHeaderCard(
+                        followersCount: _followController.followers.length,
+                        followingCount: _followController.following.length,
+                        onFollowersTap: () => _openList(FollowListType.followers),
+                        onFollowingTap: () => _openList(FollowListType.following),
+                        onFollowTap: widget.targetUserId == null ? null : _toggleFollow,
+                        isFollowing: _isFollowing,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              const SliverPadding(
-                padding: EdgeInsets.fromLTRB(18, 0, 18, 120),
-                sliver: SliverToBoxAdapter(child: ProfileHeaderCard()),
-              ),
-            ],
+            ),
           ),
-        ),
+        );
+      },
+    );
+  }
+
+  Future<void> _toggleFollow() async {
+    final targetUserId = widget.targetUserId;
+    if (targetUserId == null) return;
+    final status = await _followController.toggle(targetUserId);
+    if (!mounted || status == null) return;
+    setState(() => _isFollowing = status.isFollowing);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(status.message)),
+    );
+  }
+
+  Future<void> _reload() async {
+    await Future.wait([
+      _followController.loadFollowers(),
+      _followController.loadFollowing(),
+    ]);
+  }
+
+  Future<void> _openList(FollowListType type) async {
+    final controller = FollowsDependencies.createController();
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => FollowListPage(type: type, controller: controller),
       ),
     );
+    controller.dispose();
+    await _reload();
   }
 }
 

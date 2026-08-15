@@ -2,7 +2,22 @@ import 'package:fitness_social_app/features/user/presentation/components/profile
 import 'package:flutter/material.dart';
 
 class ProfileHeaderCard extends StatelessWidget {
-  const ProfileHeaderCard({super.key});
+  const ProfileHeaderCard({
+    this.followersCount = 0,
+    this.followingCount = 0,
+    this.onFollowersTap,
+    this.onFollowingTap,
+    this.onFollowTap,
+    this.isFollowing = false,
+    super.key,
+  });
+
+  final int followersCount;
+  final int followingCount;
+  final VoidCallback? onFollowersTap;
+  final VoidCallback? onFollowingTap;
+  final VoidCallback? onFollowTap;
+  final bool isFollowing;
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +30,14 @@ class ProfileHeaderCard extends StatelessWidget {
             const _ProfileCover(),
             Transform.translate(
               offset: const Offset(0, -56),
-              child: const _ProfileInfo(),
+              child: _ProfileInfo(
+                followersCount: followersCount,
+                followingCount: followingCount,
+                onFollowersTap: onFollowersTap,
+                onFollowingTap: onFollowingTap,
+                onFollowTap: onFollowTap,
+                isFollowing: isFollowing,
+              ),
             ),
           ],
         ),
@@ -45,7 +67,21 @@ class _ProfileCover extends StatelessWidget {
 }
 
 class _ProfileInfo extends StatelessWidget {
-  const _ProfileInfo();
+  const _ProfileInfo({
+    required this.followersCount,
+    required this.followingCount,
+    this.onFollowersTap,
+    this.onFollowingTap,
+    this.onFollowTap,
+    required this.isFollowing,
+  });
+
+  final int followersCount;
+  final int followingCount;
+  final VoidCallback? onFollowersTap;
+  final VoidCallback? onFollowingTap;
+  final VoidCallback? onFollowTap;
+  final bool isFollowing;
 
   @override
   Widget build(BuildContext context) {
@@ -54,16 +90,19 @@ class _ProfileInfo extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              _ProfileAvatar(),
-              Spacer(),
-              _CircleAction(icon: Icons.share_outlined),
-              SizedBox(width: 10),
-              _CircleAction(icon: Icons.settings_outlined),
-              SizedBox(width: 12),
-              _EditProfileButton(),
+              const _ProfileAvatar(),
+              const Spacer(),
+              const _CircleAction(icon: Icons.share_outlined),
+              const SizedBox(width: 10),
+              const _CircleAction(icon: Icons.settings_outlined),
+              const SizedBox(width: 12),
+              if (onFollowTap != null)
+                _FollowButton(isFollowing: isFollowing, onPressed: onFollowTap!)
+              else
+                const _EditProfileButton(),
             ],
           ),
           const SizedBox(height: 36),
@@ -112,11 +151,19 @@ class _ProfileInfo extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 24),
-          const Row(
+          Row(
             children: [
-              _FollowMetric(value: '1.2k', label: 'Followers'),
-              SizedBox(width: 28),
-              _FollowMetric(value: '428', label: 'Following'),
+              _FollowMetric(
+                value: followersCount.toString(),
+                label: 'Followers',
+                onTap: onFollowersTap,
+              ),
+              const SizedBox(width: 28),
+              _FollowMetric(
+                value: followingCount.toString(),
+                label: 'Following',
+                onTap: onFollowingTap,
+              ),
             ],
           ),
           const SizedBox(height: 28),
@@ -222,14 +269,18 @@ class _MetaItem extends StatelessWidget {
 }
 
 class _FollowMetric extends StatelessWidget {
-  const _FollowMetric({required this.value, required this.label});
+  const _FollowMetric({required this.value, required this.label, this.onTap});
 
   final String value;
   final String label;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return RichText(
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: RichText(
       text: TextSpan(
         children: [
           TextSpan(
@@ -249,6 +300,34 @@ class _FollowMetric extends StatelessWidget {
             ),
           ),
         ],
+      ),
+      ),
+    );
+  }
+}
+
+class _FollowButton extends StatelessWidget {
+  const _FollowButton({required this.isFollowing, required this.onPressed});
+
+  final bool isFollowing;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 40,
+      child: FilledButton(
+        onPressed: onPressed,
+        style: FilledButton.styleFrom(
+          backgroundColor: isFollowing ? ProfileTheme.panel : ProfileTheme.lime,
+          foregroundColor: isFollowing ? Colors.white : Colors.black,
+          side: isFollowing ? const BorderSide(color: ProfileTheme.border) : null,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+        ),
+        child: Text(
+          isFollowing ? 'Following' : 'Follow',
+          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w900),
+        ),
       ),
     );
   }
