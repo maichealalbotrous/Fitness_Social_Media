@@ -1,6 +1,7 @@
 import 'package:fitness_social_app/core/storage/session_storage.dart';
 import 'package:fitness_social_app/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:fitness_social_app/features/auth/domain/entities/auth_credentials.dart';
+import 'package:fitness_social_app/features/auth/domain/entities/password_reset_credentials.dart';
 import 'package:fitness_social_app/features/auth/domain/repositories/auth_repository.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
@@ -33,5 +34,20 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<String> register(RegisterCredentials credentials) {
     return _remoteDataSource.register(credentials);
+  }
+
+  @override
+  Future<String> requestPasswordReset(String email) {
+    return _remoteDataSource.requestPasswordReset(email);
+  }
+
+  @override
+  Future<String> resetPassword(PasswordResetCredentials credentials) {
+    return _remoteDataSource.resetPassword(credentials);
+  }
+
+  @override
+  Future<String> verifyEmail(String token) {
+    return _remoteDataSource.verifyEmail(token);
   }
 }

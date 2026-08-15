@@ -1,5 +1,8 @@
 import 'package:fitness_social_app/features/auth/presentation/pages/auth_gate.dart';
 import 'package:fitness_social_app/features/auth/presentation/pages/auth_page.dart';
+import 'package:fitness_social_app/features/auth/presentation/pages/forgot_password_page.dart';
+import 'package:fitness_social_app/features/auth/presentation/pages/reset_password_page.dart';
+import 'package:fitness_social_app/features/auth/presentation/pages/verify_email_page.dart';
 import 'package:fitness_social_app/features/user/presentation/components/shared/app_routes.dart';
 import 'package:fitness_social_app/features/user/presentation/pages/feed_page.dart';
 import 'package:fitness_social_app/features/user/presentation/pages/profile_page.dart';
@@ -29,6 +32,9 @@ class FitnessSocialApp extends StatelessWidget {
       home: const AuthGate(),
       routes: {
         AppRoutes.auth: (_) => const AuthPage(),
+        AppRoutes.forgotPassword: (_) => const ForgotPasswordPage(),
+        AppRoutes.resetPassword: (_) => const ResetPasswordPage(),
+        AppRoutes.verifyEmail: (_) => const VerifyEmailPage(),
         AppRoutes.feed: (_) => const FeedPage(),
         AppRoutes.workouts: (_) => const WorkoutPage(),
         AppRoutes.runs: (_) => const RunPage(),

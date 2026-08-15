@@ -4,7 +4,9 @@ import 'package:fitness_social_app/features/auth/presentation/controllers/auth_c
 import 'package:fitness_social_app/features/auth/presentation/validation/auth_validators.dart';
 import 'package:fitness_social_app/features/auth/presentation/widgets/auth_status_message.dart';
 import 'package:fitness_social_app/features/auth/presentation/widgets/auth_text_field.dart';
+import 'package:fitness_social_app/features/auth/presentation/widgets/password_visibility_button.dart';
 import 'package:fitness_social_app/features/auth/presentation/widgets/auth_theme.dart';
+import 'package:fitness_social_app/features/user/presentation/components/shared/app_routes.dart';
 
 class AuthForm extends StatefulWidget {
   const AuthForm({
@@ -117,7 +119,7 @@ class _AuthFormState extends State<AuthForm> {
                     ? AutofillHints.newPassword
                     : AutofillHints.password,
               ],
-              suffixIcon: _VisibilityButton(
+              suffixIcon: PasswordVisibilityButton(
                 isObscured: _obscurePassword,
                 onPressed: () {
                   setState(() => _obscurePassword = !_obscurePassword);
@@ -130,6 +132,19 @@ class _AuthFormState extends State<AuthForm> {
                 }
               },
             ),
+            if (!_isRegistering)
+              Align(
+                alignment: AlignmentDirectional.centerEnd,
+                child: TextButton(
+                  onPressed: isSubmitting
+                      ? null
+                      : () => Navigator.of(context).pushNamed(
+                            AppRoutes.forgotPassword,
+                          ),
+                  style: TextButton.styleFrom(foregroundColor: AuthTheme.lime),
+                  child: const Text('هل نسيت كلمة المرور؟'),
+                ),
+              ),
             if (_isRegistering) ...[
               const SizedBox(height: 14),
               AuthTextField(
@@ -138,7 +153,7 @@ class _AuthFormState extends State<AuthForm> {
                 icon: Icons.lock_reset_outlined,
                 obscureText: _obscureConfirmation,
                 textInputAction: TextInputAction.done,
-                suffixIcon: _VisibilityButton(
+                suffixIcon: PasswordVisibilityButton(
                   isObscured: _obscureConfirmation,
                   onPressed: () {
                     setState(
@@ -202,6 +217,18 @@ class _AuthFormState extends State<AuthForm> {
                 ),
               ],
             ),
+            if (!_isRegistering)
+              Center(
+                child: TextButton(
+                  onPressed: isSubmitting
+                      ? null
+                      : () => Navigator.of(context).pushNamed(
+                            AppRoutes.verifyEmail,
+                          ),
+                  style: TextButton.styleFrom(foregroundColor: AuthTheme.lime),
+                  child: const Text('لديك رمز التحقق؟ فعّل بريدك الإلكتروني'),
+                ),
+              ),
           ],
         ),
       ),
@@ -229,24 +256,5 @@ class _AuthFormState extends State<AuthForm> {
   void _switchMode() {
     widget.controller.switchMode();
     _formKey.currentState?.reset();
-  }
-}
-
-class _VisibilityButton extends StatelessWidget {
-  const _VisibilityButton({required this.isObscured, required this.onPressed});
-
-  final bool isObscured;
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return IconButton(
-      onPressed: onPressed,
-      tooltip: isObscured ? 'إظهار كلمة المرور' : 'إخفاء كلمة المرور',
-      icon: Icon(
-        isObscured ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-        color: AuthTheme.textMuted,
-      ),
-    );
   }
 }
