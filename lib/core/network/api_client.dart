@@ -46,13 +46,42 @@ class ApiClient {
       return decodedBody;
     }
 
-    final message = decodedBody['message'];
     throw ApiException(
       statusCode: response.statusCode,
-      message: message is String && message.isNotEmpty
-          ? message
-          : 'تعذر إتمام الطلب. حاول مرة أخرى.',
+      message: _readErrorMessage(decodedBody),
     );
+  }
+
+  String _readErrorMessage(Map<String, dynamic> response) {
+    final directMessage = response['message'];
+    if (directMessage is String && directMessage.isNotEmpty) {
+      return directMessage;
+    }
+
+    final validationErrors = response['errors'];
+    if (validationErrors is Map<String, dynamic>) {
+      final messages = validationErrors.values
+          .expand((value) => value is List ? value : <dynamic>[value])
+          .whereType<String>()
+          .where((message) => message.isNotEmpty)
+          .toList();
+
+      if (messages.isNotEmpty) {
+        return messages.join('\n');
+      }
+    }
+
+    final detail = response['detail'];
+    if (detail is String && detail.isNotEmpty) {
+      return detail;
+    }
+
+    final title = response['title'];
+    if (title is String && title.isNotEmpty) {
+      return title;
+    }
+
+    return 'تعذر إتمام الطلب. حاول مرة أخرى.';
   }
 
   Map<String, dynamic> _decodeBody(String body) {
