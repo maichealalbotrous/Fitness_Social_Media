@@ -1,3 +1,5 @@
+import 'package:fitness_social_app/features/auth/presentation/pages/auth_gate.dart';
+import 'package:fitness_social_app/features/auth/presentation/pages/auth_page.dart';
 import 'package:fitness_social_app/features/user/presentation/components/shared/app_routes.dart';
 import 'package:fitness_social_app/features/user/presentation/pages/feed_page.dart';
 import 'package:fitness_social_app/features/user/presentation/pages/profile_page.dart';
@@ -24,8 +26,9 @@ class FitnessSocialApp extends StatelessWidget {
         scaffoldBackgroundColor: const Color(0xFF030403),
         fontFamily: 'Arial',
       ),
-      initialRoute: AppRoutes.feed,
+      home: const AuthGate(),
       routes: {
+        AppRoutes.auth: (_) => const AuthPage(),
         AppRoutes.feed: (_) => const FeedPage(),
         AppRoutes.workouts: (_) => const WorkoutPage(),
         AppRoutes.runs: (_) => const RunPage(),

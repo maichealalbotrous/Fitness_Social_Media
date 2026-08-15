@@ -1,20 +1,13 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
+import 'package:fitness_social_app/features/auth/presentation/pages/auth_page.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:fitness_social_app/main.dart';
-
 void main() {
-  testWidgets('Feed page smoke test', (WidgetTester tester) async {
-    await tester.pumpWidget(const FitnessSocialApp());
+  testWidgets('shows the login form by default', (WidgetTester tester) async {
+    await tester.pumpWidget(const MaterialApp(home: AuthPage()));
 
-    expect(find.text('FEED'), findsOneWidget);
-    expect(find.text('Marcus Thorne'), findsOneWidget);
-    expect(find.text('140 KG'), findsOneWidget);
+    expect(find.text('مرحباً بعودتك'), findsOneWidget);
+    expect(find.text('تسجيل الدخول'), findsOneWidget);
+    expect(find.text('أنشئ حساباً'), findsOneWidget);
   });
 }
