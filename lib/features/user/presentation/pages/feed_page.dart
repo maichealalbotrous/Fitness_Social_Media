@@ -194,7 +194,11 @@ class _FeedContent extends StatelessWidget {
                 currentUserAvatar: currentUserAvatar,
                 onAuthorTap: post.authorId == currentUserId
                     ? null
-                    : () => _openAuthorProfile(context, post.authorId),
+                    : () => _openAuthorProfile(
+                        context,
+                        post.authorId,
+                        post.authorName,
+                      ),
                 onComment: () => Navigator.of(context).push(
                   MaterialPageRoute<void>(
                     builder: (_) => PostDetailsPage(post: post),
@@ -211,10 +215,17 @@ class _FeedContent extends StatelessWidget {
     );
   }
 
-  void _openAuthorProfile(BuildContext context, String userId) {
+  void _openAuthorProfile(
+    BuildContext context,
+    String userId,
+    String? displayName,
+  ) {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => ProfilePage(targetUserId: userId),
+        builder: (_) => ProfilePage(
+          targetUserId: userId,
+          targetDisplayName: displayName,
+        ),
       ),
     );
   }

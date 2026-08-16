@@ -213,7 +213,7 @@ class _CommentTile extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            _commentAuthor(comment.authorId),
+            _commentAuthor(comment),
             style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.w800,
@@ -235,9 +235,13 @@ class _CommentTile extends StatelessWidget {
   }
 }
 
-String _commentAuthor(String authorId) {
-  if (authorId.isEmpty) return 'Repflow athlete';
-  final suffix = authorId.length > 8 ? authorId.substring(0, 8) : authorId;
+String _commentAuthor(Comment comment) {
+  final authorName = comment.authorName;
+  if (authorName != null && authorName.isNotEmpty) return authorName;
+  if (comment.authorId.isEmpty) return 'Repflow athlete';
+  final suffix = comment.authorId.length > 8
+      ? comment.authorId.substring(0, 8)
+      : comment.authorId;
   return 'Athlete $suffix';
 }
 

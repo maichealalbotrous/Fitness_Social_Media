@@ -12,9 +12,10 @@ import 'package:fitness_social_app/features/user/presentation/components/profile
 import 'package:fitness_social_app/features/user/presentation/components/shared/app_sidebar.dart';
 
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({this.targetUserId, super.key});
+  const ProfilePage({this.targetUserId, this.targetDisplayName, super.key});
 
   final String? targetUserId;
+  final String? targetDisplayName;
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -118,7 +119,9 @@ class _ProfilePageState extends State<ProfilePage> {
     if (widget.targetUserId == null) {
       return _profileController?.displayName ?? 'Repflow athlete';
     }
-    return 'Athlete ${_shortId(widget.targetUserId!)}';
+    return widget.targetDisplayName?.trim().isNotEmpty == true
+        ? widget.targetDisplayName!.trim()
+        : 'Athlete ${_shortId(widget.targetUserId!)}';
   }
 
   String get _profileEmail {

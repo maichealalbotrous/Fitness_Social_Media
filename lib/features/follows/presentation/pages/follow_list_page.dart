@@ -37,10 +37,13 @@ class _FollowListPageState extends State<FollowListPage> {
     super.dispose();
   }
 
-  void _openUserProfile(String userId) {
+  void _openUserProfile(FollowUser user) {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => ProfilePage(targetUserId: userId),
+        builder: (_) => ProfilePage(
+          targetUserId: user.userId,
+          targetDisplayName: user.username,
+        ),
       ),
     );
   }
@@ -100,7 +103,7 @@ class _ListBody extends StatelessWidget {
   final bool isLoading;
   final String? errorMessage;
   final Future<void> Function() onRetry;
-  final ValueChanged<String> onUserTap;
+  final ValueChanged<FollowUser> onUserTap;
 
   @override
   Widget build(BuildContext context) {
@@ -131,7 +134,7 @@ class _ListBody extends StatelessWidget {
       separatorBuilder: (_, _) => const SizedBox(height: 10),
       itemBuilder: (_, index) => _FollowUserTile(
         user: users[index],
-        onTap: () => onUserTap(users[index].userId),
+        onTap: () => onUserTap(users[index]),
       ),
     );
   }

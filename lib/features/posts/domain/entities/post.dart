@@ -2,6 +2,7 @@ class Post {
   const Post({
     required this.id,
     required this.authorId,
+    this.authorName,
     required this.content,
     required this.mediaUrls,
     required this.likesCount,
@@ -13,6 +14,7 @@ class Post {
 
   final String id;
   final String authorId;
+  final String? authorName;
   final String content;
   final List<String> mediaUrls;
   final int likesCount;
@@ -22,6 +24,7 @@ class Post {
   final String? communityId;
 
   Post copyWith({
+    String? authorName,
     int? likesCount,
     int? commentsCount,
     bool? isLikedByCurrentUser,
@@ -29,6 +32,7 @@ class Post {
     return Post(
       id: id,
       authorId: authorId,
+      authorName: authorName ?? this.authorName,
       content: content,
       mediaUrls: mediaUrls,
       likesCount: likesCount ?? this.likesCount,
@@ -46,6 +50,7 @@ class Comment {
     required this.id,
     required this.postId,
     required this.authorId,
+    this.authorName,
     required this.content,
     required this.createdAt,
     this.parentCommentId,
@@ -54,6 +59,7 @@ class Comment {
   final String id;
   final String postId;
   final String authorId;
+  final String? authorName;
   final String content;
   final DateTime createdAt;
   final String? parentCommentId;

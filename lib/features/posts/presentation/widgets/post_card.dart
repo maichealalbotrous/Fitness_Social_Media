@@ -34,7 +34,7 @@ class PostCard extends StatelessWidget {
         children: [
           PostHeader(
             name: _authorLabel(
-              post.authorId,
+              post,
               currentUserId: currentUserId,
               currentUserName: currentUserName,
             ),
@@ -127,17 +127,25 @@ class _MediaPlaceholder extends StatelessWidget {
 }
 
 String _authorLabel(
-  String authorId, {
+  Post post, {
   String? currentUserId,
   String? currentUserName,
 }) {
-  if (currentUserId != null && authorId == currentUserId && currentUserName != null) {
+  if (currentUserId != null &&
+      post.authorId == currentUserId &&
+      currentUserName != null) {
     return currentUserName;
   }
-  if (authorId.isEmpty) {
+  final authorName = post.authorName;
+  if (authorName != null && authorName.isNotEmpty) {
+    return authorName;
+  }
+  if (post.authorId.isEmpty) {
     return 'Repflow athlete';
   }
-  final suffix = authorId.length > 8 ? authorId.substring(0, 8) : authorId;
+  final suffix = post.authorId.length > 8
+      ? post.authorId.substring(0, 8)
+      : post.authorId;
   return 'Athlete $suffix';
 }
 
