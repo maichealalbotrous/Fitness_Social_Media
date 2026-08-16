@@ -36,7 +36,6 @@ class PostsController extends ChangeNotifier {
   bool _isLoadingComments = false;
 
   List<Post> _posts = const <Post>[];
-  final Set<String> _likedPostIds = <String>{};
   bool _isLoading = false;
   String? _errorMessage;
 
@@ -52,18 +51,9 @@ class PostsController extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final loadedPosts = followingOnly
-          ? await _getFeedPosts()
-          : await _getAllPosts();
-      _posts = loadedPosts.map((post) {
-        if (post.isLikedByCurrentUser) {
-          _likedPostIds.add(post.id);
-        }
-        return post.copyWith(
-          isLikedByCurrentUser:
-              post.isLikedByCurrentUser || _likedPostIds.contains(post.id),
-        );
-      }).toList(growable: false);
+      // The personalized feed is the endpoint that includes
+      // isLikedByCurrentUser for the authenticated account.
+      _posts = await _getFeedPosts();
     } on ApiException catch (exception) {
       _errorMessage = exception.message;
     } catch (_) {
@@ -115,11 +105,6 @@ class PostsController extends ChangeNotifier {
   Future<Post?> toggleLike(Post post) async {
     try {
       final isLiked = await _togglePostLike(post.id);
-      if (isLiked) {
-        _likedPostIds.add(post.id);
-      } else {
-        _likedPostIds.remove(post.id);
-      }
       final countDelta = isLiked == post.isLikedByCurrentUser
           ? 0
           : isLiked
