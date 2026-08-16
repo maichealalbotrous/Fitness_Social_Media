@@ -1,5 +1,6 @@
 import 'package:fitness_social_app/features/user/presentation/components/feed/feed_theme.dart';
 import 'package:fitness_social_app/features/user/presentation/components/feed/shared/avatar.dart';
+import 'package:fitness_social_app/features/user/presentation/components/shared/local_profile_avatar.dart';
 import 'package:flutter/material.dart';
 
 class PostShell extends StatelessWidget {
@@ -31,12 +32,14 @@ class PostHeader extends StatelessWidget {
     required this.name,
     required this.subtitle,
     this.action,
+    this.avatarBase64,
     super.key,
   });
 
   final String name;
   final String subtitle;
   final Widget? action;
+  final String? avatarBase64;
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +49,12 @@ class PostHeader extends StatelessWidget {
       color: FeedTheme.panel,
       child: Row(
         children: [
-          const FeedAvatar(size: 42),
+          avatarBase64 == null
+              ? const FeedAvatar(size: 42)
+              : LocalProfileAvatar(
+                  radius: 21,
+                  base64Image: avatarBase64,
+                ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(

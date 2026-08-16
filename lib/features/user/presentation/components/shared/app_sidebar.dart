@@ -1,6 +1,11 @@
 import 'package:fitness_social_app/features/user/presentation/components/shared/app_routes.dart';
 import 'package:flutter/material.dart';
 
+import 'package:fitness_social_app/core/storage/session_storage.dart';
+import 'package:fitness_social_app/features/user/data/local_profile_storage.dart';
+import 'package:fitness_social_app/features/user/presentation/controllers/local_profile_controller.dart';
+import 'package:fitness_social_app/features/user/presentation/components/shared/local_profile_avatar.dart';
+
 enum AppSidebarSection { feed, workouts, runs, profile }
 
 class AppSidebar extends StatelessWidget {
@@ -198,40 +203,72 @@ class _SidebarLogo extends StatelessWidget {
   }
 }
 
-class _CurrentUserTile extends StatelessWidget {
+class _CurrentUserTile extends StatefulWidget {
   const _CurrentUserTile();
 
   @override
+  State<_CurrentUserTile> createState() => _CurrentUserTileState();
+}
+
+class _CurrentUserTileState extends State<_CurrentUserTile> {
+  LocalProfileController? _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _initialize();
+  }
+
+  Future<void> _initialize() async {
+    final profileStorage = await LocalProfileStorage.create();
+    final controller = LocalProfileController(
+      sessionStorage: SecureSessionStorage(),
+      profileStorage: profileStorage,
+    );
+    await controller.load();
+    if (!mounted) {
+      controller.dispose();
+      return;
+    }
+    setState(() => _controller = controller);
+  }
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return const Row(
+    final displayName = _controller?.displayName ?? 'Repflow athlete';
+    return Row(
       children: [
-        CircleAvatar(
-          radius: 21,
-          backgroundColor: Color(0xFF151515),
-          child: Icon(Icons.person, color: AppSidebar._muted),
-        ),
-        SizedBox(width: 12),
+        LocalProfileAvatar(base64Image: _controller?.avatarBase64),
+        const SizedBox(width: 12),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Michael alboutros',
+                displayName,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w800,
                 ),
               ),
               Text(
-                '@Michael alboutros',
+                _controller?.email.isNotEmpty == true
+                    ? '@${_controller!.email}'
+                    : '@repflow_athlete',
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: AppSidebar._muted, fontSize: 12),
+                style: const TextStyle(color: AppSidebar._muted, fontSize: 12),
               ),
             ],
           ),
         ),
-        Icon(Icons.more_horiz, color: AppSidebar._muted),
+        const Icon(Icons.more_horiz, color: AppSidebar._muted),
       ],
     );
   }

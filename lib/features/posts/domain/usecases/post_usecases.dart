@@ -59,6 +59,16 @@ class TogglePostLike {
   Future<bool> call(String postId) => _repository.toggleLike(postId);
 }
 
+class GetPostComments {
+  const GetPostComments(this._repository);
+
+  final PostRepository _repository;
+
+  Future<List<Comment>> call(String postId) {
+    return _repository.getComments(postId);
+  }
+}
+
 class AddPostComment {
   const AddPostComment(this._repository);
 

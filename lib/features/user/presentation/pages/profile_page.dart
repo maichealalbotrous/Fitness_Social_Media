@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
+import 'package:fitness_social_app/core/storage/session_storage.dart';
 import 'package:fitness_social_app/features/follows/presentation/controllers/follow_controller.dart';
+import 'package:fitness_social_app/features/user/data/local_profile_storage.dart';
+import 'package:fitness_social_app/features/user/presentation/controllers/local_profile_controller.dart';
 import 'package:fitness_social_app/features/follows/presentation/follows_dependencies.dart';
 import 'package:fitness_social_app/features/follows/presentation/pages/follow_list_page.dart';
 import 'package:fitness_social_app/features/user/presentation/components/profile/profile_header_card.dart';
@@ -19,6 +22,7 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   late final FollowController _followController;
+  LocalProfileController? _profileController;
   bool _isFollowing = false;
 
   @override
@@ -27,11 +31,27 @@ class _ProfilePageState extends State<ProfilePage> {
     _followController = FollowsDependencies.createController();
     _followController.loadFollowers();
     _followController.loadFollowing();
+    _initializeProfile();
+  }
+
+  Future<void> _initializeProfile() async {
+    final storage = await LocalProfileStorage.create();
+    final controller = LocalProfileController(
+      sessionStorage: SecureSessionStorage(),
+      profileStorage: storage,
+    );
+    await controller.load();
+    if (!mounted) {
+      controller.dispose();
+      return;
+    }
+    setState(() => _profileController = controller);
   }
 
   @override
   void dispose() {
     _followController.dispose();
+    _profileController?.dispose();
     super.dispose();
   }
 
@@ -74,6 +94,10 @@ class _ProfilePageState extends State<ProfilePage> {
                         onFollowingTap: () => _openList(FollowListType.following),
                         onFollowTap: widget.targetUserId == null ? null : _toggleFollow,
                         isFollowing: _isFollowing,
+                        displayName: _profileController?.displayName ?? 'Repflow athlete',
+                        email: _profileController?.email ?? '',
+                        avatarBase64: _profileController?.avatarBase64,
+                        onAvatarTap: _profileController == null ? null : _pickAvatar,
                       ),
                     ),
                   ),
@@ -84,6 +108,11 @@ class _ProfilePageState extends State<ProfilePage> {
         );
       },
     );
+  }
+
+  Future<void> _pickAvatar() async {
+    await _profileController?.pickAvatar();
+    if (mounted) setState(() {});
   }
 
   Future<void> _toggleFollow() async {

@@ -12,6 +12,7 @@ class PostsController extends ChangeNotifier {
     required CreatePost createPost,
     required DeletePost deletePost,
     required TogglePostLike togglePostLike,
+    required GetPostComments getPostComments,
     required AddPostComment addPostComment,
   })  : _getFeedPosts = getFeedPosts,
         _getAllPosts = getAllPosts,
@@ -19,6 +20,7 @@ class PostsController extends ChangeNotifier {
         _createPost = createPost,
         _deletePost = deletePost,
         _togglePostLike = togglePostLike,
+        _getPostComments = getPostComments,
         _addPostComment = addPostComment;
 
   final GetFeedPosts _getFeedPosts;
@@ -27,7 +29,11 @@ class PostsController extends ChangeNotifier {
   final CreatePost _createPost;
   final DeletePost _deletePost;
   final TogglePostLike _togglePostLike;
+  final GetPostComments _getPostComments;
   final AddPostComment _addPostComment;
+
+  List<Comment> _comments = const <Comment>[];
+  bool _isLoadingComments = false;
 
   List<Post> _posts = const <Post>[];
   bool _isLoading = false;
@@ -36,6 +42,8 @@ class PostsController extends ChangeNotifier {
   List<Post> get posts => _posts;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
+  List<Comment> get comments => _comments;
+  bool get isLoadingComments => _isLoadingComments;
 
   Future<void> loadFeed({bool followingOnly = false}) async {
     _isLoading = true;
@@ -127,6 +135,22 @@ class PostsController extends ChangeNotifier {
     return false;
   }
 
+  Future<void> loadComments(String postId) async {
+    _isLoadingComments = true;
+    _errorMessage = null;
+    notifyListeners();
+    try {
+      _comments = await _getPostComments(postId);
+    } on ApiException catch (exception) {
+      _errorMessage = exception.message;
+    } catch (_) {
+      _errorMessage = 'تعذر تحميل التعليقات. حاول مرة أخرى.';
+    } finally {
+      _isLoadingComments = false;
+      notifyListeners();
+    }
+  }
+
   Future<Comment?> addComment({
     required Post post,
     required String content,
@@ -138,7 +162,9 @@ class PostsController extends ChangeNotifier {
         content: content,
         parentCommentId: parentCommentId,
       );
+      _comments = <Comment>[..._comments, comment];
       _replacePost(post.copyWith(commentsCount: post.commentsCount + 1));
+      notifyListeners();
       return comment;
     } on ApiException catch (exception) {
       _errorMessage = exception.message;

@@ -13,7 +13,7 @@ class PrPostCard extends StatelessWidget {
       child: Column(
         children: const [
           PostHeader(
-            name: 'Marcus Thorne',
+            name: 'Repflow athlete',
             subtitle: '2 hours ago',
             action: NewPrBadge(),
           ),

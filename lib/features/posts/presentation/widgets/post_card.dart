@@ -10,6 +10,9 @@ class PostCard extends StatelessWidget {
     required this.onLike,
     this.onDelete,
     this.onComment,
+    this.currentUserId,
+    this.currentUserName,
+    this.currentUserAvatar,
     super.key,
   });
 
@@ -17,6 +20,9 @@ class PostCard extends StatelessWidget {
   final VoidCallback onLike;
   final VoidCallback? onDelete;
   final VoidCallback? onComment;
+  final String? currentUserId;
+  final String? currentUserName;
+  final String? currentUserAvatar;
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +31,12 @@ class PostCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           PostHeader(
-            name: _authorLabel(post.authorId),
+            name: _authorLabel(
+              post.authorId,
+              currentUserId: currentUserId,
+              currentUserName: currentUserName,
+            ),
+            avatarBase64: post.authorId == currentUserId ? currentUserAvatar : null,
             subtitle: _formatDate(post.createdAt),
             action: onDelete == null
                 ? null
@@ -112,7 +123,14 @@ class _MediaPlaceholder extends StatelessWidget {
   }
 }
 
-String _authorLabel(String authorId) {
+String _authorLabel(
+  String authorId, {
+  String? currentUserId,
+  String? currentUserName,
+}) {
+  if (currentUserId != null && authorId == currentUserId && currentUserName != null) {
+    return currentUserName;
+  }
   if (authorId.isEmpty) {
     return 'Repflow athlete';
   }

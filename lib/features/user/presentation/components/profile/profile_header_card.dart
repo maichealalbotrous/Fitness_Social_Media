@@ -1,4 +1,5 @@
 import 'package:fitness_social_app/features/user/presentation/components/profile/profile_theme.dart';
+import 'package:fitness_social_app/features/user/presentation/components/shared/local_profile_avatar.dart';
 import 'package:flutter/material.dart';
 
 class ProfileHeaderCard extends StatelessWidget {
@@ -9,6 +10,10 @@ class ProfileHeaderCard extends StatelessWidget {
     this.onFollowingTap,
     this.onFollowTap,
     this.isFollowing = false,
+    this.displayName = 'Repflow athlete',
+    this.email = '',
+    this.avatarBase64,
+    this.onAvatarTap,
     super.key,
   });
 
@@ -18,6 +23,10 @@ class ProfileHeaderCard extends StatelessWidget {
   final VoidCallback? onFollowingTap;
   final VoidCallback? onFollowTap;
   final bool isFollowing;
+  final String displayName;
+  final String email;
+  final String? avatarBase64;
+  final VoidCallback? onAvatarTap;
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +46,10 @@ class ProfileHeaderCard extends StatelessWidget {
                 onFollowingTap: onFollowingTap,
                 onFollowTap: onFollowTap,
                 isFollowing: isFollowing,
+                displayName: displayName,
+                email: email,
+                avatarBase64: avatarBase64,
+                onAvatarTap: onAvatarTap,
               ),
             ),
           ],
@@ -74,6 +87,10 @@ class _ProfileInfo extends StatelessWidget {
     this.onFollowingTap,
     this.onFollowTap,
     required this.isFollowing,
+    required this.displayName,
+    required this.email,
+    this.avatarBase64,
+    this.onAvatarTap,
   });
 
   final int followersCount;
@@ -82,6 +99,10 @@ class _ProfileInfo extends StatelessWidget {
   final VoidCallback? onFollowingTap;
   final VoidCallback? onFollowTap;
   final bool isFollowing;
+  final String displayName;
+  final String email;
+  final String? avatarBase64;
+  final VoidCallback? onAvatarTap;
 
   @override
   Widget build(BuildContext context) {
@@ -93,7 +114,10 @@ class _ProfileInfo extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              const _ProfileAvatar(),
+              _ProfileAvatar(
+                base64Image: avatarBase64,
+                onTap: onAvatarTap,
+              ),
               const Spacer(),
               const _CircleAction(icon: Icons.share_outlined),
               const SizedBox(width: 10),
@@ -106,8 +130,8 @@ class _ProfileInfo extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 36),
-          const Text(
-            'Marcus Thorne',
+          Text(
+            displayName,
             style: TextStyle(
               color: Colors.white,
               fontSize: 31,
@@ -116,8 +140,8 @@ class _ProfileInfo extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
-            '@m_thorne_lifts',
+          Text(
+            email.isEmpty ? '@repflow_athlete' : '@$email',
             style: TextStyle(color: ProfileTheme.muted, fontSize: 15),
           ),
           const SizedBox(height: 20),
@@ -175,7 +199,10 @@ class _ProfileInfo extends StatelessWidget {
 }
 
 class _ProfileAvatar extends StatelessWidget {
-  const _ProfileAvatar();
+  const _ProfileAvatar({this.base64Image, this.onTap});
+
+  final String? base64Image;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -187,7 +214,15 @@ class _ProfileAvatar extends StatelessWidget {
         color: Colors.black,
         border: Border.all(color: ProfileTheme.background, width: 5),
       ),
-      child: ClipOval(child: CustomPaint(painter: _AvatarPainter())),
+      child: ClipOval(
+        child: base64Image == null
+            ? CustomPaint(painter: _AvatarPainter())
+            : LocalProfileAvatar(
+                base64Image: base64Image,
+                radius: 62,
+                onTap: onTap,
+              ),
+      ),
     );
   }
 }

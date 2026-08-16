@@ -105,7 +105,9 @@ String _string(
   String key, {
   String? fallbackKey,
 }) {
-  final value = json[key] ?? (fallbackKey == null ? null : json[fallbackKey]);
+  final pascalKey = key[0].toUpperCase() + key.substring(1);
+  final value =
+      json[key] ?? json[pascalKey] ?? (fallbackKey == null ? null : json[fallbackKey]);
   return value is String ? value : '';
 }
 

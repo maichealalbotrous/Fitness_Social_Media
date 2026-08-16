@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:fitness_social_app/core/storage/session_storage.dart';
 import 'package:fitness_social_app/features/posts/domain/entities/post.dart';
 import 'package:fitness_social_app/features/posts/presentation/controllers/posts_controller.dart';
 import 'package:fitness_social_app/features/posts/presentation/posts_dependencies.dart';
@@ -11,7 +12,9 @@ import 'package:fitness_social_app/features/user/presentation/components/feed/fe
 import 'package:fitness_social_app/features/user/presentation/components/feed/feed_theme.dart';
 import 'package:fitness_social_app/features/user/presentation/components/feed/identity_card.dart';
 import 'package:fitness_social_app/features/user/presentation/components/feed/weekly_challenge_card.dart';
+import 'package:fitness_social_app/features/user/data/local_profile_storage.dart';
 import 'package:fitness_social_app/features/user/presentation/components/shared/app_sidebar.dart';
+import 'package:fitness_social_app/features/user/presentation/controllers/local_profile_controller.dart';
 
 class FeedPage extends StatefulWidget {
   const FeedPage({super.key});
@@ -22,6 +25,7 @@ class FeedPage extends StatefulWidget {
 
 class _FeedPageState extends State<FeedPage> {
   late final PostsController _controller;
+  LocalProfileController? _profileController;
   bool _followingOnly = false;
 
   @override
@@ -29,18 +33,37 @@ class _FeedPageState extends State<FeedPage> {
     super.initState();
     _controller = PostsDependencies.createController();
     _loadPosts();
+    _initializeProfile();
+  }
+
+  Future<void> _initializeProfile() async {
+    final storage = await LocalProfileStorage.create();
+    final profileController = LocalProfileController(
+      sessionStorage: SecureSessionStorage(),
+      profileStorage: storage,
+    );
+    await profileController.load();
+    if (!mounted) {
+      profileController.dispose();
+      return;
+    }
+    setState(() => _profileController = profileController);
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    _profileController?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: _controller,
+      animation: Listenable.merge([
+        _controller,
+        if (_profileController != null) _profileController!,
+      ]),
       builder: (context, _) {
         return Scaffold(
           backgroundColor: FeedTheme.background,
@@ -74,6 +97,9 @@ class _FeedPageState extends State<FeedPage> {
                         controller: _controller,
                         onCreatePost: _openCreatePost,
                         followingOnly: _followingOnly,
+                        currentUserId: _profileController?.userId,
+                        currentUserName: _profileController?.displayName,
+                        currentUserAvatar: _profileController?.avatarBase64,
                         onAll: () => _selectFeed(false),
                         onFollowing: () => _selectFeed(true),
                       ),
@@ -113,6 +139,9 @@ class _FeedContent extends StatelessWidget {
     required this.controller,
     required this.onCreatePost,
     required this.followingOnly,
+    required this.currentUserId,
+    required this.currentUserName,
+    required this.currentUserAvatar,
     required this.onAll,
     required this.onFollowing,
   });
@@ -120,6 +149,9 @@ class _FeedContent extends StatelessWidget {
   final PostsController controller;
   final VoidCallback onCreatePost;
   final bool followingOnly;
+  final String? currentUserId;
+  final String? currentUserName;
+  final String? currentUserAvatar;
   final VoidCallback onAll;
   final VoidCallback onFollowing;
 
@@ -157,6 +189,9 @@ class _FeedContent extends StatelessWidget {
                 post: post,
                 onLike: () => controller.toggleLike(post),
                 onDelete: () => _confirmDelete(context, controller, post),
+                currentUserId: currentUserId,
+                currentUserName: currentUserName,
+                currentUserAvatar: currentUserAvatar,
                 onComment: () => Navigator.of(context).push(
                   MaterialPageRoute<void>(
                     builder: (_) => PostDetailsPage(post: post),

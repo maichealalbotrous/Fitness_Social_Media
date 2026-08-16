@@ -18,6 +18,8 @@ abstract interface class PostRemoteDataSource {
 
   Future<bool> toggleLike(String postId);
 
+  Future<List<CommentModel>> getComments(String postId);
+
   Future<CommentModel> addComment({
     required String postId,
     required String content,
@@ -77,6 +79,12 @@ class ApiPostRemoteDataSource implements PostRemoteDataSource {
       body: <String, dynamic>{},
     );
     return response['isLiked'] == true || response['IsLiked'] == true;
+  }
+
+  @override
+  Future<List<CommentModel>> getComments(String postId) async {
+    final response = await _apiClient.getListJson('/api/Posts/$postId/comments');
+    return response.map(CommentModel.fromJson).toList(growable: false);
   }
 
   @override

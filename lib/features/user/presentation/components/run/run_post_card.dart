@@ -40,7 +40,7 @@ class _RunPostHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Marcus Thorne',
+                'Repflow athlete',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 15,

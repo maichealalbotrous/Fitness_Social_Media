@@ -22,6 +22,7 @@ class PostsDependencies {
       createPost: CreatePost(repository),
       deletePost: DeletePost(repository),
       togglePostLike: TogglePostLike(repository),
+      getPostComments: GetPostComments(repository),
       addPostComment: AddPostComment(repository),
     );
   }

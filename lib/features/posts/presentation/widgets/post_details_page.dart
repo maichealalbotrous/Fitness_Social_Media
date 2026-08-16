@@ -29,6 +29,7 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
     _controller = PostsDependencies.createController();
     _post = widget.post;
     _loadPost();
+    _controller.loadComments(widget.post.id);
   }
 
   @override
@@ -93,9 +94,14 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
             onSubmit: _addComment,
           ),
           const SizedBox(height: 10),
-          const Text(
-            'سيتم عرض التعليقات الموجودة عند توفير endpoint جلب التعليقات في الباك-إند.',
-            style: TextStyle(color: FeedTheme.muted, fontSize: 12),
+          AnimatedBuilder(
+            animation: _controller,
+            builder: (context, _) => _CommentsList(
+              comments: _controller.comments,
+              isLoading: _controller.isLoadingComments,
+              errorMessage: _controller.errorMessage,
+              onRetry: () => _controller.loadComments(_post.id),
+            ),
           ),
         ],
       ),
@@ -137,6 +143,110 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
     });
     if (comment != null) _commentController.clear();
   }
+}
+
+class _CommentsList extends StatelessWidget {
+  const _CommentsList({
+    required this.comments,
+    required this.isLoading,
+    required this.errorMessage,
+    required this.onRetry,
+  });
+
+  final List<Comment> comments;
+  final bool isLoading;
+  final String? errorMessage;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    if (isLoading && comments.isEmpty) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(vertical: 24),
+        child: Center(
+          child: CircularProgressIndicator(color: FeedTheme.lime),
+        ),
+      );
+    }
+    if (errorMessage != null && comments.isEmpty) {
+      return Column(
+        children: [
+          Text(errorMessage!, style: const TextStyle(color: FeedTheme.muted)),
+          TextButton(onPressed: onRetry, child: const Text('إعادة المحاولة')),
+        ],
+      );
+    }
+    if (comments.isEmpty) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(vertical: 18),
+        child: Text(
+          'لا توجد تعليقات بعد.',
+          style: TextStyle(color: FeedTheme.muted),
+        ),
+      );
+    }
+    return Column(
+      children: comments
+          .map((comment) => _CommentTile(comment: comment))
+          .toList(growable: false),
+    );
+  }
+}
+
+class _CommentTile extends StatelessWidget {
+  const _CommentTile({required this.comment});
+
+  final Comment comment;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: FeedTheme.panel,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: FeedTheme.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            _commentAuthor(comment.authorId),
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            comment.content,
+            style: const TextStyle(color: Colors.white70, height: 1.35),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            _commentDate(comment.createdAt),
+            style: const TextStyle(color: FeedTheme.muted, fontSize: 11),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+String _commentAuthor(String authorId) {
+  if (authorId.isEmpty) return 'Repflow athlete';
+  final suffix = authorId.length > 8 ? authorId.substring(0, 8) : authorId;
+  return 'Athlete $suffix';
+}
+
+String _commentDate(DateTime date) {
+  final difference = DateTime.now().difference(date);
+  if (difference.inMinutes < 1) return 'الآن';
+  if (difference.inMinutes < 60) return 'منذ ${difference.inMinutes} دقيقة';
+  if (difference.inHours < 24) return 'منذ ${difference.inHours} ساعة';
+  return 'منذ ${difference.inDays} يوم';
 }
 
 class _CommentComposer extends StatelessWidget {
