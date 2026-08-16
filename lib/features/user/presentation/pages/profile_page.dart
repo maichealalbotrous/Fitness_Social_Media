@@ -29,8 +29,7 @@ class _ProfilePageState extends State<ProfilePage> {
   void initState() {
     super.initState();
     _followController = FollowsDependencies.createController();
-    _followController.loadFollowers();
-    _followController.loadFollowing();
+    _loadFollowData();
     _initializeProfile();
   }
 
@@ -94,10 +93,15 @@ class _ProfilePageState extends State<ProfilePage> {
                         onFollowingTap: () => _openList(FollowListType.following),
                         onFollowTap: widget.targetUserId == null ? null : _toggleFollow,
                         isFollowing: _isFollowing,
-                        displayName: _profileController?.displayName ?? 'Repflow athlete',
-                        email: _profileController?.email ?? '',
-                        avatarBase64: _profileController?.avatarBase64,
-                        onAvatarTap: _profileController == null ? null : _pickAvatar,
+                        displayName: _displayName,
+                        email: _profileEmail,
+                        avatarBase64: widget.targetUserId == null
+                            ? _profileController?.avatarBase64
+                            : null,
+                        onAvatarTap: widget.targetUserId == null &&
+                                _profileController != null
+                            ? _pickAvatar
+                            : null,
                       ),
                     ),
                   ),
@@ -108,6 +112,20 @@ class _ProfilePageState extends State<ProfilePage> {
         );
       },
     );
+  }
+
+  String get _displayName {
+    if (widget.targetUserId == null) {
+      return _profileController?.displayName ?? 'Repflow athlete';
+    }
+    return 'Athlete ${_shortId(widget.targetUserId!)}';
+  }
+
+  String get _profileEmail {
+    if (widget.targetUserId == null) {
+      return _profileController?.email ?? '';
+    }
+    return '@user_${_shortId(widget.targetUserId!)}';
   }
 
   Future<void> _pickAvatar() async {
@@ -126,12 +144,20 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Future<void> _reload() async {
+  Future<void> _loadFollowData() async {
     await Future.wait([
       _followController.loadFollowers(),
       _followController.loadFollowing(),
     ]);
+    if (!mounted || widget.targetUserId == null) return;
+    setState(() {
+      _isFollowing = _followController.following.any(
+        (user) => user.userId == widget.targetUserId,
+      );
+    });
   }
+
+  Future<void> _reload() => _loadFollowData();
 
   Future<void> _openList(FollowListType type) async {
     final controller = FollowsDependencies.createController();
@@ -140,9 +166,13 @@ class _ProfilePageState extends State<ProfilePage> {
         builder: (_) => FollowListPage(type: type, controller: controller),
       ),
     );
-    controller.dispose();
     await _reload();
   }
+}
+
+String _shortId(String value) {
+  final end = value.length < 8 ? value.length : 8;
+  return value.substring(0, end);
 }
 
 class _ProfileLogo extends StatelessWidget {

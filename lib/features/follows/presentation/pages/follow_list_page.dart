@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fitness_social_app/features/follows/domain/entities/follow.dart';
 import 'package:fitness_social_app/features/follows/presentation/controllers/follow_controller.dart';
 import 'package:fitness_social_app/features/user/presentation/components/profile/profile_theme.dart';
+import 'package:fitness_social_app/features/user/presentation/pages/profile_page.dart';
 
 class FollowListPage extends StatefulWidget {
   const FollowListPage({
@@ -34,6 +35,14 @@ class _FollowListPageState extends State<FollowListPage> {
   void dispose() {
     _controller.dispose();
     super.dispose();
+  }
+
+  void _openUserProfile(String userId) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => ProfilePage(targetUserId: userId),
+      ),
+    );
   }
 
   Future<void> _load() {
@@ -69,6 +78,7 @@ class _FollowListPageState extends State<FollowListPage> {
               isLoading: _controller.isLoading,
               errorMessage: _controller.errorMessage,
               onRetry: _load,
+              onUserTap: _openUserProfile,
             ),
           ),
         );
@@ -83,12 +93,14 @@ class _ListBody extends StatelessWidget {
     required this.isLoading,
     required this.errorMessage,
     required this.onRetry,
+    required this.onUserTap,
   });
 
   final List<FollowUser> users;
   final bool isLoading;
   final String? errorMessage;
   final Future<void> Function() onRetry;
+  final ValueChanged<String> onUserTap;
 
   @override
   Widget build(BuildContext context) {
@@ -117,20 +129,27 @@ class _ListBody extends StatelessWidget {
       padding: const EdgeInsets.all(18),
       itemCount: users.length,
       separatorBuilder: (_, __) => const SizedBox(height: 10),
-      itemBuilder: (_, index) => _FollowUserTile(user: users[index]),
+      itemBuilder: (_, index) => _FollowUserTile(
+        user: users[index],
+        onTap: () => onUserTap(users[index].userId),
+      ),
     );
   }
 }
 
 class _FollowUserTile extends StatelessWidget {
-  const _FollowUserTile({required this.user});
+  const _FollowUserTile({required this.user, required this.onTap});
 
   final FollowUser user;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(14),
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: ProfileTheme.panel,
         borderRadius: BorderRadius.circular(14),
@@ -151,6 +170,7 @@ class _FollowUserTile extends StatelessWidget {
           ),
           const Icon(Icons.chevron_right, color: ProfileTheme.muted),
         ],
+        ),
       ),
     );
   }

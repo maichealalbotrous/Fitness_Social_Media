@@ -5,7 +5,7 @@ import 'package:fitness_social_app/features/posts/domain/entities/post.dart';
 import 'package:fitness_social_app/features/posts/presentation/controllers/posts_controller.dart';
 import 'package:fitness_social_app/features/posts/presentation/posts_dependencies.dart';
 import 'package:fitness_social_app/features/posts/presentation/widgets/create_post_sheet.dart';
-import 'package:fitness_social_app/features/posts/presentation/widgets/post_card.dart';
+import 'package:fitness_social_app/features/user/presentation/pages/profile_page.dart';
 import 'package:fitness_social_app/features/posts/presentation/widgets/post_details_page.dart';
 import 'package:fitness_social_app/features/user/presentation/components/feed/feed_header.dart';
 import 'package:fitness_social_app/features/user/presentation/components/feed/feed_mobile_navigation.dart';
@@ -192,6 +192,9 @@ class _FeedContent extends StatelessWidget {
                 currentUserId: currentUserId,
                 currentUserName: currentUserName,
                 currentUserAvatar: currentUserAvatar,
+                onAuthorTap: post.authorId == currentUserId
+                    ? null
+                    : () => _openAuthorProfile(context, post.authorId),
                 onComment: () => Navigator.of(context).push(
                   MaterialPageRoute<void>(
                     builder: (_) => PostDetailsPage(post: post),
@@ -205,6 +208,14 @@ class _FeedContent extends StatelessWidget {
           const WeeklyChallengeCard(),
         ],
       ],
+    );
+  }
+
+  void _openAuthorProfile(BuildContext context, String userId) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => ProfilePage(targetUserId: userId),
+      ),
     );
   }
 

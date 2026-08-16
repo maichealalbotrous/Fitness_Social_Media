@@ -33,6 +33,7 @@ class PostHeader extends StatelessWidget {
     required this.subtitle,
     this.action,
     this.avatarBase64,
+    this.onTap,
     super.key,
   });
 
@@ -40,14 +41,17 @@ class PostHeader extends StatelessWidget {
   final String subtitle;
   final Widget? action;
   final String? avatarBase64;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 70,
-      padding: const EdgeInsets.symmetric(horizontal: 18),
-      color: FeedTheme.panel,
-      child: Row(
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        height: 70,
+        padding: const EdgeInsets.symmetric(horizontal: 18),
+        color: FeedTheme.panel,
+        child: Row(
         children: [
           avatarBase64 == null
               ? const FeedAvatar(size: 42)
@@ -83,6 +87,7 @@ class PostHeader extends StatelessWidget {
           ),
           ?action,
         ],
+        ),
       ),
     );
   }

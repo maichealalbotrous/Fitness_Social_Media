@@ -10,6 +10,7 @@ class PostCard extends StatelessWidget {
     required this.onLike,
     this.onDelete,
     this.onComment,
+    this.onAuthorTap,
     this.currentUserId,
     this.currentUserName,
     this.currentUserAvatar,
@@ -20,6 +21,7 @@ class PostCard extends StatelessWidget {
   final VoidCallback onLike;
   final VoidCallback? onDelete;
   final VoidCallback? onComment;
+  final VoidCallback? onAuthorTap;
   final String? currentUserId;
   final String? currentUserName;
   final String? currentUserAvatar;
@@ -38,6 +40,7 @@ class PostCard extends StatelessWidget {
             ),
             avatarBase64: post.authorId == currentUserId ? currentUserAvatar : null,
             subtitle: _formatDate(post.createdAt),
+            onTap: onAuthorTap,
             action: onDelete == null
                 ? null
                 : PopupMenuButton<String>(
