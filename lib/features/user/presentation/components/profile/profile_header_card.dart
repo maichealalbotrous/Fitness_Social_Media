@@ -215,13 +215,19 @@ class _ProfileAvatar extends StatelessWidget {
         border: Border.all(color: ProfileTheme.background, width: 5),
       ),
       child: ClipOval(
-        child: base64Image == null
-            ? CustomPaint(painter: _AvatarPainter())
-            : LocalProfileAvatar(
-                base64Image: base64Image,
-                radius: 62,
-                onTap: onTap,
-              ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(62),
+            child: base64Image == null
+                ? CustomPaint(painter: _AvatarPainter())
+                : LocalProfileAvatar(
+                    base64Image: base64Image,
+                    radius: 62,
+                  ),
+          ),
+        ),
       ),
     );
   }
