@@ -100,7 +100,7 @@ class _PostContent extends StatelessWidget {
             width: double.infinity,
             height: 220,
             fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => const _MediaPlaceholder(),
+            errorBuilder: (_, _, _) => const _MediaPlaceholder(),
           ),
         ),
       ],

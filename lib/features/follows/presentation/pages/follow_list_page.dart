@@ -128,7 +128,7 @@ class _ListBody extends StatelessWidget {
     return ListView.separated(
       padding: const EdgeInsets.all(18),
       itemCount: users.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 10),
+      separatorBuilder: (_, _) => const SizedBox(height: 10),
       itemBuilder: (_, index) => _FollowUserTile(
         user: users[index],
         onTap: () => onUserTap(users[index].userId),

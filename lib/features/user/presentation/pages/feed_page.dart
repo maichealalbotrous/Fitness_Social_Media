@@ -5,6 +5,7 @@ import 'package:fitness_social_app/features/posts/domain/entities/post.dart';
 import 'package:fitness_social_app/features/posts/presentation/controllers/posts_controller.dart';
 import 'package:fitness_social_app/features/posts/presentation/posts_dependencies.dart';
 import 'package:fitness_social_app/features/posts/presentation/widgets/create_post_sheet.dart';
+import 'package:fitness_social_app/features/posts/presentation/widgets/post_card.dart';
 import 'package:fitness_social_app/features/user/presentation/pages/profile_page.dart';
 import 'package:fitness_social_app/features/posts/presentation/widgets/post_details_page.dart';
 import 'package:fitness_social_app/features/user/presentation/components/feed/feed_header.dart';
@@ -59,11 +60,10 @@ class _FeedPageState extends State<FeedPage> {
 
   @override
   Widget build(BuildContext context) {
+    final listenables = <Listenable>[_controller];
+    if (_profileController != null) listenables.add(_profileController!);
     return AnimatedBuilder(
-      animation: Listenable.merge([
-        _controller,
-        if (_profileController != null) _profileController!,
-      ]),
+      animation: Listenable.merge(listenables),
       builder: (context, _) {
         return Scaffold(
           backgroundColor: FeedTheme.background,
