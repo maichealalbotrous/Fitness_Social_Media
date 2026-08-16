@@ -149,7 +149,9 @@ int _integer(Map<String, dynamic> json, String key) {
 
 bool _boolean(Map<String, dynamic> json, String key) {
   final value = json[key] ?? json[key[0].toUpperCase() + key.substring(1)];
-  return value == true;
+  if (value is bool) return value;
+  if (value is String) return value.toLowerCase() == 'true';
+  return false;
 }
 
 List<String> _strings(dynamic value) {

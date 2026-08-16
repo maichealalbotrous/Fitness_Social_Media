@@ -118,7 +118,7 @@ class PostActions extends StatelessWidget {
           _PostActionButton(
             icon: isLiked ? Icons.favorite : Icons.favorite_border,
             label: likesCount.toString(),
-            color: isLiked ? Colors.redAccent : FeedTheme.muted,
+            color: isLiked ? Colors.red : FeedTheme.muted,
             onPressed: onLike,
           ),
           const SizedBox(width: 24),
