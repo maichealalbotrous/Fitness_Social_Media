@@ -78,7 +78,13 @@ class ApiPostRemoteDataSource implements PostRemoteDataSource {
       '/api/Posts/$postId/like',
       body: <String, dynamic>{},
     );
-    return response['isLiked'] == true || response['IsLiked'] == true;
+    final value = response['isLiked'] ??
+        response['IsLiked'] ??
+        response['isLikedByCurrentUser'] ??
+        response['IsLikedByCurrentUser'];
+    if (value is bool) return value;
+    if (value is String) return value.toLowerCase() == 'true';
+    return false;
   }
 
   @override
