@@ -164,9 +164,31 @@ class _CommunityPageState extends State<CommunityPage> {
   }
 
   Future<void> _leave() async {
-    final id = _controller.community?.id;
+    final community = _controller.community;
+    if (community == null) return;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Leave community?'),
+        content: Text('Are you sure you want to leave ${community.name}?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Leave'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
     await _controller.leave();
-    if (id != null) await _localStorage.remove(id);
+    if (_controller.errorMessage == null) {
+      await _localStorage.remove(community.id);
+    }
   }
 
   String _mimeType(String name) {
