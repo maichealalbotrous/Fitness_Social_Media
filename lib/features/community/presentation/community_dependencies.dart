@@ -20,6 +20,7 @@ class CommunityDependencies {
       joinCommunity: JoinCommunity(repository),
       leaveCommunity: LeaveCommunity(repository),
       handleRequest: HandleCommunityRequest(repository),
+      sessionStorage: SecureSessionStorage(),
     );
   }
 }

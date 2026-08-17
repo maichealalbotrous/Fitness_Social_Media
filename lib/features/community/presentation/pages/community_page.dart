@@ -79,6 +79,7 @@ class _CommunityPageState extends State<CommunityPage> {
             if (_controller.community case final community?)
               _CommunityDetails(
                 community: community,
+                isRequestPending: _controller.isRequestPending,
                 requestIdController: _requestIdController,
                 isLoading: _controller.isLoading,
                 onJoin: _controller.join,
@@ -192,6 +193,7 @@ class _LookupCard extends StatelessWidget {
 class _CommunityDetails extends StatelessWidget {
   const _CommunityDetails({
     required this.community,
+    required this.isRequestPending,
     required this.requestIdController,
     required this.isLoading,
     required this.onJoin,
@@ -201,6 +203,7 @@ class _CommunityDetails extends StatelessWidget {
   });
 
   final Community community;
+  final bool isRequestPending;
   final TextEditingController requestIdController;
   final bool isLoading;
   final Future<void> Function() onJoin;
@@ -211,6 +214,11 @@ class _CommunityDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final action = community.isMember ? onLeave : onJoin;
+    final actionLabel = community.isMember
+        ? 'LEAVE COMMUNITY'
+        : isRequestPending
+            ? 'REQUEST PENDING'
+            : 'JOIN COMMUNITY';
     return _Panel(
       title: community.name,
       child: Column(
@@ -242,12 +250,12 @@ class _CommunityDetails extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: OutlinedButton.icon(
-                onPressed: isLoading ? null : action,
-                icon: Icon(community.isMember ? Icons.logout : Icons.group_add),
-                label: Text(community.isMember ? 'LEAVE COMMUNITY' : 'JOIN COMMUNITY'),
+                onPressed: isLoading || isRequestPending ? null : action,
+                icon: Icon(community.isMember ? Icons.logout : isRequestPending ? Icons.hourglass_top : Icons.group_add),
+                label: Text(actionLabel),
               ),
             ),
-          if (community.isPrivate && !community.isMember && !community.isOwner)
+          if (community.isPrivate && !community.isMember && !community.isOwner && !isRequestPending)
             const Padding(
               padding: EdgeInsets.only(top: 8),
               child: Text(
