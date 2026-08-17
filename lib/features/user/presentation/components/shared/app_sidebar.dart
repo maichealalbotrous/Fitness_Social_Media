@@ -18,6 +18,15 @@ class AppSidebar extends StatelessWidget {
   static const _lime = Color(0xFFDFFF00);
   static const _muted = Color(0xFF858585);
 
+  Future<void> _logout(BuildContext context) async {
+    await AuthDependencies.createLogoutUser()();
+    if (!context.mounted) return;
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      AppRoutes.auth,
+      (route) => false,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -83,9 +92,9 @@ class AppSidebar extends StatelessWidget {
                       borderRadius: BorderRadius.circular(28),
                     ),
                   ),
-                  onPressed: () {},
+                  onPressed: () => _logout(context),
                   child: const Text(
-                    'Log Workout',
+                    'Logout',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
                   ),
                 ),
