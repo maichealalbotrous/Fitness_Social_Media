@@ -142,7 +142,7 @@ class _ProfileInfo extends StatelessWidget {
               if (onFollowTap != null)
                 _FollowButton(isFollowing: isFollowing, onPressed: onFollowTap!)
               else
-                const _EditProfileButton(),
+                _EditProfileButton(onPressed: onBioEdit),
             ],
           ),
           const SizedBox(height: 36),
@@ -286,7 +286,9 @@ class _CircleAction extends StatelessWidget {
 }
 
 class _EditProfileButton extends StatelessWidget {
-  const _EditProfileButton();
+  const _EditProfileButton({this.onPressed});
+
+  final VoidCallback? onPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -300,7 +302,7 @@ class _EditProfileButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(22),
           ),
         ),
-        onPressed: () {},
+        onPressed: onPressed,
         child: const Text(
           'Edit Profile',
           style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900),
