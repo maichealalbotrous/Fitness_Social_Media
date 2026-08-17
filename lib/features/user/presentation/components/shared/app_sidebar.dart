@@ -1,3 +1,4 @@
+import 'package:fitness_social_app/features/auth/presentation/auth_dependencies.dart';
 import 'package:fitness_social_app/features/user/presentation/components/shared/app_routes.dart';
 import 'package:flutter/material.dart';
 
@@ -224,6 +225,7 @@ class _CurrentUserTile extends StatefulWidget {
 
 class _CurrentUserTileState extends State<_CurrentUserTile> {
   LocalProfileController? _controller;
+  bool _isLoggingOut = false;
 
   @override
   void initState() {
@@ -249,6 +251,20 @@ class _CurrentUserTileState extends State<_CurrentUserTile> {
   void dispose() {
     _controller?.dispose();
     super.dispose();
+  }
+
+  Future<void> _logout(BuildContext context) async {
+    setState(() => _isLoggingOut = true);
+    try {
+      await AuthDependencies.createLogoutUser()();
+      if (!mounted) return;
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        AppRoutes.auth,
+        (route) => false,
+      );
+    } finally {
+      if (mounted) setState(() => _isLoggingOut = false);
+    }
   }
 
   @override
@@ -280,7 +296,25 @@ class _CurrentUserTileState extends State<_CurrentUserTile> {
             ],
           ),
         ),
-        const Icon(Icons.more_horiz, color: AppSidebar._muted),
+        PopupMenuButton<String>(
+          enabled: !_isLoggingOut,
+          icon: _isLoggingOut
+              ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : const Icon(Icons.more_horiz, color: AppSidebar._muted),
+          onSelected: (value) {
+            if (value == 'logout') _logout(context);
+          },
+          itemBuilder: (context) => const [
+            PopupMenuItem<String>(
+              value: 'logout',
+              child: Text('Logout'),
+            ),
+          ],
+        ),
       ],
     );
   }

@@ -39,4 +39,8 @@ class AuthDependencies {
   static HasActiveSession createHasActiveSession() {
     return HasActiveSession(createRepository());
   }
+
+  static LogoutUser createLogoutUser() {
+    return LogoutUser(createRepository());
+  }
 }
