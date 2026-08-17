@@ -48,7 +48,7 @@ class ApiCommunityRemoteDataSource implements CommunityRemoteDataSource {
   @override
   Future<String> join(String id) async {
     final response = await _apiClient.postJson(
-      '/api/Community/$id/join',
+      '/api/Community/$id/join?communityId=${Uri.encodeComponent(id)}',
       body: <String, dynamic>{},
     );
     return _message(response, fallback: 'تم تنفيذ طلب الانضمام.');
