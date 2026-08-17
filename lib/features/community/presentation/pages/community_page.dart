@@ -35,8 +35,15 @@ class _CommunityPageState extends State<CommunityPage> {
     super.initState();
     _controller = CommunityDependencies.createController();
     if (widget.initialCommunityId != null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _controller.load(widget.initialCommunityId!);
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        final id = widget.initialCommunityId!;
+        await _controller.load(id);
+        if (!mounted) return;
+        final cached = await _localStorage.read();
+        final matching = cached.where((item) => item.id == id).toList();
+        if (matching.isNotEmpty) {
+          _controller.restoreLocalMembership(matching.first);
+        }
       });
     }
   }
@@ -55,11 +62,23 @@ class _CommunityPageState extends State<CommunityPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF050505),
-      appBar: AppBar(
-        title: const Text('Community'),
-        backgroundColor: const Color(0xFF050505),
-        foregroundColor: Colors.white,
-      ),
+              appBar: AppBar(
+          leading: IconButton(
+            tooltip: 'Back',
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              if (Navigator.of(context).canPop()) {
+                Navigator.of(context).pop();
+              } else {
+                Navigator.of(context).pushReplacementNamed('/feed');
+              }
+            },
+          ),
+          title: const Text('Community'),
+          backgroundColor: const Color(0xFF050505),
+          foregroundColor: Colors.white,
+        ),
+
       body: AnimatedBuilder(
         animation: _controller,
         builder: (context, _) => ListView(

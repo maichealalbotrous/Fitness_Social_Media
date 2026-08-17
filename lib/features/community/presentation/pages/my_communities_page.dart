@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fitness_social_app/features/community/data/community_local_storage.dart';
 import 'package:fitness_social_app/features/community/domain/entities/community.dart';
 import 'package:fitness_social_app/features/community/presentation/community_dependencies.dart';
+import 'package:fitness_social_app/features/user/presentation/components/shared/app_routes.dart';
 import 'package:fitness_social_app/features/community/presentation/controllers/community_controller.dart';
 import 'package:fitness_social_app/features/community/presentation/pages/community_page.dart';
 
@@ -37,6 +38,17 @@ class _MyCommunitiesPageState extends State<MyCommunitiesPage> {
     return Scaffold(
       backgroundColor: const Color(0xFF050505),
       appBar: AppBar(
+        leading: IconButton(
+          tooltip: 'Back',
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            } else {
+              Navigator.of(context).pushReplacementNamed(AppRoutes.feed);
+            }
+          },
+        ),
         title: const Text('My Communities'),
         backgroundColor: const Color(0xFF050505),
         foregroundColor: Colors.white,

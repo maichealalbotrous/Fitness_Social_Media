@@ -53,9 +53,11 @@ class CommunityController extends ChangeNotifier {
     try {
       final loaded = await _getCommunity(trimmedId);
       final userId = await _currentUserId();
+      final isOwner = loaded.isOwner || (userId != null && loaded.ownerId == userId);
       _community = loaded.copyWith(
-        isOwner: loaded.isOwner || (userId != null && loaded.ownerId == userId),
+        isOwner: isOwner,
         isAdmin: loaded.isAdmin || (userId != null && loaded.adminIds.contains(userId)),
+        isMember: loaded.isMember || isOwner,
       );
       _errorMessage = null;
     } on ApiException catch (error) {
@@ -79,6 +81,20 @@ class CommunityController extends ChangeNotifier {
     } finally {
       _finishLoading();
     }
+  }
+
+  void restoreLocalMembership(Community cached) {
+    final current = _community;
+    if (current == null || current.id != cached.id || !cached.isMember) return;
+    _community = current.copyWith(
+      isMember: true,
+      isAdmin: current.isAdmin || cached.isAdmin,
+      isOwner: current.isOwner || cached.isOwner,
+      memberCount: cached.memberCount > current.memberCount
+          ? cached.memberCount
+          : current.memberCount,
+    );
+    notifyListeners();
   }
 
   Future<void> create({
