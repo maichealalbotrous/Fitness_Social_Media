@@ -18,8 +18,14 @@ class AppSidebar extends StatelessWidget {
   static const _lime = Color(0xFFDFFF00);
   static const _muted = Color(0xFF858585);
 
+  static Future<void> _clearCachedProfile() async {
+    final profileStorage = await LocalProfileStorage.create();
+    await profileStorage.clear();
+  }
+
   Future<void> _logout(BuildContext context) async {
     await AuthDependencies.createLogoutUser()();
+    await _clearCachedProfile();
     if (!context.mounted) return;
     Navigator.of(context).pushNamedAndRemoveUntil(
       AppRoutes.auth,
@@ -271,6 +277,7 @@ class _CurrentUserTileState extends State<_CurrentUserTile> {
     setState(() => _isLoggingOut = true);
     try {
       await AuthDependencies.createLogoutUser()();
+      await AppSidebar._clearCachedProfile();
       if (!mounted) return;
       Navigator.of(context).pushNamedAndRemoveUntil(
         AppRoutes.auth,

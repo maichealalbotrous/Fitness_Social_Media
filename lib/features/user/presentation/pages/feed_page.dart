@@ -15,6 +15,7 @@ import 'package:fitness_social_app/features/user/presentation/components/feed/id
 import 'package:fitness_social_app/features/user/presentation/components/feed/weekly_challenge_card.dart';
 import 'package:fitness_social_app/features/user/data/local_profile_storage.dart';
 import 'package:fitness_social_app/features/user/presentation/components/shared/app_sidebar.dart';
+import 'package:fitness_social_app/features/user/presentation/components/shared/app_routes.dart';
 import 'package:fitness_social_app/features/user/presentation/controllers/local_profile_controller.dart';
 import 'package:fitness_social_app/features/user/presentation/controllers/user_controller.dart';
 import 'package:fitness_social_app/features/user/presentation/user_dependencies.dart';
@@ -94,6 +95,13 @@ class _FeedPageState extends State<FeedPage> {
                     ),
                     title: const _MobileLogo(),
                     centerTitle: false,
+                    actions: [
+                      IconButton(
+                        tooltip: 'Search users',
+                        icon: const Icon(Icons.search, color: Colors.white),
+                        onPressed: () => Navigator.pushNamed(context, AppRoutes.userSearch),
+                      ),
+                    ],
                   ),
                   SliverPadding(
                     padding: const EdgeInsets.fromLTRB(18, 18, 18, 120),

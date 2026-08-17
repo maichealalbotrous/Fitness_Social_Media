@@ -43,4 +43,12 @@ class LocalProfileStorage {
   Future<void> saveAvatarBytes(List<int> bytes) {
     return _preferences.setString(_avatarBase64Key, base64Encode(bytes));
   }
+
+  Future<void> clear() async {
+    await Future.wait([
+      _preferences.remove(_displayNameKey),
+      _preferences.remove(_emailKey),
+      _preferences.remove(_avatarBase64Key),
+    ]);
+  }
 }
