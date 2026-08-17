@@ -107,8 +107,21 @@ class ApiPostRemoteDataSource implements PostRemoteDataSource {
         'commentId': commentId.trim(),
     };
     final uri = Uri(queryParameters: query);
-    final response = await _apiClient.getListJson('/api/Comments?$uri');
-    return response.map(CommentModel.fromJson).toList(growable: false);
+    final decoded = await _apiClient.getJsonValue('/api/Comments$uri');
+    final values = decoded is List
+        ? decoded
+        : decoded is Map<String, dynamic>
+            ? (decoded['items'] ??
+                    decoded['data'] ??
+                    decoded['comments'] ??
+                    decoded['results'] ??
+                    const <dynamic>[]) as dynamic
+            : const <dynamic>[];
+    if (values is! List) return const <CommentModel>[];
+    return values
+        .whereType<Map<String, dynamic>>()
+        .map(CommentModel.fromJson)
+        .toList(growable: false);
   }
 
   @override

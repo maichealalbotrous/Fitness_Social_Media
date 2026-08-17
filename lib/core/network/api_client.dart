@@ -21,6 +21,16 @@ class ApiClient {
     return _decodeObjectResponse(response);
   }
 
+  Future<dynamic> getJsonValue(
+    String path, {
+    Map<String, String>? headers,
+  }) async {
+    final response = await _sendRequest('GET', path, headers: headers);
+    final decodedBody = _decodeValue(response.body);
+    _ensureSuccess(response, decodedBody);
+    return decodedBody;
+  }
+
   Future<List<dynamic>> getListValue(
     String path, {
     Map<String, String>? headers,

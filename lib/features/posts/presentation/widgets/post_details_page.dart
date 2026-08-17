@@ -5,6 +5,10 @@ import 'package:fitness_social_app/features/posts/presentation/posts_dependencie
 import 'package:fitness_social_app/features/posts/presentation/controllers/posts_controller.dart';
 import 'package:fitness_social_app/features/posts/presentation/widgets/post_card.dart';
 import 'package:fitness_social_app/features/user/presentation/components/feed/feed_theme.dart';
+import 'package:fitness_social_app/features/user/presentation/components/shared/local_profile_avatar.dart';
+import 'package:fitness_social_app/features/user/domain/entities/user_profile.dart';
+import 'package:fitness_social_app/features/user/presentation/controllers/user_controller.dart';
+import 'package:fitness_social_app/features/user/presentation/user_dependencies.dart';
 
 class PostDetailsPage extends StatefulWidget {
   const PostDetailsPage({required this.post, super.key});
@@ -17,7 +21,9 @@ class PostDetailsPage extends StatefulWidget {
 
 class _PostDetailsPageState extends State<PostDetailsPage> {
   late final PostsController _controller;
+  late final UserController _userController;
   late Post _post;
+  final Map<String, UserProfile> _commentProfiles = <String, UserProfile>{};
   final _commentController = TextEditingController();
   bool _isSubmittingComment = false;
   bool _isLoadingPost = false;
@@ -27,15 +33,17 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
   void initState() {
     super.initState();
     _controller = PostsDependencies.createController();
+    _userController = UserDependencies.createController();
     _post = widget.post;
     _loadPost();
-    _controller.loadComments(widget.post.id);
+    _loadComments();
   }
 
   @override
   void dispose() {
     _commentController.dispose();
     _controller.dispose();
+    _userController.dispose();
     super.dispose();
   }
 
@@ -100,12 +108,30 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
               comments: _controller.comments,
               isLoading: _controller.isLoadingComments,
               errorMessage: _controller.errorMessage,
-              onRetry: () => _controller.loadComments(_post.id),
+              profiles: _commentProfiles,
+              onRetry: _loadComments,
             ),
           ),
         ],
       ),
     );
+  }
+
+  Future<void> _loadComments() async {
+    await _controller.loadComments(_post.id);
+    if (!mounted) return;
+    final comments = List<Comment>.of(_controller.comments);
+    final profiles = await Future.wait(
+      comments.map((comment) => _userController.loadById(comment.authorId)),
+    );
+    if (!mounted) return;
+    for (var index = 0; index < comments.length; index++) {
+      final profile = profiles[index];
+      if (profile != null) {
+        _commentProfiles[comments[index].authorId] = profile;
+      }
+    }
+    setState(() {});
   }
 
   Future<void> _loadPost() async {
@@ -114,7 +140,12 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
     if (!mounted) return;
     setState(() {
       _isLoadingPost = false;
-      if (loadedPost != null) _post = loadedPost;
+      if (loadedPost != null) {
+        _post = loadedPost.copyWith(
+          isLikedByCurrentUser:
+              loadedPost.isLikedByCurrentUser || _post.isLikedByCurrentUser,
+        );
+      }
     });
   }
 
@@ -150,12 +181,14 @@ class _CommentsList extends StatelessWidget {
     required this.comments,
     required this.isLoading,
     required this.errorMessage,
+    required this.profiles,
     required this.onRetry,
   });
 
   final List<Comment> comments;
   final bool isLoading;
   final String? errorMessage;
+  final Map<String, UserProfile> profiles;
   final VoidCallback onRetry;
 
   @override
@@ -187,16 +220,22 @@ class _CommentsList extends StatelessWidget {
     }
     return Column(
       children: comments
-          .map((comment) => _CommentTile(comment: comment))
+          .map(
+            (comment) => _CommentTile(
+              comment: comment,
+              profile: profiles[comment.authorId],
+            ),
+          )
           .toList(growable: false),
     );
   }
 }
 
 class _CommentTile extends StatelessWidget {
-  const _CommentTile({required this.comment});
+  const _CommentTile({required this.comment, this.profile});
 
   final Comment comment;
+  final UserProfile? profile;
 
   @override
   Widget build(BuildContext context) {
@@ -209,11 +248,20 @@ class _CommentTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: FeedTheme.border),
       ),
-      child: Column(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          LocalProfileAvatar(
+            radius: 18,
+            imageUrl: profile?.profilePictureUrl,
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
           Text(
-            _commentAuthor(comment),
+            _commentAuthor(comment, profile),
             style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.w800,
@@ -229,14 +277,17 @@ class _CommentTile extends StatelessWidget {
             _commentDate(comment.createdAt),
             style: const TextStyle(color: FeedTheme.muted, fontSize: 11),
           ),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
 }
 
-String _commentAuthor(Comment comment) {
-  final authorName = comment.authorName;
+String _commentAuthor(Comment comment, UserProfile? profile) {
+  final authorName = comment.authorName ?? profile?.username;
   if (authorName != null && authorName.isNotEmpty) return authorName;
   if (comment.authorId.isEmpty) return 'Repflow athlete';
   final suffix = comment.authorId.length > 8
