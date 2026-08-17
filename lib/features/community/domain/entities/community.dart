@@ -24,6 +24,27 @@ class Community {
   final bool isMember;
   final List<String> adminIds;
   final int memberCount;
+
+  Community copyWith({
+    bool? isOwner,
+    bool? isAdmin,
+    bool? isMember,
+    int? memberCount,
+  }) {
+    return Community(
+      id: id,
+      name: name,
+      description: description,
+      imageUrl: imageUrl,
+      isPrivate: isPrivate,
+      ownerId: ownerId,
+      isOwner: isOwner ?? this.isOwner,
+      isAdmin: isAdmin ?? this.isAdmin,
+      isMember: isMember ?? this.isMember,
+      adminIds: adminIds,
+      memberCount: memberCount ?? this.memberCount,
+    );
+  }
 }
 
 class CommunityActionResult {
