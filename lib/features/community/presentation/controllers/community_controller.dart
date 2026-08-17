@@ -51,6 +51,7 @@ class CommunityController extends ChangeNotifier {
   Future<void> create({
     required String name,
     String? description,
+    String? imageUrl,
     required bool isPrivate,
   }) async {
     _beginLoading();
@@ -58,6 +59,7 @@ class CommunityController extends ChangeNotifier {
       _community = await _createCommunity(
         name: name.trim(),
         description: description?.trim().isEmpty == true ? null : description?.trim(),
+        imageUrl: imageUrl?.trim().isEmpty == true ? null : imageUrl?.trim(),
         isPrivate: isPrivate,
       );
       _successMessage = 'تم إنشاء المجتمع بنجاح.';
