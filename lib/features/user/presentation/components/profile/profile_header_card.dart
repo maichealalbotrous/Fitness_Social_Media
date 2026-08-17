@@ -13,6 +13,7 @@ class ProfileHeaderCard extends StatelessWidget {
     this.displayName = 'Repflow athlete',
     this.email = '',
     this.avatarBase64,
+    this.avatarUrl,
     this.onAvatarTap,
     super.key,
   });
@@ -26,6 +27,7 @@ class ProfileHeaderCard extends StatelessWidget {
   final String displayName;
   final String email;
   final String? avatarBase64;
+  final String? avatarUrl;
   final VoidCallback? onAvatarTap;
 
   @override
@@ -49,6 +51,7 @@ class ProfileHeaderCard extends StatelessWidget {
                 displayName: displayName,
                 email: email,
                 avatarBase64: avatarBase64,
+                avatarUrl: avatarUrl,
                 onAvatarTap: onAvatarTap,
               ),
             ),
@@ -90,6 +93,7 @@ class _ProfileInfo extends StatelessWidget {
     required this.displayName,
     required this.email,
     this.avatarBase64,
+    this.avatarUrl,
     this.onAvatarTap,
   });
 
@@ -102,6 +106,7 @@ class _ProfileInfo extends StatelessWidget {
   final String displayName;
   final String email;
   final String? avatarBase64;
+  final String? avatarUrl;
   final VoidCallback? onAvatarTap;
 
   @override
@@ -116,6 +121,7 @@ class _ProfileInfo extends StatelessWidget {
             children: [
               _ProfileAvatar(
                 base64Image: avatarBase64,
+                imageUrl: avatarUrl,
                 onTap: onAvatarTap,
               ),
               const Spacer(),

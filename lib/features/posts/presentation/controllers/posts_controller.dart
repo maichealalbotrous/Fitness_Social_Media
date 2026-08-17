@@ -64,6 +64,19 @@ class PostsController extends ChangeNotifier {
     }
   }
 
+  void updatePostAuthorName(String postId, String authorName) {
+    final name = authorName.trim();
+    if (name.isEmpty) return;
+    final post = _posts.where((item) => item.id == postId).isEmpty
+        ? null
+        : _posts.firstWhere((item) => item.id == postId);
+    if (post == null || post.authorName == name) return;
+    _posts = _posts
+        .map((item) => item.id == postId ? item.copyWith(authorName: name) : item)
+        .toList(growable: false);
+    notifyListeners();
+  }
+
   Future<Post?> loadPost(String postId) async {
     try {
       return await _getPostById(postId);

@@ -10,6 +10,9 @@ import 'package:fitness_social_app/features/user/presentation/components/profile
 import 'package:fitness_social_app/features/user/presentation/components/profile/profile_mobile_navigation.dart';
 import 'package:fitness_social_app/features/user/presentation/components/profile/profile_theme.dart';
 import 'package:fitness_social_app/features/user/presentation/components/shared/app_sidebar.dart';
+import 'package:fitness_social_app/features/user/domain/entities/user_profile.dart';
+import 'package:fitness_social_app/features/user/presentation/controllers/user_controller.dart';
+import 'package:fitness_social_app/features/user/presentation/user_dependencies.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({this.targetUserId, this.targetDisplayName, super.key});
@@ -23,14 +26,18 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   late final FollowController _followController;
+  late final UserController _userController;
   LocalProfileController? _profileController;
+  UserProfile? _remoteProfile;
   bool _isFollowing = false;
 
   @override
   void initState() {
     super.initState();
     _followController = FollowsDependencies.createController();
+    _userController = UserDependencies.createController();
     _loadFollowData();
+    if (widget.targetUserId != null) _loadRemoteProfile();
     _initializeProfile();
   }
 
@@ -51,6 +58,7 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void dispose() {
     _followController.dispose();
+    _userController.dispose();
     _profileController?.dispose();
     super.dispose();
   }
@@ -58,7 +66,7 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: _followController,
+      animation: Listenable.merge([_followController, _userController]),
       builder: (context, _) {
         return Scaffold(
           backgroundColor: ProfileTheme.background,
@@ -99,6 +107,9 @@ class _ProfilePageState extends State<ProfilePage> {
                         avatarBase64: widget.targetUserId == null
                             ? _profileController?.avatarBase64
                             : null,
+                        avatarUrl: widget.targetUserId == null
+                            ? null
+                            : _remoteProfile?.profilePictureUrl,
                         onAvatarTap: widget.targetUserId == null &&
                                 _profileController != null
                             ? _pickAvatar
@@ -119,7 +130,9 @@ class _ProfilePageState extends State<ProfilePage> {
     if (widget.targetUserId == null) {
       return _profileController?.displayName ?? 'Repflow athlete';
     }
-    return widget.targetDisplayName?.trim().isNotEmpty == true
+    return _remoteProfile?.username.trim().isNotEmpty == true
+        ? _remoteProfile!.username.trim()
+        : widget.targetDisplayName?.trim().isNotEmpty == true
         ? widget.targetDisplayName!.trim()
         : 'Athlete ${_shortId(widget.targetUserId!)}';
   }
@@ -128,7 +141,16 @@ class _ProfilePageState extends State<ProfilePage> {
     if (widget.targetUserId == null) {
       return _profileController?.email ?? '';
     }
-    return '@user_${_shortId(widget.targetUserId!)}';
+    return _remoteProfile?.email.isNotEmpty == true
+        ? _remoteProfile!.email
+        : '@user_${_shortId(widget.targetUserId!)}';
+  }
+
+  Future<void> _loadRemoteProfile() async {
+    final targetUserId = widget.targetUserId;
+    if (targetUserId == null) return;
+    final profile = await _userController.loadById(targetUserId);
+    if (mounted && profile != null) setState(() => _remoteProfile = profile);
   }
 
   Future<void> _pickAvatar() async {

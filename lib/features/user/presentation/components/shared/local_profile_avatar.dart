@@ -5,12 +5,14 @@ import 'package:flutter/material.dart';
 class LocalProfileAvatar extends StatelessWidget {
   const LocalProfileAvatar({
     this.base64Image,
+    this.imageUrl,
     this.radius = 21,
     this.onTap,
     super.key,
   });
 
   final String? base64Image;
+  final String? imageUrl;
   final double radius;
   final VoidCallback? onTap;
 
@@ -28,6 +30,9 @@ class LocalProfileAvatar extends StatelessWidget {
   }
 
   ImageProvider<Object>? get _imageProvider {
+    if (imageUrl != null && imageUrl!.isNotEmpty) {
+      return NetworkImage(imageUrl!);
+    }
     if (base64Image == null || base64Image!.isEmpty) return null;
     try {
       return MemoryImage(base64Decode(base64Image!));
