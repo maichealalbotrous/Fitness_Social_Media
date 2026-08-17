@@ -111,7 +111,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             ? _profileController?.avatarBase64
                             : null,
                         avatarUrl: widget.targetUserId == null
-                            ? _remoteProfile?.profilePictureUrl
+                            ? null
                             : _remoteProfile?.profilePictureUrl,
                         bio: _remoteProfile?.bio ?? '',
                         onBioEdit: widget.targetUserId == null ? _editBio : null,
