@@ -16,6 +16,8 @@ import 'package:fitness_social_app/features/user/presentation/components/feed/we
 import 'package:fitness_social_app/features/user/data/local_profile_storage.dart';
 import 'package:fitness_social_app/features/user/presentation/components/shared/app_sidebar.dart';
 import 'package:fitness_social_app/features/user/presentation/controllers/local_profile_controller.dart';
+import 'package:fitness_social_app/features/user/presentation/controllers/user_controller.dart';
+import 'package:fitness_social_app/features/user/presentation/user_dependencies.dart';
 
 class FeedPage extends StatefulWidget {
   const FeedPage({super.key});
@@ -26,6 +28,7 @@ class FeedPage extends StatefulWidget {
 
 class _FeedPageState extends State<FeedPage> {
   late final PostsController _controller;
+  late final UserController _userController;
   LocalProfileController? _profileController;
   bool _followingOnly = false;
 
@@ -33,6 +36,7 @@ class _FeedPageState extends State<FeedPage> {
   void initState() {
     super.initState();
     _controller = PostsDependencies.createController();
+    _userController = UserDependencies.createController();
     _loadPosts();
     _initializeProfile();
   }
@@ -54,6 +58,7 @@ class _FeedPageState extends State<FeedPage> {
   @override
   void dispose() {
     _controller.dispose();
+    _userController.dispose();
     _profileController?.dispose();
     super.dispose();
   }
@@ -114,8 +119,20 @@ class _FeedPageState extends State<FeedPage> {
     );
   }
 
-  Future<void> _loadPosts() {
-    return _controller.loadFeed(followingOnly: _followingOnly);
+  Future<void> _loadPosts() async {
+    await _controller.loadFeed(followingOnly: _followingOnly);
+    if (!mounted) return;
+    final posts = List<Post>.of(_controller.posts);
+    final profiles = await Future.wait(
+      posts.map((post) => _userController.loadById(post.authorId)),
+    );
+    if (!mounted) return;
+    for (var index = 0; index < posts.length; index++) {
+      final profile = profiles[index];
+      if (profile != null) {
+        _controller.updatePostAuthorName(posts[index].id, profile.username);
+      }
+    }
   }
 
   Future<void> _selectFeed(bool followingOnly) async {
