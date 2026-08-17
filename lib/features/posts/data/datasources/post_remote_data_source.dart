@@ -39,7 +39,8 @@ class ApiPostRemoteDataSource implements PostRemoteDataSource {
 
   @override
   Future<List<PostModel>> getAllPosts() async {
-    final response = await _apiClient.getListJson('/api/Posts');
+    // The feed endpoint includes isLikedByCurrentUser for the authenticated user.
+    final response = await _apiClient.getListJson('/api/Posts/feed');
     return response.map(PostModel.fromJson).toList(growable: false);
   }
 
