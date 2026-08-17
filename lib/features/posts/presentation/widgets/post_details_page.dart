@@ -23,6 +23,7 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
   late final PostsController _controller;
   late final UserController _userController;
   late Post _post;
+  UserProfile? _postProfile;
   final Map<String, UserProfile> _commentProfiles = <String, UserProfile>{};
   final _commentController = TextEditingController();
   bool _isSubmittingComment = false;
@@ -65,6 +66,9 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
               PostCard(
                 post: _post,
                 onLike: _toggleLike,
+                currentUserId: _post.authorId,
+                currentUserName: _postProfile?.username,
+                authorAvatar: _postProfile?.profilePictureUrl,
               ),
               if (_isLoadingPost)
                 const Positioned.fill(
@@ -137,9 +141,14 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
   Future<void> _loadPost() async {
     setState(() => _isLoadingPost = true);
     final loadedPost = await _controller.loadPost(widget.post.id);
+    final profile = await _userController.loadById(
+      (loadedPost ?? _post).authorId,
+      forceRefresh: true,
+    );
     if (!mounted) return;
     setState(() {
       _isLoadingPost = false;
+      _postProfile = profile;
       if (loadedPost != null) {
         _post = loadedPost.copyWith(
           isLikedByCurrentUser:
@@ -172,7 +181,14 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
       _isSubmittingComment = false;
       _message = comment == null ? _controller.errorMessage : 'تمت إضافة التعليق.';
     });
-    if (comment != null) _commentController.clear();
+    if (comment != null) {
+      final profile = await _userController.loadById(comment.authorId);
+      if (profile != null) {
+        _commentProfiles[comment.authorId] = profile;
+      }
+      _commentController.clear();
+      setState(() {});
+    }
   }
 }
 
