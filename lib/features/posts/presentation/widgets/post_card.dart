@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 
 import 'package:fitness_social_app/features/posts/domain/entities/post.dart';
@@ -94,17 +96,43 @@ class _PostContent extends StatelessWidget {
               ),
             ),
           ),
-        ...post.mediaUrls.map(
-          (url) => Image.network(
-            url,
-            width: double.infinity,
-            height: 220,
-            fit: BoxFit.cover,
-            errorBuilder: (_, _, _) => const _MediaPlaceholder(),
-          ),
-        ),
+        ...post.mediaUrls.map((url) => _PostMedia(url: url)),
       ],
     );
+  }
+}
+
+class _PostMedia extends StatelessWidget {
+  const _PostMedia({required this.url});
+
+  final String url;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!url.startsWith('data:')) {
+      return Image.network(
+        url,
+        width: double.infinity,
+        height: 220,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => const _MediaPlaceholder(),
+      );
+    }
+
+    final separator = url.indexOf(',');
+    if (separator < 0) return const _MediaPlaceholder();
+    try {
+      final bytes = base64Decode(url.substring(separator + 1));
+      return Image.memory(
+        bytes,
+        width: double.infinity,
+        height: 220,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => const _MediaPlaceholder(),
+      );
+    } catch (_) {
+      return const _MediaPlaceholder();
+    }
   }
 }
 
