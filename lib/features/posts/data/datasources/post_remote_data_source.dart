@@ -18,7 +18,12 @@ abstract interface class PostRemoteDataSource {
 
   Future<bool> toggleLike(String postId);
 
-  Future<List<CommentModel>> getComments(String postId);
+  Future<List<CommentModel>> getComments(
+    String postId, {
+    String? commentId,
+    int page = 1,
+    int pageSize = 10,
+  });
 
   Future<CommentModel> addComment({
     required String postId,
@@ -88,8 +93,21 @@ class ApiPostRemoteDataSource implements PostRemoteDataSource {
   }
 
   @override
-  Future<List<CommentModel>> getComments(String postId) async {
-    final response = await _apiClient.getListJson('/api/Posts/$postId/comments');
+  Future<List<CommentModel>> getComments(
+    String postId, {
+    String? commentId,
+    int page = 1,
+    int pageSize = 10,
+  }) async {
+    final query = <String, String>{
+      'postId': postId,
+      'page': page.toString(),
+      'pageSize': pageSize.toString(),
+      if (commentId != null && commentId.trim().isNotEmpty)
+        'commentId': commentId.trim(),
+    };
+    final uri = Uri(queryParameters: query);
+    final response = await _apiClient.getListJson('/api/Comments?$uri');
     return response.map(CommentModel.fromJson).toList(growable: false);
   }
 

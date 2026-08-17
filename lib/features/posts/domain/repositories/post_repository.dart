@@ -17,7 +17,12 @@ abstract interface class PostRepository {
 
   Future<bool> toggleLike(String postId);
 
-  Future<List<Comment>> getComments(String postId);
+  Future<List<Comment>> getComments(
+    String postId, {
+    String? commentId,
+    int page = 1,
+    int pageSize = 10,
+  });
 
   Future<Comment> addComment({
     required String postId,

@@ -64,8 +64,18 @@ class GetPostComments {
 
   final PostRepository _repository;
 
-  Future<List<Comment>> call(String postId) {
-    return _repository.getComments(postId);
+  Future<List<Comment>> call(
+    String postId, {
+    String? commentId,
+    int page = 1,
+    int pageSize = 10,
+  }) {
+    return _repository.getComments(
+      postId,
+      commentId: commentId,
+      page: page,
+      pageSize: pageSize,
+    );
   }
 }
 
