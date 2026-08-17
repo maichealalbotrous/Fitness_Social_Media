@@ -15,6 +15,8 @@ class _CommunityPageState extends State<CommunityPage> {
   final _idController = TextEditingController();
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
+  final _imageUrlController = TextEditingController();
+  final _requestIdController = TextEditingController();
   bool _isPrivate = false;
 
   @override
@@ -29,6 +31,8 @@ class _CommunityPageState extends State<CommunityPage> {
     _idController.dispose();
     _nameController.dispose();
     _descriptionController.dispose();
+    _imageUrlController.dispose();
+    _requestIdController.dispose();
     super.dispose();
   }
 
@@ -49,6 +53,7 @@ class _CommunityPageState extends State<CommunityPage> {
             _CreateCommunityCard(
               nameController: _nameController,
               descriptionController: _descriptionController,
+              imageUrlController: _imageUrlController,
               isPrivate: _isPrivate,
               isLoading: _controller.isLoading,
               onPrivateChanged: (value) => setState(() => _isPrivate = value),
@@ -74,9 +79,12 @@ class _CommunityPageState extends State<CommunityPage> {
             if (_controller.community case final community?)
               _CommunityDetails(
                 community: community,
+                requestIdController: _requestIdController,
                 isLoading: _controller.isLoading,
                 onJoin: _controller.join,
                 onLeave: _controller.leave,
+                onAcceptRequest: () => _handleRequest(true),
+                onRejectRequest: () => _handleRequest(false),
               ),
           ],
         ),
@@ -84,10 +92,23 @@ class _CommunityPageState extends State<CommunityPage> {
     );
   }
 
+  Future<void> _handleRequest(bool accepted) async {
+    final requestId = _requestIdController.text.trim();
+    if (requestId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('أدخل Request ID أولاً.')),
+      );
+      return;
+    }
+    await _controller.handleRequest(requestId: requestId, accepted: accepted);
+    _requestIdController.clear();
+  }
+
   Future<void> _create() async {
     await _controller.create(
       name: _nameController.text,
       description: _descriptionController.text,
+      imageUrl: _imageUrlController.text,
       isPrivate: _isPrivate,
     );
   }
@@ -97,6 +118,7 @@ class _CreateCommunityCard extends StatelessWidget {
   const _CreateCommunityCard({
     required this.nameController,
     required this.descriptionController,
+    required this.imageUrlController,
     required this.isPrivate,
     required this.isLoading,
     required this.onPrivateChanged,
@@ -105,6 +127,7 @@ class _CreateCommunityCard extends StatelessWidget {
 
   final TextEditingController nameController;
   final TextEditingController descriptionController;
+  final TextEditingController imageUrlController;
   final bool isPrivate;
   final bool isLoading;
   final ValueChanged<bool> onPrivateChanged;
@@ -119,6 +142,8 @@ class _CreateCommunityCard extends StatelessWidget {
           _Input(controller: nameController, label: 'Name'),
           const SizedBox(height: 10),
           _Input(controller: descriptionController, label: 'Description', maxLines: 3),
+          const SizedBox(height: 10),
+          _Input(controller: imageUrlController, label: 'Image URL (optional)'),
           SwitchListTile.adaptive(
             contentPadding: EdgeInsets.zero,
             title: const Text('Private community', style: TextStyle(color: Colors.white)),
@@ -167,15 +192,21 @@ class _LookupCard extends StatelessWidget {
 class _CommunityDetails extends StatelessWidget {
   const _CommunityDetails({
     required this.community,
+    required this.requestIdController,
     required this.isLoading,
     required this.onJoin,
     required this.onLeave,
+    required this.onAcceptRequest,
+    required this.onRejectRequest,
   });
 
   final Community community;
+  final TextEditingController requestIdController;
   final bool isLoading;
   final Future<void> Function() onJoin;
   final Future<void> Function() onLeave;
+  final Future<void> Function() onAcceptRequest;
+  final Future<void> Function() onRejectRequest;
 
   @override
   Widget build(BuildContext context) {
@@ -185,6 +216,18 @@ class _CommunityDetails extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          if (community.imageUrl?.isNotEmpty == true)
+            ClipRRect(
+              borderRadius: BorderRadius.circular(14),
+              child: Image.network(
+                community.imageUrl!,
+                height: 160,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+              ),
+            ),
+          if (community.imageUrl?.isNotEmpty == true) const SizedBox(height: 12),
           if (community.description?.isNotEmpty == true)
             Text(community.description!, style: const TextStyle(color: Colors.white70)),
           const SizedBox(height: 12),
@@ -198,11 +241,54 @@ class _CommunityDetails extends StatelessWidget {
           if (!community.isOwner)
             SizedBox(
               width: double.infinity,
-              child: OutlinedButton(
+              child: OutlinedButton.icon(
                 onPressed: isLoading ? null : action,
-                child: Text(community.isMember ? 'LEAVE' : 'JOIN'),
+                icon: Icon(community.isMember ? Icons.logout : Icons.group_add),
+                label: Text(community.isMember ? 'LEAVE COMMUNITY' : 'JOIN COMMUNITY'),
               ),
             ),
+          if (community.isPrivate && !community.isMember && !community.isOwner)
+            const Padding(
+              padding: EdgeInsets.only(top: 8),
+              child: Text(
+                'سيتم إنشاء طلب انضمام يحتاج إلى موافقة أحد المدراء.',
+                style: TextStyle(color: Colors.amber),
+              ),
+            ),
+          if (community.isAdmin) ...[
+            const SizedBox(height: 20),
+            const Divider(color: Colors.white24),
+            const SizedBox(height: 10),
+            const Text(
+              'Manage join request',
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            _Input(controller: requestIdController, label: 'Request ID'),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: FilledButton(
+                    onPressed: isLoading ? null : onAcceptRequest,
+                    child: const Text('ACCEPT'),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: isLoading ? null : onRejectRequest,
+                    child: const Text('REJECT'),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            const Text(
+              'Backend لا يوفر حالياً endpoint لجلب قائمة الطلبات، لذلك يجب إدخال Request ID المتاح لديك.',
+              style: TextStyle(color: Colors.white38, fontSize: 12),
+            ),
+          ],
         ],
       ),
     );
