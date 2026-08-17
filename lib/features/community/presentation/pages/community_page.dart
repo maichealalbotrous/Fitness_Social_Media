@@ -35,15 +35,8 @@ class _CommunityPageState extends State<CommunityPage> {
     super.initState();
     _controller = CommunityDependencies.createController();
     if (widget.initialCommunityId != null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        final id = widget.initialCommunityId!;
-        await _controller.load(id);
-        if (!mounted) return;
-        final cached = await _localStorage.read();
-        final matching = cached.where((item) => item.id == id).toList();
-        if (matching.isNotEmpty) {
-          _controller.restoreLocalMembership(matching.first);
-        }
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _loadCommunity(widget.initialCommunityId!);
       });
     }
   }
@@ -102,7 +95,7 @@ class _CommunityPageState extends State<CommunityPage> {
             _LookupCard(
               controller: _idController,
               isLoading: _controller.isLoading,
-              onLoad: () => _controller.load(_idController.text),
+              onLoad: () => _loadCommunity(_idController.text),
             ),
             const SizedBox(height: 16),
             if (_controller.errorMessage != null)
@@ -130,6 +123,18 @@ class _CommunityPageState extends State<CommunityPage> {
         ),
       ),
     );
+  }
+
+  Future<void> _loadCommunity(String id) async {
+    final trimmedId = id.trim();
+    if (trimmedId.isEmpty) return;
+    await _controller.load(trimmedId);
+    if (!mounted) return;
+    final cached = await _localStorage.read();
+    final matching = cached.where((item) => item.id == trimmedId).toList();
+    if (matching.isNotEmpty) {
+      _controller.restoreLocalMembership(matching.first);
+    }
   }
 
   Future<void> _handleRequest(bool accepted) async {
