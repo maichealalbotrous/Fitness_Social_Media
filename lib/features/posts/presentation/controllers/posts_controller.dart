@@ -155,12 +155,21 @@ class PostsController extends ChangeNotifier {
     return false;
   }
 
-  Future<void> loadComments(String postId) async {
+  Future<void> loadComments(
+    String postId, {
+    int page = 1,
+    int pageSize = 10,
+  }) async {
     _isLoadingComments = true;
     _errorMessage = null;
     notifyListeners();
     try {
-      _comments = await _getPostComments(postId);
+      final loaded = await _getPostComments(
+        postId,
+        page: page,
+        pageSize: pageSize,
+      );
+      _comments = page == 1 ? loaded : <Comment>[..._comments, ...loaded];
     } on ApiException catch (exception) {
       _errorMessage = exception.message;
     } catch (_) {

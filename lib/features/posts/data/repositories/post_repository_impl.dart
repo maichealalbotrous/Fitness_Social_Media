@@ -50,8 +50,18 @@ class PostRepositoryImpl implements PostRepository {
   }
 
   @override
-  Future<List<Comment>> getComments(String postId) async {
-    final comments = await _remoteDataSource.getComments(postId);
+  Future<List<Comment>> getComments(
+    String postId, {
+    String? commentId,
+    int page = 1,
+    int pageSize = 10,
+  }) async {
+    final comments = await _remoteDataSource.getComments(
+      postId,
+      commentId: commentId,
+      page: page,
+      pageSize: pageSize,
+    );
     return comments.map((comment) => comment.toEntity()).toList(growable: false);
   }
 
