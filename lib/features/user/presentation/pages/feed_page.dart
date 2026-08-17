@@ -32,6 +32,7 @@ class _FeedPageState extends State<FeedPage> {
   late final UserController _userController;
   LocalProfileController? _profileController;
   bool _followingOnly = false;
+  final Map<String, String?> _authorAvatars = <String, String?>{};
 
   @override
   void initState() {
@@ -114,6 +115,7 @@ class _FeedPageState extends State<FeedPage> {
                     sliver: SliverToBoxAdapter(
                       child: _FeedContent(
                         controller: _controller,
+                        authorAvatars: _authorAvatars,
                         onCreatePost: _openCreatePost,
                         followingOnly: _followingOnly,
                         currentUserId: _profileController?.userId,
@@ -144,9 +146,11 @@ class _FeedPageState extends State<FeedPage> {
     for (var index = 0; index < posts.length; index++) {
       final profile = profiles[index];
       if (profile != null) {
+        _authorAvatars[posts[index].authorId] = profile.profilePictureUrl;
         _controller.updatePostAuthorName(posts[index].id, profile.username);
       }
     }
+    if (mounted) setState(() {});
   }
 
   Future<void> _selectFeed(bool followingOnly) async {
@@ -168,6 +172,7 @@ class _FeedPageState extends State<FeedPage> {
 class _FeedContent extends StatelessWidget {
   const _FeedContent({
     required this.controller,
+    required this.authorAvatars,
     required this.onCreatePost,
     required this.followingOnly,
     required this.currentUserId,
@@ -178,6 +183,7 @@ class _FeedContent extends StatelessWidget {
   });
 
   final PostsController controller;
+  final Map<String, String?> authorAvatars;
   final VoidCallback onCreatePost;
   final bool followingOnly;
   final String? currentUserId;
@@ -223,6 +229,7 @@ class _FeedContent extends StatelessWidget {
                 currentUserId: currentUserId,
                 currentUserName: currentUserName,
                 currentUserAvatar: currentUserAvatar,
+                authorAvatar: authorAvatars[post.authorId],
                 onAuthorTap: post.authorId == currentUserId
                     ? null
                     : () => _openAuthorProfile(

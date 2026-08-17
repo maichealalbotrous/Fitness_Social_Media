@@ -16,6 +16,7 @@ class PostCard extends StatelessWidget {
     this.currentUserId,
     this.currentUserName,
     this.currentUserAvatar,
+    this.authorAvatar,
     super.key,
   });
 
@@ -27,6 +28,7 @@ class PostCard extends StatelessWidget {
   final String? currentUserId;
   final String? currentUserName;
   final String? currentUserAvatar;
+  final String? authorAvatar;
 
   @override
   Widget build(BuildContext context) {
@@ -41,6 +43,7 @@ class PostCard extends StatelessWidget {
               currentUserName: currentUserName,
             ),
             avatarBase64: post.authorId == currentUserId ? currentUserAvatar : null,
+            avatarImageUrl: authorAvatar,
             subtitle: _formatDate(post.createdAt),
             onTap: onAuthorTap,
             action: onDelete == null

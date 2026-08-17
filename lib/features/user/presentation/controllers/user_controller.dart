@@ -25,6 +25,7 @@ class UserController extends ChangeNotifier {
   String? _errorMessage;
 
   UserProfile? get profile => _profile;
+  UserProfile? profileFor(String id) => _cache[id.trim()];
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 

@@ -33,6 +33,7 @@ class PostHeader extends StatelessWidget {
     required this.subtitle,
     this.action,
     this.avatarBase64,
+    this.avatarImageUrl,
     this.onTap,
     super.key,
   });
@@ -41,6 +42,7 @@ class PostHeader extends StatelessWidget {
   final String subtitle;
   final Widget? action;
   final String? avatarBase64;
+  final String? avatarImageUrl;
   final VoidCallback? onTap;
 
   @override
@@ -53,11 +55,12 @@ class PostHeader extends StatelessWidget {
         color: FeedTheme.panel,
         child: Row(
         children: [
-          avatarBase64 == null
+          avatarBase64 == null && (avatarImageUrl == null || avatarImageUrl!.isEmpty)
               ? const FeedAvatar(size: 42)
               : LocalProfileAvatar(
                   radius: 21,
                   base64Image: avatarBase64,
+                  imageUrl: avatarImageUrl,
                 ),
           const SizedBox(width: 12),
           Expanded(
