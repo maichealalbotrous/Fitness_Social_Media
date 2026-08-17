@@ -78,6 +78,55 @@ class ApiClient {
     return _decodeObjectResponse(response);
   }
 
+  Future<Map<String, dynamic>> putJson(
+    String path, {
+    required Map<String, dynamic> body,
+    Map<String, String>? headers,
+  }) async {
+    final response = await _sendRequest(
+      'PUT',
+      path,
+      body: body,
+      headers: headers,
+    );
+    return _decodeObjectResponse(response);
+  }
+
+  Future<Map<String, dynamic>> postMultipartBytes(
+    String path, {
+    required String fieldName,
+    required String fileName,
+    required List<int> bytes,
+  }) async {
+    try {
+      final request = http.MultipartRequest('POST', AppConfig.apiUri(path));
+      request.headers.addAll({
+        'Accept': 'application/json',
+        ...await _authorizationHeaders(),
+      });
+      request.files.add(
+        http.MultipartFile.fromBytes(
+          fieldName,
+          bytes,
+          filename: fileName,
+        ),
+      );
+      final streamedResponse = await _client
+          .send(request)
+          .timeout(const Duration(seconds: 20));
+      final response = await http.Response.fromStream(streamedResponse);
+      return _decodeObjectResponse(response);
+    } on TimeoutException {
+      throw const ApiException(
+        message: 'انتهت مهلة الاتصال بالخادم. حاول مرة أخرى.',
+      );
+    } on http.ClientException {
+      throw const ApiException(
+        message: 'تعذر الاتصال بالخادم. تحقق من عنوان API والاتصال بالشبكة.',
+      );
+    }
+  }
+
   Future<Map<String, dynamic>> deleteJson(
     String path, {
     Map<String, String>? headers,
