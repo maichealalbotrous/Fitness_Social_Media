@@ -6,7 +6,7 @@ import 'package:fitness_social_app/features/user/data/local_profile_storage.dart
 import 'package:fitness_social_app/features/user/presentation/controllers/local_profile_controller.dart';
 import 'package:fitness_social_app/features/user/presentation/components/shared/local_profile_avatar.dart';
 
-enum AppSidebarSection { feed, workouts, runs, profile }
+enum AppSidebarSection { feed, workouts, runs, profile, community }
 
 class AppSidebar extends StatelessWidget {
   const AppSidebar({required this.activeSection, super.key});
@@ -52,6 +52,12 @@ class AppSidebar extends StatelessWidget {
                 label: 'Profile',
                 active: activeSection == AppSidebarSection.profile,
                 routeName: AppRoutes.profile,
+              ),
+              _SidebarItem(
+                icon: Icons.groups_outlined,
+                label: 'Community',
+                active: activeSection == AppSidebarSection.community,
+                routeName: AppRoutes.community,
               ),
               const _StaticSidebarItem(icon: Icons.search, label: 'Search'),
               const _StaticSidebarItem(
