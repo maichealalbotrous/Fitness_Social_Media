@@ -26,6 +26,13 @@ class GetCommunity {
   Future<Community> call(String id) => _repository.getById(id);
 }
 
+class GetMyCommunities {
+  const GetMyCommunities(this._repository);
+  final CommunityRepository _repository;
+
+  Future<List<Community>> call() => _repository.getMyCommunities();
+}
+
 class JoinCommunity {
   const JoinCommunity(this._repository);
   final CommunityRepository _repository;

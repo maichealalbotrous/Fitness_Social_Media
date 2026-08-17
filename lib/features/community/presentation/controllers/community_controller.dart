@@ -10,12 +10,14 @@ class CommunityController extends ChangeNotifier {
   CommunityController({
     required CreateCommunity createCommunity,
     required GetCommunity getCommunity,
+    required GetMyCommunities getMyCommunities,
     required JoinCommunity joinCommunity,
     required LeaveCommunity leaveCommunity,
     required HandleCommunityRequest handleRequest,
     required SessionStorage sessionStorage,
   })  : _createCommunity = createCommunity,
         _getCommunity = getCommunity,
+        _getMyCommunities = getMyCommunities,
         _joinCommunity = joinCommunity,
         _leaveCommunity = leaveCommunity,
         _handleRequest = handleRequest,
@@ -23,6 +25,7 @@ class CommunityController extends ChangeNotifier {
 
   final CreateCommunity _createCommunity;
   final GetCommunity _getCommunity;
+  final GetMyCommunities _getMyCommunities;
   final JoinCommunity _joinCommunity;
   final LeaveCommunity _leaveCommunity;
   final HandleCommunityRequest _handleRequest;
@@ -34,7 +37,10 @@ class CommunityController extends ChangeNotifier {
   String? _errorMessage;
   String? _successMessage;
 
+  List<Community> _myCommunities = const <Community>[];
+
   Community? get community => _community;
+  List<Community> get myCommunities => _myCommunities;
   bool get isLoading => _isLoading;
   bool get isRequestPending => _isRequestPending;
   String? get errorMessage => _errorMessage;
@@ -56,6 +62,20 @@ class CommunityController extends ChangeNotifier {
       _errorMessage = error.message;
     } catch (_) {
       _errorMessage = 'تعذر تحميل المجتمع.';
+    } finally {
+      _finishLoading();
+    }
+  }
+
+  Future<void> loadMyCommunities() async {
+    _beginLoading();
+    try {
+      _myCommunities = await _getMyCommunities();
+      _errorMessage = null;
+    } on ApiException catch (error) {
+      _errorMessage = error.message;
+    } catch (_) {
+      _errorMessage = 'تعذر تحميل مجتمعاتك.';
     } finally {
       _finishLoading();
     }

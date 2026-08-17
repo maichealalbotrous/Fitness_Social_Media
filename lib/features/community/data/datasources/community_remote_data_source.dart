@@ -10,6 +10,7 @@ abstract interface class CommunityRemoteDataSource {
   });
 
   Future<CommunityModel> getById(String id);
+  Future<List<CommunityModel>> getMyCommunities();
   Future<String> join(String id);
   Future<String> leave(String id);
   Future<String> handleRequest({required String requestId, required bool accepted});
@@ -43,6 +44,12 @@ class ApiCommunityRemoteDataSource implements CommunityRemoteDataSource {
   Future<CommunityModel> getById(String id) async {
     final response = await _apiClient.getJson('/api/Community/$id');
     return CommunityModel.fromJson(response);
+  }
+
+  @override
+  Future<List<CommunityModel>> getMyCommunities() async {
+    final response = await _apiClient.getListJson('/api/Community/my');
+    return response.map(CommunityModel.fromJson).toList(growable: false);
   }
 
   @override

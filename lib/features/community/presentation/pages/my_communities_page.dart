@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:fitness_social_app/features/community/data/community_local_storage.dart';
 import 'package:fitness_social_app/features/community/domain/entities/community.dart';
+import 'package:fitness_social_app/features/community/presentation/community_dependencies.dart';
+import 'package:fitness_social_app/features/community/presentation/controllers/community_controller.dart';
 import 'package:fitness_social_app/features/community/presentation/pages/community_page.dart';
 
 class MyCommunitiesPage extends StatefulWidget {
@@ -13,13 +15,21 @@ class MyCommunitiesPage extends StatefulWidget {
 
 class _MyCommunitiesPageState extends State<MyCommunitiesPage> {
   final _storage = CommunityLocalStorage();
+  late final CommunityController _controller;
   List<Community> _communities = const <Community>[];
   bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
+    _controller = CommunityDependencies.createController();
     _load();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -74,11 +84,25 @@ class _MyCommunitiesPageState extends State<MyCommunitiesPage> {
   }
 
   Future<void> _load() async {
-    setState(() => _isLoading = true);
-    final communities = await _storage.read();
+    if (mounted) setState(() => _isLoading = true);
+    final cached = await _storage.read();
+    await _controller.loadMyCommunities();
     if (!mounted) return;
+
+    final remote = _controller.myCommunities;
+    if (_controller.errorMessage == null) {
+      for (final community in remote) {
+        await _storage.save(community);
+      }
+      setState(() {
+        _communities = remote;
+        _isLoading = false;
+      });
+      return;
+    }
+
     setState(() {
-      _communities = communities;
+      _communities = cached;
       _isLoading = false;
     });
   }

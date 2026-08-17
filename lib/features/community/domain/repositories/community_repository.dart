@@ -9,6 +9,7 @@ abstract interface class CommunityRepository {
   });
 
   Future<Community> getById(String id);
+  Future<List<Community>> getMyCommunities();
 
   Future<String> join(String id);
 
