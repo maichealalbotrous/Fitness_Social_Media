@@ -14,6 +14,8 @@ class ProfileHeaderCard extends StatelessWidget {
     this.email = '',
     this.avatarBase64,
     this.avatarUrl,
+    this.bio = '',
+    this.onBioEdit,
     this.onAvatarTap,
     super.key,
   });
@@ -28,6 +30,8 @@ class ProfileHeaderCard extends StatelessWidget {
   final String email;
   final String? avatarBase64;
   final String? avatarUrl;
+  final String bio;
+  final VoidCallback? onBioEdit;
   final VoidCallback? onAvatarTap;
 
   @override
@@ -52,6 +56,8 @@ class ProfileHeaderCard extends StatelessWidget {
                 email: email,
                 avatarBase64: avatarBase64,
                 avatarUrl: avatarUrl,
+                bio: bio,
+                onBioEdit: onBioEdit,
                 onAvatarTap: onAvatarTap,
               ),
             ),
@@ -94,6 +100,8 @@ class _ProfileInfo extends StatelessWidget {
     required this.email,
     this.avatarBase64,
     this.avatarUrl,
+    required this.bio,
+    this.onBioEdit,
     this.onAvatarTap,
   });
 
@@ -107,6 +115,8 @@ class _ProfileInfo extends StatelessWidget {
   final String email;
   final String? avatarBase64;
   final String? avatarUrl;
+  final String bio;
+  final VoidCallback? onBioEdit;
   final VoidCallback? onAvatarTap;
 
   @override
@@ -151,14 +161,27 @@ class _ProfileInfo extends StatelessWidget {
             style: TextStyle(color: ProfileTheme.muted, fontSize: 15),
           ),
           const SizedBox(height: 20),
-          const Text(
-            'Powerbuilding. 4x per week. PPL split. Building a high-performance engine\nthrough data-driven training. Focused on the long game. 🏋️💪',
-            style: TextStyle(
-              color: Colors.white70,
-              fontSize: 15,
-              height: 1.45,
-              fontWeight: FontWeight.w500,
-            ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Text(
+                  bio.trim().isEmpty ? 'Tell the community about yourself.' : bio,
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 15,
+                    height: 1.45,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              if (onBioEdit != null)
+                IconButton(
+                  tooltip: 'Edit bio',
+                  onPressed: onBioEdit,
+                  icon: const Icon(Icons.edit_outlined, color: ProfileTheme.muted, size: 18),
+                ),
+            ],
           ),
           const SizedBox(height: 18),
           const Wrap(

@@ -5,7 +5,7 @@ abstract interface class UserRepository {
   Future<UserProfile> getByUsername(String username);
 
   Future<UserProfile> updateProfile({
-    required String bio,
+    String? bio,
     String? profilePictureUrl,
   });
 

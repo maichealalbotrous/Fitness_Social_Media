@@ -17,7 +17,7 @@ class UserRepositoryImpl implements UserRepository {
   }
 
   @override
-  Future<UserProfile> updateProfile({required String bio, String? profilePictureUrl}) async {
+  Future<UserProfile> updateProfile({String? bio, String? profilePictureUrl}) async {
     return (await _remoteDataSource.updateProfile(
       bio: bio,
       profilePictureUrl: profilePictureUrl,

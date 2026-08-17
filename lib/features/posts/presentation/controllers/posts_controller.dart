@@ -51,9 +51,9 @@ class PostsController extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // The personalized feed is the endpoint that includes
-      // isLikedByCurrentUser for the authenticated account.
-      _posts = await _getFeedPosts();
+      _posts = followingOnly
+          ? await _getFeedPosts()
+          : await _getAllPosts();
     } on ApiException catch (exception) {
       _errorMessage = exception.message;
     } catch (_) {

@@ -4,7 +4,7 @@ import 'package:fitness_social_app/features/user/data/models/user_profile_model.
 abstract interface class UserRemoteDataSource {
   Future<UserProfileModel> getById(String id);
   Future<UserProfileModel> getByUsername(String username);
-  Future<UserProfileModel> updateProfile({required String bio, String? profilePictureUrl});
+  Future<UserProfileModel> updateProfile({String? bio, String? profilePictureUrl});
   Future<String> uploadProfilePicture({required String fileName, required List<int> bytes});
 }
 
@@ -28,14 +28,14 @@ class ApiUserRemoteDataSource implements UserRemoteDataSource {
 
   @override
   Future<UserProfileModel> updateProfile({
-    required String bio,
+    String? bio,
     String? profilePictureUrl,
   }) async {
     final response = await _apiClient.putJson(
       '/api/Users/profile',
       body: <String, dynamic>{
-        'bio': bio,
-        'profilePictureUrl': profilePictureUrl,
+        if (bio != null) 'bio': bio,
+        if (profilePictureUrl != null) 'profilePictureUrl': profilePictureUrl,
       },
     );
     return UserProfileModel.fromJson(response);

@@ -17,7 +17,7 @@ class UpdateUserProfile {
   const UpdateUserProfile(this._repository);
   final UserRepository _repository;
 
-  Future<UserProfile> call({required String bio, String? profilePictureUrl}) {
+  Future<UserProfile> call({String? bio, String? profilePictureUrl}) {
     return _repository.updateProfile(
       bio: bio,
       profilePictureUrl: profilePictureUrl,

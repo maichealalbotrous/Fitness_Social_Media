@@ -67,17 +67,22 @@ class LocalProfileController extends ChangeNotifier {
   }
 
   Future<void> pickAvatar() async {
+    await pickAvatarBytes();
+  }
+
+  Future<List<int>?> pickAvatarBytes() async {
     final image = await _imagePicker.pickImage(
       source: ImageSource.gallery,
       imageQuality: 80,
       maxWidth: 512,
       maxHeight: 512,
     );
-    if (image == null) return;
+    if (image == null) return null;
     final bytes = await image.readAsBytes();
     await _profileStorage.saveAvatarBytes(bytes);
     _avatarBase64 = base64Encode(bytes);
     notifyListeners();
+    return bytes;
   }
 
   Map<String, dynamic> _decodeClaims(String token) {

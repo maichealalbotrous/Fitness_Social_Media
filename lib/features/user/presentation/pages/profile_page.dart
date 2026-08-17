@@ -48,6 +48,9 @@ class _ProfilePageState extends State<ProfilePage> {
       profileStorage: storage,
     );
     await controller.load();
+    if (controller.userId != null) {
+      await _userController.loadById(controller.userId!);
+    }
     if (!mounted) {
       controller.dispose();
       return;
@@ -108,8 +111,10 @@ class _ProfilePageState extends State<ProfilePage> {
                             ? _profileController?.avatarBase64
                             : null,
                         avatarUrl: widget.targetUserId == null
-                            ? null
+                            ? _remoteProfile?.profilePictureUrl
                             : _remoteProfile?.profilePictureUrl,
+                        bio: _remoteProfile?.bio ?? '',
+                        onBioEdit: widget.targetUserId == null ? _editBio : null,
                         onAvatarTap: widget.targetUserId == null &&
                                 _profileController != null
                             ? _pickAvatar
@@ -154,8 +159,56 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _pickAvatar() async {
-    await _profileController?.pickAvatar();
-    if (mounted) setState(() {});
+    final bytes = await _profileController?.pickAvatarBytes();
+    if (bytes == null) return;
+    final url = await _userController.uploadProfilePicture(
+      fileName: 'profile.jpg',
+      bytes: bytes,
+    );
+    if (url != null) {
+      final updated = await _userController.updateProfile(profilePictureUrl: url);
+      if (updated != null) _remoteProfile = updated;
+    }
+    if (!mounted) return;
+    setState(() {});
+    final error = _userController.errorMessage;
+    if (error != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(error)),
+      );
+    }
+  }
+
+  Future<void> _editBio() async {
+    final controller = TextEditingController(text: _remoteProfile?.bio ?? '');
+    final bio = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Edit bio'),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          maxLines: 4,
+          maxLength: 300,
+          decoration: const InputDecoration(hintText: 'Tell the community about yourself'),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          FilledButton(onPressed: () => Navigator.pop(context, controller.text.trim()), child: const Text('Save')),
+        ],
+      ),
+    );
+    controller.dispose();
+    if (bio == null || !mounted) return;
+    final updated = await _userController.updateProfile(bio: bio);
+    if (!mounted) return;
+    if (updated != null) {
+      setState(() => _remoteProfile = updated);
+    } else if (_userController.errorMessage != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(_userController.errorMessage!)),
+      );
+    }
   }
 
   Future<void> _toggleFollow() async {

@@ -45,7 +45,7 @@ class UserController extends ChangeNotifier {
     return _load(() => _getByUsername(value));
   }
 
-  Future<UserProfile?> updateProfile({required String bio, String? profilePictureUrl}) async {
+  Future<UserProfile?> updateProfile({String? bio, String? profilePictureUrl}) async {
     return _load(() => _updateProfile(
           bio: bio,
           profilePictureUrl: profilePictureUrl,

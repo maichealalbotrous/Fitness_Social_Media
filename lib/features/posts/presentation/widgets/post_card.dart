@@ -96,37 +96,122 @@ class _PostContent extends StatelessWidget {
               ),
             ),
           ),
-        ...post.mediaUrls.map((url) => _PostMedia(url: url)),
+        if (post.mediaUrls.isNotEmpty)
+          _PostMediaGrid(urls: post.mediaUrls),
       ],
     );
   }
 }
 
-class _PostMedia extends StatelessWidget {
-  const _PostMedia({required this.url});
+class _PostMediaGrid extends StatelessWidget {
+  const _PostMediaGrid({required this.urls});
 
-  final String url;
+  final List<String> urls;
 
   @override
   Widget build(BuildContext context) {
-    if (!url.startsWith('data:')) {
-      return Image.network(
-        url,
-        width: double.infinity,
-        height: 220,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) => const _MediaPlaceholder(),
+    if (urls.length == 1) {
+      return _PostMedia(url: urls.first, height: 260);
+    }
+    if (urls.length == 2) {
+      return Row(
+        children: [
+          Expanded(child: _PostMedia(url: urls[0], height: 210)),
+          const SizedBox(width: 3),
+          Expanded(child: _PostMedia(url: urls[1], height: 210)),
+        ],
+      );
+    }
+    if (urls.length == 3) {
+      return SizedBox(
+        height: 260,
+        child: Row(
+          children: [
+            Expanded(flex: 2, child: _PostMedia(url: urls[0], height: 260)),
+            const SizedBox(width: 3),
+            Expanded(
+              child: Column(
+                children: [
+                  Expanded(child: _PostMedia(url: urls[1], height: 128)),
+                  const SizedBox(height: 3),
+                  Expanded(child: _PostMedia(url: urls[2], height: 128)),
+                ],
+              ),
+            ),
+          ],
+        ),
       );
     }
 
+    final visible = urls.take(4).toList(growable: false);
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      padding: EdgeInsets.zero,
+      itemCount: visible.length,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 3,
+        mainAxisSpacing: 3,
+        childAspectRatio: 1.15,
+      ),
+      itemBuilder: (context, index) {
+        final remaining = urls.length - 4;
+        return Stack(
+          fit: StackFit.expand,
+          children: [
+            _PostMedia(url: visible[index], height: 140),
+            if (index == 3 && remaining > 0)
+              Container(
+                color: Colors.black54,
+                alignment: Alignment.center,
+                child: Text(
+                  '+$remaining',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 26,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _PostMedia extends StatelessWidget {
+  const _PostMedia({required this.url, required this.height});
+
+  final String url;
+  final double height;
+
+  @override
+  Widget build(BuildContext context) {
+    final image = !url.startsWith('data:')
+        ? Image.network(
+            url,
+            width: double.infinity,
+            height: height,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) => const _MediaPlaceholder(),
+          )
+        : _dataImage();
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(2),
+      child: SizedBox(width: double.infinity, height: height, child: image),
+    );
+  }
+
+  Widget _dataImage() {
     final separator = url.indexOf(',');
     if (separator < 0) return const _MediaPlaceholder();
     try {
-      final bytes = base64Decode(url.substring(separator + 1));
       return Image.memory(
-        bytes,
+        base64Decode(url.substring(separator + 1)),
         width: double.infinity,
-        height: 220,
+        height: height,
         fit: BoxFit.cover,
         errorBuilder: (context, error, stackTrace) => const _MediaPlaceholder(),
       );

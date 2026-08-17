@@ -75,7 +75,12 @@ class AppSidebar extends StatelessWidget {
                 active: activeSection == AppSidebarSection.community,
                 routeName: AppRoutes.myCommunities,
               ),
-              const _StaticSidebarItem(icon: Icons.search, label: 'Search'),
+              _SidebarItem(
+                icon: Icons.search,
+                label: 'Search users',
+                active: false,
+                routeName: AppRoutes.userSearch,
+              ),
               const _StaticSidebarItem(
                 icon: Icons.notifications_none,
                 label: 'Notifications',

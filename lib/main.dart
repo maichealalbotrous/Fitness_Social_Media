@@ -6,6 +6,7 @@ import 'package:fitness_social_app/features/auth/presentation/pages/verify_email
 import 'package:fitness_social_app/features/user/presentation/components/shared/app_routes.dart';
 import 'package:fitness_social_app/features/user/presentation/pages/feed_page.dart';
 import 'package:fitness_social_app/features/user/presentation/pages/profile_page.dart';
+import 'package:fitness_social_app/features/user/presentation/pages/user_search_page.dart';
 import 'package:fitness_social_app/features/user/presentation/pages/run_page.dart';
 import 'package:fitness_social_app/features/user/presentation/pages/workout_page.dart';
 import 'package:fitness_social_app/features/community/presentation/pages/community_page.dart';
@@ -43,6 +44,7 @@ class FitnessSocialApp extends StatelessWidget {
         AppRoutes.profile: (_) => const ProfilePage(),
         AppRoutes.community: (_) => const CommunityPage(),
         AppRoutes.myCommunities: (_) => const MyCommunitiesPage(),
+        AppRoutes.userSearch: (_) => const UserSearchPage(),
       },
     );
   }
