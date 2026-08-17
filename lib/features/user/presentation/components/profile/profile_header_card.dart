@@ -205,9 +205,10 @@ class _ProfileInfo extends StatelessWidget {
 }
 
 class _ProfileAvatar extends StatelessWidget {
-  const _ProfileAvatar({this.base64Image, this.onTap});
+  const _ProfileAvatar({this.base64Image, this.imageUrl, this.onTap});
 
   final String? base64Image;
+  final String? imageUrl;
   final VoidCallback? onTap;
 
   @override
@@ -226,10 +227,12 @@ class _ProfileAvatar extends StatelessWidget {
           child: InkWell(
             onTap: onTap,
             borderRadius: BorderRadius.circular(62),
-            child: base64Image == null
+            child: (base64Image == null || base64Image!.isEmpty) &&
+                    (imageUrl == null || imageUrl!.isEmpty)
                 ? CustomPaint(painter: _AvatarPainter())
                 : LocalProfileAvatar(
                     base64Image: base64Image,
+                    imageUrl: imageUrl,
                     radius: 62,
                   ),
           ),
