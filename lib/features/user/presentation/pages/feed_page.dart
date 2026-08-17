@@ -49,6 +49,12 @@ class _FeedPageState extends State<FeedPage> {
       profileStorage: storage,
     );
     await profileController.load();
+    if (profileController.userId != null) {
+      await _userController.loadById(
+        profileController.userId!,
+        forceRefresh: true,
+      );
+    }
     if (!mounted) {
       profileController.dispose();
       return;

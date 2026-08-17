@@ -30,14 +30,16 @@ class LocalProfileAvatar extends StatelessWidget {
   }
 
   ImageProvider<Object>? get _imageProvider {
+    if (base64Image != null && base64Image!.isNotEmpty) {
+      try {
+        return MemoryImage(base64Decode(base64Image!));
+      } catch (_) {
+        // Fall through to the remote URL if the local cache is invalid.
+      }
+    }
     if (imageUrl != null && imageUrl!.isNotEmpty) {
       return NetworkImage(imageUrl!);
     }
-    if (base64Image == null || base64Image!.isEmpty) return null;
-    try {
-      return MemoryImage(base64Decode(base64Image!));
-    } catch (_) {
-      return null;
-    }
+    return null;
   }
 }

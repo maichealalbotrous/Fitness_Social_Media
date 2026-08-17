@@ -49,7 +49,10 @@ class _ProfilePageState extends State<ProfilePage> {
     );
     await controller.load();
     if (controller.userId != null) {
-      await _userController.loadById(controller.userId!);
+      _remoteProfile = await _userController.loadById(
+        controller.userId!,
+        forceRefresh: true,
+      );
     }
     if (!mounted) {
       controller.dispose();
@@ -110,9 +113,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         avatarBase64: widget.targetUserId == null
                             ? _profileController?.avatarBase64
                             : null,
-                        avatarUrl: widget.targetUserId == null
-                            ? null
-                            : _remoteProfile?.profilePictureUrl,
+                        avatarUrl: _remoteProfile?.profilePictureUrl,
                         bio: _remoteProfile?.bio ?? '',
                         onBioEdit: widget.targetUserId == null ? _editBio : null,
                         onAvatarTap: widget.targetUserId == null &&
@@ -154,7 +155,10 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<void> _loadRemoteProfile() async {
     final targetUserId = widget.targetUserId;
     if (targetUserId == null) return;
-    final profile = await _userController.loadById(targetUserId);
+    final profile = await _userController.loadById(
+      targetUserId,
+      forceRefresh: true,
+    );
     if (mounted && profile != null) setState(() => _remoteProfile = profile);
   }
 
