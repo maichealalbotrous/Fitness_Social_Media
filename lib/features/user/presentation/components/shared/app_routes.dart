@@ -10,4 +10,5 @@ class AppRoutes {
   static const runs = '/runs';
   static const profile = '/profile';
   static const community = '/community';
+  static const myCommunities = '/my-communities';
 }
