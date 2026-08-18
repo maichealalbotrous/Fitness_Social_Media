@@ -52,16 +52,20 @@ class ApiCommunityRemoteDataSource implements CommunityRemoteDataSource {
 
   @override
   Future<List<CommunityModel>> getMyCommunities() async {
-    final response = await _apiClient.getListJson('/api/Community/user/communities');
-    return response.map(CommunityModel.fromJson).toList(growable: false);
+    final value = await _apiClient.getJsonValue('/api/Community/user/communities');
+    return _listOfMaps(value, const ['communities', 'Communities', 'data', 'Data'])
+        .map(CommunityModel.fromJson)
+        .toList(growable: false);
   }
 
   @override
   Future<List<CommunityMemberModel>> getMembers(String communityId) async {
-    final response = await _apiClient.getListJson(
+    final value = await _apiClient.getJsonValue(
       '/api/Community/${Uri.encodeComponent(communityId)}/members',
     );
-    return response.map(CommunityMemberModel.fromJson).toList(growable: false);
+    return _listOfMaps(value, const ['members', 'Members', 'data', 'Data'])
+        .map(CommunityMemberModel.fromJson)
+        .toList(growable: false);
   }
 
   @override
@@ -115,6 +119,21 @@ class ApiCommunityRemoteDataSource implements CommunityRemoteDataSource {
       '/api/Community/${Uri.encodeComponent(communityId)}/remove-member/${Uri.encodeComponent(userId)}',
     );
     return _message(response, fallback: 'تمت إزالة العضو.');
+  }
+
+  List<Map<String, dynamic>> _listOfMaps(dynamic value, List<String> wrapperKeys) {
+    if (value is List) {
+      return value.whereType<Map<String, dynamic>>().toList(growable: false);
+    }
+    if (value is Map<String, dynamic>) {
+      for (final key in wrapperKeys) {
+        final nested = value[key];
+        if (nested is List) {
+          return nested.whereType<Map<String, dynamic>>().toList(growable: false);
+        }
+      }
+    }
+    throw const ApiException(message: 'استجابة قائمة المجتمع غير صالحة.');
   }
 
   String _message(Map<String, dynamic> response, {required String fallback}) {
