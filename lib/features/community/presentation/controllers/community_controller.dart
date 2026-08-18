@@ -87,6 +87,21 @@ class CommunityController extends ChangeNotifier {
     _beginLoading();
     try {
       _members = await _getCommunityMembers(communityId);
+      final current = _community;
+      final userId = await _currentUserId();
+      if (current != null && current.id == communityId && userId != null) {
+        CommunityMember? member;
+        for (final item in _members) {
+          if (item.userId == userId) {
+            member = item;
+            break;
+          }
+        }
+        _community = current.copyWith(
+          isMember: member != null || current.isOwner,
+          isAdmin: member?.isAdmin == true || current.isOwner,
+        );
+      }
       _errorMessage = null;
     } on ApiException catch (error) {
       _errorMessage = error.message;
