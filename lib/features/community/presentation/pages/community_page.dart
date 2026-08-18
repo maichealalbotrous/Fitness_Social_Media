@@ -141,7 +141,7 @@ class _CommunityPageState extends State<CommunityPage> {
       _controller.restoreLocalMembership(matching.first);
     }
     final community = _controller.community;
-    if (community != null && (community.isMember || community.isAdmin || community.isOwner)) {
+    if (community != null) {
       await _controller.loadMembers(community.id);
     }
   }
