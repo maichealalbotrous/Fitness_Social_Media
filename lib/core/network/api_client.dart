@@ -137,6 +137,20 @@ class ApiClient {
     }
   }
 
+  Future<Map<String, dynamic>> patchJson(
+    String path, {
+    Map<String, dynamic> body = const <String, dynamic>{},
+    Map<String, String>? headers,
+  }) async {
+    final response = await _sendRequest(
+      'PATCH',
+      path,
+      body: body,
+      headers: headers,
+    );
+    return _decodeObjectResponse(response);
+  }
+
   Future<Map<String, dynamic>> deleteJson(
     String path, {
     Map<String, String>? headers,

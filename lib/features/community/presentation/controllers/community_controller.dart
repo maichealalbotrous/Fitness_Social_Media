@@ -14,6 +14,10 @@ class CommunityController extends ChangeNotifier {
     required JoinCommunity joinCommunity,
     required LeaveCommunity leaveCommunity,
     required HandleCommunityRequest handleRequest,
+    required GetCommunityMembers getCommunityMembers,
+    required MakeCommunityAdmin makeCommunityAdmin,
+    required RemoveCommunityAdmin removeCommunityAdmin,
+    required RemoveCommunityMember removeCommunityMember,
     required SessionStorage sessionStorage,
   })  : _createCommunity = createCommunity,
         _getCommunity = getCommunity,
@@ -21,6 +25,10 @@ class CommunityController extends ChangeNotifier {
         _joinCommunity = joinCommunity,
         _leaveCommunity = leaveCommunity,
         _handleRequest = handleRequest,
+        _getCommunityMembers = getCommunityMembers,
+        _makeCommunityAdmin = makeCommunityAdmin,
+        _removeCommunityAdmin = removeCommunityAdmin,
+        _removeCommunityMember = removeCommunityMember,
         _sessionStorage = sessionStorage;
 
   final CreateCommunity _createCommunity;
@@ -29,6 +37,10 @@ class CommunityController extends ChangeNotifier {
   final JoinCommunity _joinCommunity;
   final LeaveCommunity _leaveCommunity;
   final HandleCommunityRequest _handleRequest;
+  final GetCommunityMembers _getCommunityMembers;
+  final MakeCommunityAdmin _makeCommunityAdmin;
+  final RemoveCommunityAdmin _removeCommunityAdmin;
+  final RemoveCommunityMember _removeCommunityMember;
   final SessionStorage _sessionStorage;
 
   Community? _community;
@@ -38,9 +50,11 @@ class CommunityController extends ChangeNotifier {
   String? _successMessage;
 
   List<Community> _myCommunities = const <Community>[];
+  List<CommunityMember> _members = const <CommunityMember>[];
 
   Community? get community => _community;
   List<Community> get myCommunities => _myCommunities;
+  List<CommunityMember> get members => _members;
   bool get isLoading => _isLoading;
   bool get isRequestPending => _isRequestPending;
   String? get errorMessage => _errorMessage;
@@ -64,6 +78,20 @@ class CommunityController extends ChangeNotifier {
       _errorMessage = error.message;
     } catch (_) {
       _errorMessage = 'تعذر تحميل المجتمع.';
+    } finally {
+      _finishLoading();
+    }
+  }
+
+  Future<void> loadMembers(String communityId) async {
+    _beginLoading();
+    try {
+      _members = await _getCommunityMembers(communityId);
+      _errorMessage = null;
+    } on ApiException catch (error) {
+      _errorMessage = error.message;
+    } catch (_) {
+      _errorMessage = 'تعذر تحميل أعضاء المجتمع.';
     } finally {
       _finishLoading();
     }
@@ -171,6 +199,27 @@ class CommunityController extends ChangeNotifier {
     }
   }
 
+  Future<void> makeAdmin(String userId) => _runMemberAction(
+        action: () => _makeCommunityAdmin(
+          communityId: _community!.id,
+          userId: userId,
+        ),
+      );
+
+  Future<void> removeAdmin(String userId) => _runMemberAction(
+        action: () => _removeCommunityAdmin(
+          communityId: _community!.id,
+          userId: userId,
+        ),
+      );
+
+  Future<void> removeMember(String userId) => _runMemberAction(
+        action: () => _removeCommunityMember(
+          communityId: _community!.id,
+          userId: userId,
+        ),
+      );
+
   Future<void> handleRequest({required String requestId, required bool accepted}) =>
       _runAction(
         action: () => _handleRequest(
@@ -178,6 +227,21 @@ class CommunityController extends ChangeNotifier {
           accepted: accepted,
         ),
       );
+
+  Future<void> _runMemberAction({required Future<String> Function() action}) async {
+    _beginLoading();
+    try {
+      _successMessage = await action();
+      _errorMessage = null;
+      if (_community != null) await loadMembers(_community!.id);
+    } on ApiException catch (error) {
+      _errorMessage = error.message;
+    } catch (_) {
+      _errorMessage = 'تعذر تنفيذ عملية العضو.';
+    } finally {
+      _finishLoading();
+    }
+  }
 
   void clearMessages() {
     _errorMessage = null;

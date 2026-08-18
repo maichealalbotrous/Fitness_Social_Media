@@ -56,3 +56,39 @@ class HandleCommunityRequest {
     );
   }
 }
+
+class GetCommunityMembers {
+  const GetCommunityMembers(this._repository);
+  final CommunityRepository _repository;
+
+  Future<List<CommunityMember>> call(String communityId) {
+    return _repository.getMembers(communityId);
+  }
+}
+
+class MakeCommunityAdmin {
+  const MakeCommunityAdmin(this._repository);
+  final CommunityRepository _repository;
+
+  Future<String> call({required String communityId, required String userId}) {
+    return _repository.makeAdmin(communityId: communityId, userId: userId);
+  }
+}
+
+class RemoveCommunityAdmin {
+  const RemoveCommunityAdmin(this._repository);
+  final CommunityRepository _repository;
+
+  Future<String> call({required String communityId, required String userId}) {
+    return _repository.removeAdmin(communityId: communityId, userId: userId);
+  }
+}
+
+class RemoveCommunityMember {
+  const RemoveCommunityMember(this._repository);
+  final CommunityRepository _repository;
+
+  Future<String> call({required String communityId, required String userId}) {
+    return _repository.removeMember(communityId: communityId, userId: userId);
+  }
+}

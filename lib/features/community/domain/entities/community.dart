@@ -53,3 +53,15 @@ class CommunityActionResult {
   final String message;
   final Community? community;
 }
+
+class CommunityMember {
+  const CommunityMember({
+    required this.userId,
+    required this.userName,
+    required this.isAdmin,
+  });
+
+  final String userId;
+  final String userName;
+  final bool isAdmin;
+}

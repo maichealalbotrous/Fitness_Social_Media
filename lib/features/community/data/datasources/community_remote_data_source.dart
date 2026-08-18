@@ -11,9 +11,13 @@ abstract interface class CommunityRemoteDataSource {
 
   Future<CommunityModel> getById(String id);
   Future<List<CommunityModel>> getMyCommunities();
+  Future<List<CommunityMemberModel>> getMembers(String communityId);
   Future<String> join(String id);
   Future<String> leave(String id);
   Future<String> handleRequest({required String requestId, required bool accepted});
+  Future<String> makeAdmin({required String communityId, required String userId});
+  Future<String> removeAdmin({required String communityId, required String userId});
+  Future<String> removeMember({required String communityId, required String userId});
 }
 
 class ApiCommunityRemoteDataSource implements CommunityRemoteDataSource {
@@ -42,28 +46,38 @@ class ApiCommunityRemoteDataSource implements CommunityRemoteDataSource {
 
   @override
   Future<CommunityModel> getById(String id) async {
-    final response = await _apiClient.getJson('/api/Community/$id');
+    final response = await _apiClient.getJson('/api/Community/${Uri.encodeComponent(id)}');
     return CommunityModel.fromJson(response);
   }
 
   @override
   Future<List<CommunityModel>> getMyCommunities() async {
-    final response = await _apiClient.getListJson('/api/Community/my');
+    final response = await _apiClient.getListJson('/api/Community/user/communities');
     return response.map(CommunityModel.fromJson).toList(growable: false);
+  }
+
+  @override
+  Future<List<CommunityMemberModel>> getMembers(String communityId) async {
+    final response = await _apiClient.getListJson(
+      '/api/Community/${Uri.encodeComponent(communityId)}/members',
+    );
+    return response.map(CommunityMemberModel.fromJson).toList(growable: false);
   }
 
   @override
   Future<String> join(String id) async {
     final response = await _apiClient.postJson(
-      '/api/Community/$id/join?communityId=${Uri.encodeComponent(id)}',
-      body: <String, dynamic>{},
+      '/api/Community/${Uri.encodeComponent(id)}/join',
+      body: const <String, dynamic>{},
     );
     return _message(response, fallback: 'تم تنفيذ طلب الانضمام.');
   }
 
   @override
   Future<String> leave(String id) async {
-    final response = await _apiClient.deleteJson('/api/Community/$id/leave');
+    final response = await _apiClient.deleteJson(
+      '/api/Community/${Uri.encodeComponent(id)}/leave',
+    );
     return _message(response, fallback: 'تمت مغادرة المجتمع.');
   }
 
@@ -73,10 +87,34 @@ class ApiCommunityRemoteDataSource implements CommunityRemoteDataSource {
     required bool accepted,
   }) async {
     final response = await _apiClient.postJson(
-      '/requests/$requestId?accepted=$accepted',
-      body: <String, dynamic>{},
+      '/requests/${Uri.encodeComponent(requestId)}?accepted=$accepted',
+      body: const <String, dynamic>{},
     );
     return _message(response, fallback: 'تمت معالجة الطلب.');
+  }
+
+  @override
+  Future<String> makeAdmin({required String communityId, required String userId}) async {
+    final response = await _apiClient.patchJson(
+      '/api/Community/${Uri.encodeComponent(communityId)}/make-admin/${Uri.encodeComponent(userId)}',
+    );
+    return _message(response, fallback: 'تمت ترقية العضو إلى إداري.');
+  }
+
+  @override
+  Future<String> removeAdmin({required String communityId, required String userId}) async {
+    final response = await _apiClient.patchJson(
+      '/api/Community/${Uri.encodeComponent(communityId)}/remove-admin/${Uri.encodeComponent(userId)}',
+    );
+    return _message(response, fallback: 'تمت إزالة صلاحية الإداري.');
+  }
+
+  @override
+  Future<String> removeMember({required String communityId, required String userId}) async {
+    final response = await _apiClient.deleteJson(
+      '/api/Community/${Uri.encodeComponent(communityId)}/remove-member/${Uri.encodeComponent(userId)}',
+    );
+    return _message(response, fallback: 'تمت إزالة العضو.');
   }
 
   String _message(Map<String, dynamic> response, {required String fallback}) {

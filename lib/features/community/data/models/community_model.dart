@@ -85,3 +85,23 @@ List<String> _strings(dynamic value) {
 }
 
 String _pascal(String value) => value[0].toUpperCase() + value.substring(1);
+
+class CommunityMemberModel {
+  const CommunityMemberModel({
+    required this.userId,
+    required this.userName,
+    required this.isAdmin,
+  });
+
+  final String userId;
+  final String userName;
+  final bool isAdmin;
+
+  factory CommunityMemberModel.fromJson(Map<String, dynamic> json) {
+    return CommunityMemberModel(
+      userId: _string(json, 'userId'),
+      userName: _string(json, 'userName'),
+      isAdmin: _bool(json, 'isAdmin'),
+    );
+  }
+}

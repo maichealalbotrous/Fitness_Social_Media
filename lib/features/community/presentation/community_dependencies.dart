@@ -21,6 +21,10 @@ class CommunityDependencies {
       joinCommunity: JoinCommunity(repository),
       leaveCommunity: LeaveCommunity(repository),
       handleRequest: HandleCommunityRequest(repository),
+      getCommunityMembers: GetCommunityMembers(repository),
+      makeCommunityAdmin: MakeCommunityAdmin(repository),
+      removeCommunityAdmin: RemoveCommunityAdmin(repository),
+      removeCommunityMember: RemoveCommunityMember(repository),
       sessionStorage: SecureSessionStorage(),
     );
   }
