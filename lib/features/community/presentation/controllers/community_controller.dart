@@ -10,22 +10,37 @@ class CommunityController extends ChangeNotifier {
   CommunityController({
     required CreateCommunity createCommunity,
     required GetCommunity getCommunity,
+    required GetMyCommunities getMyCommunities,
     required JoinCommunity joinCommunity,
     required LeaveCommunity leaveCommunity,
     required HandleCommunityRequest handleRequest,
+    required GetCommunityMembers getCommunityMembers,
+    required MakeCommunityAdmin makeCommunityAdmin,
+    required RemoveCommunityAdmin removeCommunityAdmin,
+    required RemoveCommunityMember removeCommunityMember,
     required SessionStorage sessionStorage,
   })  : _createCommunity = createCommunity,
         _getCommunity = getCommunity,
+        _getMyCommunities = getMyCommunities,
         _joinCommunity = joinCommunity,
         _leaveCommunity = leaveCommunity,
         _handleRequest = handleRequest,
+        _getCommunityMembers = getCommunityMembers,
+        _makeCommunityAdmin = makeCommunityAdmin,
+        _removeCommunityAdmin = removeCommunityAdmin,
+        _removeCommunityMember = removeCommunityMember,
         _sessionStorage = sessionStorage;
 
   final CreateCommunity _createCommunity;
   final GetCommunity _getCommunity;
+  final GetMyCommunities _getMyCommunities;
   final JoinCommunity _joinCommunity;
   final LeaveCommunity _leaveCommunity;
   final HandleCommunityRequest _handleRequest;
+  final GetCommunityMembers _getCommunityMembers;
+  final MakeCommunityAdmin _makeCommunityAdmin;
+  final RemoveCommunityAdmin _removeCommunityAdmin;
+  final RemoveCommunityMember _removeCommunityMember;
   final SessionStorage _sessionStorage;
 
   Community? _community;
@@ -34,7 +49,12 @@ class CommunityController extends ChangeNotifier {
   String? _errorMessage;
   String? _successMessage;
 
+  List<Community> _myCommunities = const <Community>[];
+  List<CommunityMember> _members = const <CommunityMember>[];
+
   Community? get community => _community;
+  List<Community> get myCommunities => _myCommunities;
+  List<CommunityMember> get members => _members;
   bool get isLoading => _isLoading;
   bool get isRequestPending => _isRequestPending;
   String? get errorMessage => _errorMessage;
@@ -47,9 +67,11 @@ class CommunityController extends ChangeNotifier {
     try {
       final loaded = await _getCommunity(trimmedId);
       final userId = await _currentUserId();
+      final isOwner = loaded.isOwner || (userId != null && loaded.ownerId == userId);
       _community = loaded.copyWith(
-        isOwner: loaded.isOwner || (userId != null && loaded.ownerId == userId),
+        isOwner: isOwner,
         isAdmin: loaded.isAdmin || (userId != null && loaded.adminIds.contains(userId)),
+        isMember: loaded.isMember || isOwner,
       );
       _errorMessage = null;
     } on ApiException catch (error) {
@@ -59,6 +81,48 @@ class CommunityController extends ChangeNotifier {
     } finally {
       _finishLoading();
     }
+  }
+
+  Future<void> loadMembers(String communityId) async {
+    _beginLoading();
+    try {
+      _members = await _getCommunityMembers(communityId);
+      _errorMessage = null;
+    } on ApiException catch (error) {
+      _errorMessage = error.message;
+    } catch (_) {
+      _errorMessage = 'تعذر تحميل أعضاء المجتمع.';
+    } finally {
+      _finishLoading();
+    }
+  }
+
+  Future<void> loadMyCommunities() async {
+    _beginLoading();
+    try {
+      _myCommunities = await _getMyCommunities();
+      _errorMessage = null;
+    } on ApiException catch (error) {
+      _errorMessage = error.message;
+    } catch (_) {
+      _errorMessage = 'تعذر تحميل مجتمعاتك.';
+    } finally {
+      _finishLoading();
+    }
+  }
+
+  void restoreLocalMembership(Community cached) {
+    final current = _community;
+    if (current == null || current.id != cached.id || !cached.isMember) return;
+    _community = current.copyWith(
+      isMember: true,
+      isAdmin: current.isAdmin || cached.isAdmin,
+      isOwner: current.isOwner || cached.isOwner,
+      memberCount: cached.memberCount > current.memberCount
+          ? cached.memberCount
+          : current.memberCount,
+    );
+    notifyListeners();
   }
 
   Future<void> create({
@@ -135,6 +199,27 @@ class CommunityController extends ChangeNotifier {
     }
   }
 
+  Future<void> makeAdmin(String userId) => _runMemberAction(
+        action: () => _makeCommunityAdmin(
+          communityId: _community!.id,
+          userId: userId,
+        ),
+      );
+
+  Future<void> removeAdmin(String userId) => _runMemberAction(
+        action: () => _removeCommunityAdmin(
+          communityId: _community!.id,
+          userId: userId,
+        ),
+      );
+
+  Future<void> removeMember(String userId) => _runMemberAction(
+        action: () => _removeCommunityMember(
+          communityId: _community!.id,
+          userId: userId,
+        ),
+      );
+
   Future<void> handleRequest({required String requestId, required bool accepted}) =>
       _runAction(
         action: () => _handleRequest(
@@ -142,6 +227,21 @@ class CommunityController extends ChangeNotifier {
           accepted: accepted,
         ),
       );
+
+  Future<void> _runMemberAction({required Future<String> Function() action}) async {
+    _beginLoading();
+    try {
+      _successMessage = await action();
+      _errorMessage = null;
+      if (_community != null) await loadMembers(_community!.id);
+    } on ApiException catch (error) {
+      _errorMessage = error.message;
+    } catch (_) {
+      _errorMessage = 'تعذر تنفيذ عملية العضو.';
+    } finally {
+      _finishLoading();
+    }
+  }
 
   void clearMessages() {
     _errorMessage = null;

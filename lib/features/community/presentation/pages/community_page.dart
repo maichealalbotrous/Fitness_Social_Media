@@ -36,7 +36,7 @@ class _CommunityPageState extends State<CommunityPage> {
     _controller = CommunityDependencies.createController();
     if (widget.initialCommunityId != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        _controller.load(widget.initialCommunityId!);
+        _loadCommunity(widget.initialCommunityId!);
       });
     }
   }
@@ -55,11 +55,23 @@ class _CommunityPageState extends State<CommunityPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF050505),
-      appBar: AppBar(
-        title: const Text('Community'),
-        backgroundColor: const Color(0xFF050505),
-        foregroundColor: Colors.white,
-      ),
+              appBar: AppBar(
+          leading: IconButton(
+            tooltip: 'Back',
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              if (Navigator.of(context).canPop()) {
+                Navigator.of(context).pop();
+              } else {
+                Navigator.of(context).pushReplacementNamed('/feed');
+              }
+            },
+          ),
+          title: const Text('Community'),
+          backgroundColor: const Color(0xFF050505),
+          foregroundColor: Colors.white,
+        ),
+
       body: AnimatedBuilder(
         animation: _controller,
         builder: (context, _) => ListView(
@@ -83,7 +95,7 @@ class _CommunityPageState extends State<CommunityPage> {
             _LookupCard(
               controller: _idController,
               isLoading: _controller.isLoading,
-              onLoad: () => _controller.load(_idController.text),
+              onLoad: () => _loadCommunity(_idController.text),
             ),
             const SizedBox(height: 16),
             if (_controller.errorMessage != null)
@@ -102,6 +114,11 @@ class _CommunityPageState extends State<CommunityPage> {
                 isRequestPending: _controller.isRequestPending,
                 requestIdController: _requestIdController,
                 isLoading: _controller.isLoading,
+                members: _controller.members,
+                onLoadMembers: () => _controller.loadMembers(community.id),
+                onMakeAdmin: _controller.makeAdmin,
+                onRemoveAdmin: _controller.removeAdmin,
+                onRemoveMember: _controller.removeMember,
                 onJoin: _join,
                 onLeave: _leave,
                 onAcceptRequest: () => _handleRequest(true),
@@ -111,6 +128,22 @@ class _CommunityPageState extends State<CommunityPage> {
         ),
       ),
     );
+  }
+
+  Future<void> _loadCommunity(String id) async {
+    final trimmedId = id.trim();
+    if (trimmedId.isEmpty) return;
+    await _controller.load(trimmedId);
+    if (!mounted) return;
+    final cached = await _localStorage.read();
+    final matching = cached.where((item) => item.id == trimmedId).toList();
+    if (matching.isNotEmpty) {
+      _controller.restoreLocalMembership(matching.first);
+    }
+    final community = _controller.community;
+    if (community != null && (community.isMember || community.isAdmin || community.isOwner)) {
+      await _controller.loadMembers(community.id);
+    }
   }
 
   Future<void> _handleRequest(bool accepted) async {
@@ -164,9 +197,31 @@ class _CommunityPageState extends State<CommunityPage> {
   }
 
   Future<void> _leave() async {
-    final id = _controller.community?.id;
+    final community = _controller.community;
+    if (community == null) return;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Leave community?'),
+        content: Text('Are you sure you want to leave ${community.name}?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Leave'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
     await _controller.leave();
-    if (id != null) await _localStorage.remove(id);
+    if (_controller.errorMessage == null) {
+      await _localStorage.remove(community.id);
+    }
   }
 
   String _mimeType(String name) {
@@ -326,6 +381,11 @@ class _CommunityDetails extends StatelessWidget {
     required this.isRequestPending,
     required this.requestIdController,
     required this.isLoading,
+    required this.members,
+    required this.onLoadMembers,
+    required this.onMakeAdmin,
+    required this.onRemoveAdmin,
+    required this.onRemoveMember,
     required this.onJoin,
     required this.onLeave,
     required this.onAcceptRequest,
@@ -336,6 +396,11 @@ class _CommunityDetails extends StatelessWidget {
   final bool isRequestPending;
   final TextEditingController requestIdController;
   final bool isLoading;
+  final List<CommunityMember> members;
+  final VoidCallback onLoadMembers;
+  final Future<void> Function(String userId) onMakeAdmin;
+  final Future<void> Function(String userId) onRemoveAdmin;
+  final Future<void> Function(String userId) onRemoveMember;
   final Future<void> Function() onJoin;
   final Future<void> Function() onLeave;
   final Future<void> Function() onAcceptRequest;
@@ -393,6 +458,52 @@ class _CommunityDetails extends StatelessWidget {
                 style: TextStyle(color: Colors.amber),
               ),
             ),
+          if (community.isMember || community.isAdmin || community.isOwner) ...[
+            const SizedBox(height: 20),
+            const Divider(color: Colors.white24),
+            Row(
+              children: [
+                const Expanded(
+                  child: Text('Members', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                ),
+                IconButton(
+                  onPressed: isLoading ? null : onLoadMembers,
+                  icon: const Icon(Icons.refresh, color: Colors.white70),
+                  tooltip: 'Refresh members',
+                ),
+              ],
+            ),
+            if (members.isEmpty)
+              const Text('No members loaded.', style: TextStyle(color: Colors.white54))
+            else
+              ...members.map(
+                (member) => ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: CircleAvatar(
+                    radius: 18,
+                    child: Text(member.userName.isEmpty ? '?' : member.userName[0].toUpperCase()),
+                  ),
+                  title: Text(member.userName, style: const TextStyle(color: Colors.white)),
+                  subtitle: Text(member.isAdmin ? 'Admin' : 'Member', style: const TextStyle(color: Colors.white54)),
+                  trailing: community.isOwner && member.userId != community.ownerId
+                      ? PopupMenuButton<String>(
+                          onSelected: (value) {
+                            if (value == 'make-admin') onMakeAdmin(member.userId);
+                            if (value == 'remove-admin') onRemoveAdmin(member.userId);
+                            if (value == 'remove-member') onRemoveMember(member.userId);
+                          },
+                          itemBuilder: (_) => [
+                            if (!member.isAdmin)
+                              const PopupMenuItem(value: 'make-admin', child: Text('Make admin')),
+                            if (member.isAdmin)
+                              const PopupMenuItem(value: 'remove-admin', child: Text('Remove admin')),
+                            const PopupMenuItem(value: 'remove-member', child: Text('Remove member')),
+                          ],
+                        )
+                      : null,
+                ),
+              ),
+          ],
           if (community.isAdmin) ...[
             const SizedBox(height: 20),
             const Divider(color: Colors.white24),

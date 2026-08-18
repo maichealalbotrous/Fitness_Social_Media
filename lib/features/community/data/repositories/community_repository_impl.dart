@@ -28,6 +28,26 @@ class CommunityRepositoryImpl implements CommunityRepository {
   }
 
   @override
+  Future<List<Community>> getMyCommunities() async {
+    final models = await _remoteDataSource.getMyCommunities();
+    return models.map((model) => model.toEntity()).toList(growable: false);
+  }
+
+  @override
+  Future<List<CommunityMember>> getMembers(String communityId) async {
+    final models = await _remoteDataSource.getMembers(communityId);
+    return models
+        .map(
+          (model) => CommunityMember(
+            userId: model.userId,
+            userName: model.userName,
+            isAdmin: model.isAdmin,
+          ),
+        )
+        .toList(growable: false);
+  }
+
+  @override
   Future<String> join(String id) => _remoteDataSource.join(id);
 
   @override
@@ -39,5 +59,20 @@ class CommunityRepositoryImpl implements CommunityRepository {
       requestId: requestId,
       accepted: accepted,
     );
+  }
+
+  @override
+  Future<String> makeAdmin({required String communityId, required String userId}) {
+    return _remoteDataSource.makeAdmin(communityId: communityId, userId: userId);
+  }
+
+  @override
+  Future<String> removeAdmin({required String communityId, required String userId}) {
+    return _remoteDataSource.removeAdmin(communityId: communityId, userId: userId);
+  }
+
+  @override
+  Future<String> removeMember({required String communityId, required String userId}) {
+    return _remoteDataSource.removeMember(communityId: communityId, userId: userId);
   }
 }

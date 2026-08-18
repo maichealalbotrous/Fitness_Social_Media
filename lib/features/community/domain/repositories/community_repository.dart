@@ -9,6 +9,8 @@ abstract interface class CommunityRepository {
   });
 
   Future<Community> getById(String id);
+  Future<List<Community>> getMyCommunities();
+  Future<List<CommunityMember>> getMembers(String communityId);
 
   Future<String> join(String id);
 
@@ -18,4 +20,8 @@ abstract interface class CommunityRepository {
     required String requestId,
     required bool accepted,
   });
+
+  Future<String> makeAdmin({required String communityId, required String userId});
+  Future<String> removeAdmin({required String communityId, required String userId});
+  Future<String> removeMember({required String communityId, required String userId});
 }
