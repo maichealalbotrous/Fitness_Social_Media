@@ -126,7 +126,12 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
     if (!mounted) return;
     final comments = List<Comment>.of(_controller.comments);
     final profiles = await Future.wait(
-      comments.map((comment) => _userController.loadById(comment.authorId)),
+      comments.map(
+        (comment) => _userController.loadById(
+          comment.authorId,
+          forceRefresh: true,
+        ),
+      ),
     );
     if (!mounted) return;
     for (var index = 0; index < comments.length; index++) {
@@ -182,7 +187,10 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
       _message = comment == null ? _controller.errorMessage : 'تمت إضافة التعليق.';
     });
     if (comment != null) {
-      final profile = await _userController.loadById(comment.authorId);
+      final profile = await _userController.loadById(
+        comment.authorId,
+        forceRefresh: true,
+      );
       if (profile != null) {
         _commentProfiles[comment.authorId] = profile;
       }
