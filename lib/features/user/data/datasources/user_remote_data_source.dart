@@ -38,7 +38,15 @@ class ApiUserRemoteDataSource implements UserRemoteDataSource {
         if (profilePictureUrl != null) 'profilePictureUrl': profilePictureUrl,
       },
     );
-    return UserProfileModel.fromJson(response);
+    return UserProfileModel.fromJson(_unwrapUser(response));
+  }
+
+  Map<String, dynamic> _unwrapUser(Map<String, dynamic> response) {
+    for (final key in const ['user', 'User', 'data', 'Data', 'profile', 'Profile']) {
+      final value = response[key];
+      if (value is Map<String, dynamic>) return value;
+    }
+    return response;
   }
 
   @override

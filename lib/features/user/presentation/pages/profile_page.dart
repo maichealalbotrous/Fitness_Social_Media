@@ -53,6 +53,13 @@ class _ProfilePageState extends State<ProfilePage> {
         controller.userId!,
         forceRefresh: true,
       );
+      final profile = _remoteProfile;
+      if (profile != null) {
+        await controller.applyRemoteIdentity(
+          displayName: profile.username,
+          email: profile.email,
+        );
+      }
     }
     if (!mounted) {
       controller.dispose();
@@ -207,7 +214,11 @@ class _ProfilePageState extends State<ProfilePage> {
     final updated = await _userController.updateProfile(bio: bio);
     if (!mounted) return;
     if (updated != null) {
-      setState(() => _remoteProfile = updated);
+      final refreshed = await _userController.loadById(
+        updated.id,
+        forceRefresh: true,
+      );
+      setState(() => _remoteProfile = refreshed ?? updated);
     } else if (_userController.errorMessage != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(_userController.errorMessage!)),

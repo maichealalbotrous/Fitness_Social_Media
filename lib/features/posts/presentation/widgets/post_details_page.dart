@@ -66,7 +66,7 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
               PostCard(
                 post: _post,
                 onLike: _toggleLike,
-                currentUserId: _post.authorId,
+                currentUserId: null,
                 currentUserName: _postProfile?.username,
                 authorAvatar: _postProfile?.profilePictureUrl,
               ),

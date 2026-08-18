@@ -66,6 +66,20 @@ class LocalProfileController extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> applyRemoteIdentity({String? displayName, String? email}) async {
+    if (displayName != null && displayName.trim().isNotEmpty) {
+      _displayName = displayName.trim();
+    }
+    if (email != null && email.trim().isNotEmpty) {
+      _email = email.trim();
+    }
+    await _profileStorage.saveIdentity(
+      displayName: displayName,
+      email: email,
+    );
+    notifyListeners();
+  }
+
   Future<void> pickAvatar() async {
     await pickAvatarBytes();
   }

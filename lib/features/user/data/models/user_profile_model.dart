@@ -17,11 +17,14 @@ class UserProfileModel {
 
   factory UserProfileModel.fromJson(Map<String, dynamic> json) {
     return UserProfileModel(
-      id: _string(json, 'id'),
-      username: _string(json, 'username'),
-      email: _string(json, 'email'),
-      bio: _nullableString(json, 'bio'),
-      profilePictureUrl: _nullableString(json, 'profilePictureUrl'),
+      id: _firstString(json, const ['id', 'userId', 'Id', 'UserId']),
+      username: _firstString(json, const ['username', 'userName', 'Username', 'UserName']),
+      email: _firstString(json, const ['email', 'Email']),
+      bio: _firstNullableString(json, const ['bio', 'Bio']),
+      profilePictureUrl: _firstNullableString(
+        json,
+        const ['profilePictureUrl', 'ProfilePictureUrl', 'profilePicture', 'ProfilePicture'],
+      ),
     );
   }
 
@@ -34,14 +37,15 @@ class UserProfileModel {
       );
 }
 
-String _string(Map<String, dynamic> json, String key) {
-  final value = json[key] ?? json[_pascal(key)];
-  return value is String ? value : '';
+String _firstString(Map<String, dynamic> json, List<String> keys) {
+  for (final key in keys) {
+    final value = json[key];
+    if (value is String && value.trim().isNotEmpty) return value;
+  }
+  return '';
 }
 
-String? _nullableString(Map<String, dynamic> json, String key) {
-  final value = json[key] ?? json[_pascal(key)];
-  return value is String && value.isNotEmpty ? value : null;
+String? _firstNullableString(Map<String, dynamic> json, List<String> keys) {
+  final value = _firstString(json, keys);
+  return value.isEmpty ? null : value;
 }
-
-String _pascal(String value) => value[0].toUpperCase() + value.substring(1);
