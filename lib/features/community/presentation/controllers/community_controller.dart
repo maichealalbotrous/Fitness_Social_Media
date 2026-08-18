@@ -70,8 +70,10 @@ class CommunityController extends ChangeNotifier {
       final isOwner = loaded.isOwner || (userId != null && loaded.ownerId == userId);
       _community = loaded.copyWith(
         isOwner: isOwner,
-        isAdmin: loaded.isAdmin || (userId != null && loaded.adminIds.contains(userId)),
-        isMember: loaded.isMember || isOwner,
+        // GET /api/Community/{id} in the current backend uses a default
+        // IsMember value. Membership must be confirmed by /members.
+        isAdmin: isOwner,
+        isMember: isOwner,
       );
       _errorMessage = null;
     } on ApiException catch (error) {
@@ -104,8 +106,26 @@ class CommunityController extends ChangeNotifier {
       }
       _errorMessage = null;
     } on ApiException catch (error) {
-      _errorMessage = error.message;
+      _members = const <CommunityMember>[];
+      final current = _community;
+      if (current != null && current.id == communityId) {
+        _community = current.copyWith(
+          isMember: current.isOwner,
+          isAdmin: current.isOwner,
+        );
+      }
+      // A non-member receives 403 from the members endpoint; that is a
+      // normal state for the lookup page, not a visible loading error.
+      _errorMessage = error.statusCode == 403 ? null : error.message;
     } catch (_) {
+      _members = const <CommunityMember>[];
+      final current = _community;
+      if (current != null && current.id == communityId) {
+        _community = current.copyWith(
+          isMember: current.isOwner,
+          isAdmin: current.isOwner,
+        );
+      }
       _errorMessage = 'تعذر تحميل أعضاء المجتمع.';
     } finally {
       _finishLoading();
