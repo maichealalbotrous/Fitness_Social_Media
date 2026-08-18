@@ -102,6 +102,22 @@ class ApiClient {
     return _decodeObjectResponse(response);
   }
 
+  Future<dynamic> putJsonValue(
+    String path, {
+    required dynamic body,
+    Map<String, String>? headers,
+  }) async {
+    final response = await _sendRequest(
+      'PUT',
+      path,
+      body: body,
+      headers: headers,
+    );
+    final decoded = _decodeValue(response.body);
+    _ensureSuccess(response, decoded);
+    return decoded;
+  }
+
   Future<Map<String, dynamic>> postMultipartBytes(
     String path, {
     required String fieldName,
@@ -162,7 +178,7 @@ class ApiClient {
   Future<http.Response> _sendRequest(
     String method,
     String path, {
-    Map<String, dynamic>? body,
+    dynamic body,
     Map<String, String>? headers,
   }) async {
     try {

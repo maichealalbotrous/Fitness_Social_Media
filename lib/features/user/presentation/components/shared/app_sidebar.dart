@@ -82,6 +82,12 @@ class AppSidebar extends StatelessWidget {
                 routeName: AppRoutes.myCommunities,
               ),
               _SidebarItem(
+                icon: Icons.flag_outlined,
+                label: 'Challenges',
+                active: false,
+                routeName: AppRoutes.challenges,
+              ),
+              _SidebarItem(
                 icon: Icons.search,
                 label: 'Search users',
                 active: false,

@@ -12,4 +12,5 @@ class AppRoutes {
   static const community = '/community';
   static const myCommunities = '/my-communities';
   static const userSearch = '/users/search';
+  static const challenges = '/challenges';
 }

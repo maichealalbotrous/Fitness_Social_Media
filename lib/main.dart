@@ -11,6 +11,7 @@ import 'package:fitness_social_app/features/user/presentation/pages/run_page.dar
 import 'package:fitness_social_app/features/user/presentation/pages/workout_page.dart';
 import 'package:fitness_social_app/features/community/presentation/pages/community_page.dart';
 import 'package:fitness_social_app/features/community/presentation/pages/my_communities_page.dart';
+import 'package:fitness_social_app/features/challenges/presentation/pages/challenges_page.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
@@ -45,6 +46,7 @@ class FitnessSocialApp extends StatelessWidget {
         AppRoutes.community: (_) => const CommunityPage(),
         AppRoutes.myCommunities: (_) => const MyCommunitiesPage(),
         AppRoutes.userSearch: (_) => const UserSearchPage(),
+        AppRoutes.challenges: (_) => const ChallengesPage(),
       },
     );
   }
