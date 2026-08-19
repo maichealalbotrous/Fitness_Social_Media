@@ -1,3 +1,4 @@
+import 'package:fitness_social_app/core/network/api_client.dart';
 import 'package:fitness_social_app/features/posts/data/datasources/post_remote_data_source.dart';
 import 'package:fitness_social_app/features/posts/domain/entities/post.dart';
 import 'package:fitness_social_app/features/posts/domain/repositories/post_repository.dart';
@@ -23,6 +24,11 @@ class PostRepositoryImpl implements PostRepository {
   Future<Post> getPostById(String postId) async {
     final post = await _remoteDataSource.getPostById(postId);
     return post.toEntity();
+  }
+
+  @override
+  Future<List<String>> uploadPostMedia(List<MultipartUploadFile> files) {
+    return _remoteDataSource.uploadPostMedia(files);
   }
 
   @override

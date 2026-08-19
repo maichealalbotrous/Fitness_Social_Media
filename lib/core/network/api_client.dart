@@ -153,6 +153,34 @@ class ApiClient {
     }
   }
 
+  Future<Map<String, dynamic>> postMultipartFiles(
+    String path, {
+    required String fieldName,
+    required List<MultipartUploadFile> files,
+  }) async {
+    try {
+      final request = http.MultipartRequest('POST', AppConfig.apiUri(path));
+      request.headers.addAll({
+        'Accept': 'application/json',
+        ...await _authorizationHeaders(),
+      });
+      for (final file in files) {
+        request.files.add(http.MultipartFile.fromBytes(
+          fieldName,
+          file.bytes,
+          filename: file.fileName,
+        ));
+      }
+      final streamedResponse = await _client.send(request).timeout(const Duration(seconds: 30));
+      final response = await http.Response.fromStream(streamedResponse);
+      return _decodeObjectResponse(response);
+    } on TimeoutException {
+      throw const ApiException(message: 'انتهت مهلة رفع الملفات. حاول مرة أخرى.');
+    } on http.ClientException {
+      throw const ApiException(message: 'تعذر الاتصال بالخادم أثناء رفع الملفات.');
+    }
+  }
+
   Future<Map<String, dynamic>> patchJson(
     String path, {
     Map<String, dynamic> body = const <String, dynamic>{},
@@ -280,6 +308,13 @@ class ApiClient {
       return <String, dynamic>{};
     }
   }
+}
+
+class MultipartUploadFile {
+  const MultipartUploadFile({required this.fileName, required this.bytes});
+
+  final String fileName;
+  final List<int> bytes;
 }
 
 class ApiException implements Exception {

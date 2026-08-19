@@ -8,6 +8,8 @@ abstract interface class PostRemoteDataSource {
 
   Future<PostModel> getPostById(String postId);
 
+  Future<List<String>> uploadPostMedia(List<MultipartUploadFile> files);
+
   Future<PostModel> createPost({
     required String content,
     String? communityId,
@@ -54,6 +56,18 @@ class ApiPostRemoteDataSource implements PostRemoteDataSource {
   Future<PostModel> getPostById(String postId) async {
     final response = await _apiClient.getJson('/api/Posts/$postId');
     return PostModel.fromJson(response);
+  }
+
+  @override
+  Future<List<String>> uploadPostMedia(List<MultipartUploadFile> files) async {
+    final response = await _apiClient.postMultipartFiles(
+      '/api/Media/upload-post-media',
+      fieldName: 'files',
+      files: files,
+    );
+    final urls = response['urls'] ?? response['Urls'];
+    if (urls is! List) return const <String>[];
+    return urls.whereType<String>().where((url) => url.isNotEmpty).toList(growable: false);
   }
 
   @override

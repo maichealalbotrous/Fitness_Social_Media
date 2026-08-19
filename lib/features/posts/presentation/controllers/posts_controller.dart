@@ -10,6 +10,7 @@ class PostsController extends ChangeNotifier {
     required GetAllPosts getAllPosts,
     required GetPostById getPostById,
     required CreatePost createPost,
+    required UploadPostMedia uploadPostMedia,
     required DeletePost deletePost,
     required TogglePostLike togglePostLike,
     required GetPostComments getPostComments,
@@ -18,6 +19,7 @@ class PostsController extends ChangeNotifier {
         _getAllPosts = getAllPosts,
         _getPostById = getPostById,
         _createPost = createPost,
+        _uploadPostMedia = uploadPostMedia,
         _deletePost = deletePost,
         _togglePostLike = togglePostLike,
         _getPostComments = getPostComments,
@@ -27,6 +29,7 @@ class PostsController extends ChangeNotifier {
   final GetAllPosts _getAllPosts;
   final GetPostById _getPostById;
   final CreatePost _createPost;
+  final UploadPostMedia _uploadPostMedia;
   final DeletePost _deletePost;
   final TogglePostLike _togglePostLike;
   final GetPostComments _getPostComments;
@@ -89,6 +92,20 @@ class PostsController extends ChangeNotifier {
       notifyListeners();
       return null;
     }
+  }
+
+  Future<List<String>?> uploadPostMedia(List<MultipartUploadFile> files) async {
+    try {
+      final urls = await _uploadPostMedia(files);
+      _errorMessage = null;
+      return urls;
+    } on ApiException catch (exception) {
+      _errorMessage = exception.message;
+    } catch (_) {
+      _errorMessage = 'تعذر رفع صور المنشور.';
+    }
+    notifyListeners();
+    return null;
   }
 
   Future<Post?> createPost({

@@ -1,3 +1,4 @@
+import 'package:fitness_social_app/core/network/api_client.dart';
 import 'package:fitness_social_app/features/posts/domain/entities/post.dart';
 import 'package:fitness_social_app/features/posts/domain/repositories/post_repository.dart';
 
@@ -23,6 +24,15 @@ class GetPostById {
   final PostRepository _repository;
 
   Future<Post> call(String postId) => _repository.getPostById(postId);
+}
+
+class UploadPostMedia {
+  const UploadPostMedia(this._repository);
+
+  final PostRepository _repository;
+
+  Future<List<String>> call(List<MultipartUploadFile> files) =>
+      _repository.uploadPostMedia(files);
 }
 
 class CreatePost {

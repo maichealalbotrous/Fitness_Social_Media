@@ -1,5 +1,6 @@
-import 'dart:convert';
 import 'dart:typed_data';
+
+import 'package:fitness_social_app/core/network/api_client.dart';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -169,7 +170,20 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
     setState(() => _isSubmitting = true);
-    final mediaUrls = await Future.wait(_selectedImages.map(_toDataUrl));
+    final files = <MultipartUploadFile>[];
+    for (final image in _selectedImages) {
+      files.add(MultipartUploadFile(
+        fileName: image.name,
+        bytes: await image.readAsBytes(),
+      ));
+    }
+    final mediaUrls = files.isEmpty
+        ? const <String>[]
+        : await widget.controller.uploadPostMedia(files);
+    if (mediaUrls == null) {
+      if (mounted) setState(() => _isSubmitting = false);
+      return;
+    }
     final post = await widget.controller.createPost(
       content: _contentController.text.trim(),
       mediaUrls: mediaUrls,
@@ -180,21 +194,6 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
     if (post != null) Navigator.of(context).pop(true);
   }
 
-  Future<String> _toDataUrl(XFile file) async {
-    final bytes = await file.readAsBytes();
-    final mimeType = file.mimeType ?? _mimeType(file.name);
-    return 'data:$mimeType;base64,${base64Encode(bytes)}';
-  }
-
-  String _mimeType(String name) {
-    final extension = name.split('.').last.toLowerCase();
-    return switch (extension) {
-      'png' => 'image/png',
-      'webp' => 'image/webp',
-      'gif' => 'image/gif',
-      _ => 'image/jpeg',
-    };
-  }
 }
 
 class _SelectedImagesPreview extends StatelessWidget {

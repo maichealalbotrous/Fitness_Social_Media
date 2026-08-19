@@ -7,6 +7,8 @@ abstract interface class AuthRemoteDataSource {
 
   Future<String> login(LoginCredentials credentials);
 
+  Future<void> logout();
+
   Future<String> requestPasswordReset(String email);
 
   Future<String> resetPassword(PasswordResetCredentials credentials);
@@ -18,6 +20,11 @@ class ApiAuthRemoteDataSource implements AuthRemoteDataSource {
   ApiAuthRemoteDataSource(this._apiClient);
 
   final ApiClient _apiClient;
+
+  @override
+  Future<void> logout() async {
+    await _apiClient.postJson('/api/Auth/logout', body: const <String, dynamic>{});
+  }
 
   @override
   Future<String> register(RegisterCredentials credentials) async {

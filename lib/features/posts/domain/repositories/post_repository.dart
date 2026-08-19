@@ -1,3 +1,4 @@
+import 'package:fitness_social_app/core/network/api_client.dart';
 import 'package:fitness_social_app/features/posts/domain/entities/post.dart';
 
 abstract interface class PostRepository {
@@ -6,6 +7,8 @@ abstract interface class PostRepository {
   Future<List<Post>> getFeedPosts();
 
   Future<Post> getPostById(String postId);
+
+  Future<List<String>> uploadPostMedia(List<MultipartUploadFile> files);
 
   Future<Post> createPost({
     required String content,

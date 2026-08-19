@@ -126,17 +126,21 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
     if (!mounted) return;
     final comments = List<Comment>.of(_controller.comments);
     final profiles = await Future.wait(
-      comments.map(
-        (comment) => _userController.loadById(
-          comment.authorId,
-          forceRefresh: true,
-        ),
-      ),
+      comments.map((comment) async {
+        try {
+          return await _userController.loadById(
+            comment.authorId,
+            forceRefresh: false,
+          );
+        } catch (_) {
+          return null;
+        }
+      }),
     );
     if (!mounted) return;
     for (var index = 0; index < comments.length; index++) {
       final profile = profiles[index];
-      if (profile != null) {
+      if (profile != null && profile.username.trim().isNotEmpty) {
         _commentProfiles[comments[index].authorId] = profile;
       }
     }
@@ -187,10 +191,15 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
       _message = comment == null ? _controller.errorMessage : 'تمت إضافة التعليق.';
     });
     if (comment != null) {
-      final profile = await _userController.loadById(
-        comment.authorId,
-        forceRefresh: true,
-      );
+      UserProfile? profile;
+      try {
+        profile = await _userController.loadById(
+          comment.authorId,
+          forceRefresh: false,
+        );
+      } catch (_) {
+        profile = null;
+      }
       if (profile != null) {
         _commentProfiles[comment.authorId] = profile;
       }

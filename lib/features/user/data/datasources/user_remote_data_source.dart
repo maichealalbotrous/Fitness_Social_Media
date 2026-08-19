@@ -55,12 +55,15 @@ class ApiUserRemoteDataSource implements UserRemoteDataSource {
     required List<int> bytes,
   }) async {
     final response = await _apiClient.postMultipartBytes(
-      '/api/Users/upload-profile-picture',
+      '/api/Media/upload-profile-picture',
       fieldName: 'file',
       fileName: fileName,
       bytes: bytes,
     );
-    final value = response['profilePictureUrl'] ?? response['ProfilePictureUrl'];
+    final value = response['profilePictureUrl'] ??
+        response['ProfilePictureUrl'] ??
+        response['url'] ??
+        response['Url'];
     if (value is! String || value.isEmpty) {
       throw const ApiException(message: 'لم يُرجع الخادم رابط الصورة.');
     }

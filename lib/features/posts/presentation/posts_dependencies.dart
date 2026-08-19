@@ -20,6 +20,7 @@ class PostsDependencies {
       getAllPosts: GetAllPosts(repository),
       getPostById: GetPostById(repository),
       createPost: CreatePost(repository),
+      uploadPostMedia: UploadPostMedia(repository),
       deletePost: DeletePost(repository),
       togglePostLike: TogglePostLike(repository),
       getPostComments: GetPostComments(repository),
