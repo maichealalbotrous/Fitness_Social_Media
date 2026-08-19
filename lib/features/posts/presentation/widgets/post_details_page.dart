@@ -66,7 +66,7 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
               PostCard(
                 post: _post,
                 onLike: _toggleLike,
-                currentUserId: null,
+                currentUserId: _post.authorId,
                 currentUserName: _postProfile?.username,
                 authorAvatar: _postProfile?.profilePictureUrl,
               ),
@@ -130,7 +130,7 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
         try {
           return await _userController.loadById(
             comment.authorId,
-            forceRefresh: false,
+            forceRefresh: true,
           );
         } catch (_) {
           return null;
@@ -195,7 +195,7 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
       try {
         profile = await _userController.loadById(
           comment.authorId,
-          forceRefresh: false,
+          forceRefresh: true,
         );
       } catch (_) {
         profile = null;
@@ -320,7 +320,7 @@ class _CommentTile extends StatelessWidget {
 }
 
 String _commentAuthor(Comment comment, UserProfile? profile) {
-  final authorName = comment.authorName ?? profile?.username;
+  final authorName = profile?.username ?? comment.authorName;
   if (authorName != null && authorName.isNotEmpty) return authorName;
   if (comment.authorId.isEmpty) return 'Repflow athlete';
   final suffix = comment.authorId.length > 8

@@ -15,7 +15,7 @@ class ApiUserRemoteDataSource implements UserRemoteDataSource {
   @override
   Future<UserProfileModel> getById(String id) async {
     final response = await _apiClient.getJson('/api/Users/$id');
-    return UserProfileModel.fromJson(response);
+    return UserProfileModel.fromJson(_unwrapUser(response));
   }
 
   @override
@@ -23,7 +23,7 @@ class ApiUserRemoteDataSource implements UserRemoteDataSource {
     final response = await _apiClient.getJson(
       '/api/Users/by-username/${Uri.encodeComponent(username)}',
     );
-    return UserProfileModel.fromJson(response);
+    return UserProfileModel.fromJson(_unwrapUser(response));
   }
 
   @override
