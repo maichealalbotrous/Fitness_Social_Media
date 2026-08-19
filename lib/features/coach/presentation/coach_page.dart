@@ -17,7 +17,22 @@ class _CoachPageState extends State<CoachPage> {
   @override
   Widget build(BuildContext context) => Scaffold(
     backgroundColor: const Color(0xFF030403),
-    appBar: AppBar(title: const Text('Coach'), backgroundColor: Colors.black, foregroundColor: Colors.white),
+    appBar: AppBar(
+      leading: IconButton(
+        tooltip: 'Back',
+        icon: const Icon(Icons.arrow_back),
+        onPressed: () {
+          if (Navigator.of(context).canPop()) {
+            Navigator.of(context).pop();
+          } else {
+            Navigator.of(context).pushReplacementNamed('/feed');
+          }
+        },
+      ),
+      title: const Text('Coach'),
+      backgroundColor: Colors.black,
+      foregroundColor: Colors.white,
+    ),
     body: AnimatedBuilder(animation: widget.controller, builder: (_, __) => ListView(padding: const EdgeInsets.all(18), children: [
       _panel('Become a coach', Column(children: [
         TextField(controller: _certification, style: const TextStyle(color: Colors.white), decoration: _decoration('Certification URL')),
