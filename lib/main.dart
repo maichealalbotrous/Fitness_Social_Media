@@ -15,26 +15,36 @@ import 'package:fitness_social_app/features/challenges/presentation/pages/challe
 import 'package:fitness_social_app/features/coach/presentation/coach_page.dart';
 import 'package:fitness_social_app/features/coach/presentation/coach_dependencies.dart';
 import 'package:flutter/gestures.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fitness_social_app/core/settings/app_settings.dart';
+import 'package:fitness_social_app/core/settings/app_localizations.dart';
 
 void main() {
   runApp(const FitnessSocialApp());
 }
 
-class FitnessSocialApp extends StatelessWidget {
+class FitnessSocialApp extends StatefulWidget {
   const FitnessSocialApp({super.key});
-
+  @override State<FitnessSocialApp> createState() => _FitnessSocialAppState();
+}
+class _FitnessSocialAppState extends State<FitnessSocialApp> {
+  final settings = AppSettings.instance;
+  @override void initState() { super.initState(); settings.load(); }
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return AnimatedBuilder(
+      animation: settings,
+      builder: (context, _) => MaterialApp(
       title: 'Repflow',
       debugShowCheckedModeBanner: false,
       scrollBehavior: const AppScrollBehavior(),
-      theme: ThemeData(
-        useMaterial3: true,
-        scaffoldBackgroundColor: const Color(0xFF030403),
-        fontFamily: 'Arial',
-      ),
+      themeMode: settings.themeMode,
+      locale: settings.locale,
+      supportedLocales: const [Locale('en'), Locale('ar')],
+      localizationsDelegates: const [AppLocalizations.delegate, DefaultMaterialLocalizations.delegate, DefaultWidgetsLocalizations.delegate, DefaultCupertinoLocalizations.delegate],
+      theme: ThemeData(useMaterial3: true, brightness: Brightness.light, colorSchemeSeed: const Color(0xFFB7FF00), fontFamily: 'Arial'),
+      darkTheme: ThemeData(useMaterial3: true, brightness: Brightness.dark, scaffoldBackgroundColor: const Color(0xFF030403), colorSchemeSeed: const Color(0xFFB7FF00), fontFamily: 'Arial'),
       home: const AuthGate(),
       routes: {
         AppRoutes.auth: (_) => const AuthPage(),
