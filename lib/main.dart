@@ -37,7 +37,7 @@ class FitnessSocialApp extends StatelessWidget {
         colorSchemeSeed: const Color(0xFFB7FF00),
         fontFamily: 'Arial',
       ),
-      home: const AuthGate(),
+      home: AuthGate(),
       routes: {
         AppRoutes.auth: (_) => const AuthPage(),
         AppRoutes.forgotPassword: (_) => const ForgotPasswordPage(),
