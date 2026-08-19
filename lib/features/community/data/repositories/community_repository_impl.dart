@@ -28,6 +28,16 @@ class CommunityRepositoryImpl implements CommunityRepository {
   }
 
   @override
+  Future<Community> getByName(String name) async {
+    return (await _remoteDataSource.getByName(name)).toEntity();
+  }
+
+  @override
+  Future<List<CommunityJoinRequest>> getRequests(String communityId) {
+    return _remoteDataSource.getRequests(communityId);
+  }
+
+  @override
   Future<List<Community>> getMyCommunities() async {
     final models = await _remoteDataSource.getMyCommunities();
     return models.map((model) => model.toEntity()).toList(growable: false);

@@ -17,6 +17,8 @@ class CommunityDependencies {
     return CommunityController(
       createCommunity: CreateCommunity(repository),
       getCommunity: GetCommunity(repository),
+      searchCommunityByName: SearchCommunityByName(repository),
+      getCommunityRequests: GetCommunityRequests(repository),
       getMyCommunities: GetMyCommunities(repository),
       joinCommunity: JoinCommunity(repository),
       leaveCommunity: LeaveCommunity(repository),

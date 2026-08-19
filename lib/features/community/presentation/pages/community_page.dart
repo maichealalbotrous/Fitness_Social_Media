@@ -20,7 +20,7 @@ class CommunityPage extends StatefulWidget {
 
 class _CommunityPageState extends State<CommunityPage> {
   late final CommunityController _controller;
-  final _idController = TextEditingController();
+  final _nameSearchController = TextEditingController();
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _imagePicker = ImagePicker();
@@ -36,7 +36,7 @@ class _CommunityPageState extends State<CommunityPage> {
     _controller = CommunityDependencies.createController();
     if (widget.initialCommunityId != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        _loadCommunity(widget.initialCommunityId!);
+        _searchCommunity(widget.initialCommunityId!);
       });
     }
   }
@@ -44,7 +44,7 @@ class _CommunityPageState extends State<CommunityPage> {
   @override
   void dispose() {
     _controller.dispose();
-    _idController.dispose();
+    _nameSearchController.dispose();
     _nameController.dispose();
     _descriptionController.dispose();
     _requestIdController.dispose();
@@ -93,9 +93,9 @@ class _CommunityPageState extends State<CommunityPage> {
             ),
             const SizedBox(height: 16),
             _LookupCard(
-              controller: _idController,
+              controller: _nameSearchController,
               isLoading: _controller.isLoading,
-              onLoad: () => _loadCommunity(_idController.text),
+              onLoad: () => _searchCommunity(_nameSearchController.text),
             ),
             const SizedBox(height: 16),
             if (_controller.errorMessage != null)
@@ -130,19 +130,22 @@ class _CommunityPageState extends State<CommunityPage> {
     );
   }
 
-  Future<void> _loadCommunity(String id) async {
-    final trimmedId = id.trim();
+  Future<void> _searchCommunity(String name) async {
+    final trimmedId = name.trim();
     if (trimmedId.isEmpty) return;
-    await _controller.load(trimmedId);
+    await _controller.searchByName(trimmedId);
     if (!mounted) return;
     final cached = await _localStorage.read();
-    final matching = cached.where((item) => item.id == trimmedId).toList();
+    final matching = cached.where((item) => item.name.toLowerCase() == trimmedId.toLowerCase()).toList();
     if (matching.isNotEmpty) {
       _controller.restoreLocalMembership(matching.first);
     }
     final community = _controller.community;
     if (community != null) {
       await _controller.loadMembers(community.id);
+      if (community.isAdmin || community.isOwner) {
+        await _controller.loadRequests(community.id);
+      }
     }
   }
 
@@ -363,7 +366,7 @@ class _LookupCard extends StatelessWidget {
       title: 'Open community',
       child: Row(
         children: [
-          Expanded(child: _Input(controller: controller, label: 'Community ID')),
+          Expanded(child: _Input(controller: controller, label: 'Community name')),
           const SizedBox(width: 8),
           IconButton.filled(
             onPressed: isLoading ? null : onLoad,
@@ -513,7 +516,7 @@ class _CommunityDetails extends StatelessWidget {
               style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            _Input(controller: requestIdController, label: 'Request ID'),
+            _Input(controller: requestIdController, label: 'Request ID من القائمة'),
             const SizedBox(height: 8),
             Row(
               children: [

@@ -47,6 +47,22 @@ class Community {
   }
 }
 
+class CommunityJoinRequest {
+  const CommunityJoinRequest({
+    required this.id,
+    required this.communityId,
+    required this.userId,
+    required this.username,
+    this.imageUrl,
+  });
+
+  final String id;
+  final String communityId;
+  final String userId;
+  final String username;
+  final String? imageUrl;
+}
+
 class CommunityActionResult {
   const CommunityActionResult({required this.message, this.community});
 

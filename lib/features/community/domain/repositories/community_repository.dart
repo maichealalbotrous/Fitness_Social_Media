@@ -9,6 +9,8 @@ abstract interface class CommunityRepository {
   });
 
   Future<Community> getById(String id);
+  Future<Community> getByName(String name);
+  Future<List<CommunityJoinRequest>> getRequests(String communityId);
   Future<List<Community>> getMyCommunities();
   Future<List<CommunityMember>> getMembers(String communityId);
 

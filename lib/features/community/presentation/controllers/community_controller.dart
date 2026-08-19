@@ -10,6 +10,8 @@ class CommunityController extends ChangeNotifier {
   CommunityController({
     required CreateCommunity createCommunity,
     required GetCommunity getCommunity,
+    required SearchCommunityByName searchCommunityByName,
+    required GetCommunityRequests getCommunityRequests,
     required GetMyCommunities getMyCommunities,
     required JoinCommunity joinCommunity,
     required LeaveCommunity leaveCommunity,
@@ -21,6 +23,8 @@ class CommunityController extends ChangeNotifier {
     required SessionStorage sessionStorage,
   })  : _createCommunity = createCommunity,
         _getCommunity = getCommunity,
+        _searchCommunityByName = searchCommunityByName,
+        _getCommunityRequests = getCommunityRequests,
         _getMyCommunities = getMyCommunities,
         _joinCommunity = joinCommunity,
         _leaveCommunity = leaveCommunity,
@@ -33,6 +37,8 @@ class CommunityController extends ChangeNotifier {
 
   final CreateCommunity _createCommunity;
   final GetCommunity _getCommunity;
+  final SearchCommunityByName _searchCommunityByName;
+  final GetCommunityRequests _getCommunityRequests;
   final GetMyCommunities _getMyCommunities;
   final JoinCommunity _joinCommunity;
   final LeaveCommunity _leaveCommunity;
@@ -51,10 +57,12 @@ class CommunityController extends ChangeNotifier {
 
   List<Community> _myCommunities = const <Community>[];
   List<CommunityMember> _members = const <CommunityMember>[];
+  List<CommunityJoinRequest> _requests = const <CommunityJoinRequest>[];
 
   Community? get community => _community;
   List<Community> get myCommunities => _myCommunities;
   List<CommunityMember> get members => _members;
+  List<CommunityJoinRequest> get requests => _requests;
   bool get isLoading => _isLoading;
   bool get isRequestPending => _isRequestPending;
   String? get errorMessage => _errorMessage;
@@ -83,6 +91,24 @@ class CommunityController extends ChangeNotifier {
     } finally {
       _finishLoading();
     }
+  }
+
+  Future<void> searchByName(String name) async {
+    final value = name.trim();
+    if (value.isEmpty) return;
+    _beginLoading();
+    try { _community = await _searchCommunityByName(value); _errorMessage = null; }
+    on ApiException catch (error) { _errorMessage = error.message; }
+    catch (_) { _errorMessage = 'تعذر البحث عن المجتمع.'; }
+    finally { _finishLoading(); }
+  }
+
+  Future<void> loadRequests(String communityId) async {
+    _beginLoading();
+    try { _requests = await _getCommunityRequests(communityId); _errorMessage = null; }
+    on ApiException catch (error) { _errorMessage = error.message; }
+    catch (_) { _errorMessage = 'تعذر تحميل طلبات الانضمام.'; }
+    finally { _finishLoading(); }
   }
 
   Future<void> loadMembers(String communityId) async {

@@ -1,5 +1,6 @@
 import 'package:fitness_social_app/core/network/api_client.dart';
 import 'package:fitness_social_app/features/community/data/models/community_model.dart';
+import 'package:fitness_social_app/features/community/domain/entities/community.dart';
 
 abstract interface class CommunityRemoteDataSource {
   Future<CommunityModel> create({
@@ -10,6 +11,8 @@ abstract interface class CommunityRemoteDataSource {
   });
 
   Future<CommunityModel> getById(String id);
+  Future<CommunityModel> getByName(String name);
+  Future<List<CommunityJoinRequest>> getRequests(String communityId);
   Future<List<CommunityModel>> getMyCommunities();
   Future<List<CommunityMemberModel>> getMembers(String communityId);
   Future<String> join(String id);
@@ -48,6 +51,22 @@ class ApiCommunityRemoteDataSource implements CommunityRemoteDataSource {
   Future<CommunityModel> getById(String id) async {
     final response = await _apiClient.getJson('/api/Community/${Uri.encodeComponent(id)}');
     return CommunityModel.fromJson(response);
+  }
+
+  @override
+  Future<CommunityModel> getByName(String name) async {
+    final response = await _apiClient.getJson('/api/Community/${Uri.encodeComponent(name.trim())}');
+    return CommunityModel.fromJson(response);
+  }
+
+  @override
+  Future<List<CommunityJoinRequest>> getRequests(String communityId) async {
+    final value = await _apiClient.getJsonValue('/api/Community/${Uri.encodeComponent(communityId)}/requests');
+    final raw = value is List ? value : value is Map<String, dynamic> ? (value['data'] ?? value['requests'] ?? const []) : const [];
+    if (raw is! List) return const [];
+    return raw.whereType<Map<String, dynamic>>().map((json) => CommunityJoinRequest(
+      id: (json['id'] ?? json['Id'] ?? '').toString(), communityId: (json['communityId'] ?? json['CommunityId'] ?? '').toString(), userId: (json['userId'] ?? json['UserId'] ?? '').toString(), username: (json['username'] ?? json['Username'] ?? '').toString(), imageUrl: json['imageUrl'] ?? json['ImageUrl'],
+    )).toList(growable: false);
   }
 
   @override
