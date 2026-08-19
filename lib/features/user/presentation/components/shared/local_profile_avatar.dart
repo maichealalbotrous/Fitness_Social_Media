@@ -22,6 +22,7 @@ class LocalProfileAvatar extends StatelessWidget {
       radius: radius,
       backgroundColor: const Color(0xFF151515),
       backgroundImage: _imageProvider,
+      onBackgroundImageError: _imageProvider == null ? null : (_, __) {},
       child: _imageProvider == null
           ? Icon(Icons.person, color: Colors.grey.shade500, size: radius * 1.1)
           : null,
@@ -37,9 +38,21 @@ class LocalProfileAvatar extends StatelessWidget {
         // Fall through to the remote URL if the local cache is invalid.
       }
     }
-    if (imageUrl != null && imageUrl!.isNotEmpty) {
-      return NetworkImage(imageUrl!);
+    final remoteUrl = _normalizeRemoteUrl(imageUrl);
+    if (remoteUrl != null) {
+      return NetworkImage(remoteUrl);
     }
     return null;
+  }
+
+  String? _normalizeRemoteUrl(String? value) {
+    final raw = value?.trim();
+    if (raw == null || raw.isEmpty) return null;
+    final uri = Uri.tryParse(raw);
+    if (uri == null || !uri.hasScheme || uri.host.isEmpty) return null;
+    if (uri.host == 'localhost') {
+      return uri.replace(host: '127.0.0.1').toString();
+    }
+    return uri.toString();
   }
 }
