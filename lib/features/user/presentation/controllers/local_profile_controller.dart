@@ -23,12 +23,14 @@ class LocalProfileController extends ChangeNotifier {
   String _email = '';
   String? _userId;
   String? _avatarBase64;
+  String? _avatarUrl;
   bool _isLoading = false;
 
   String get displayName => _displayName;
   String get email => _email;
   String? get userId => _userId;
   String? get avatarBase64 => _avatarBase64;
+  String? get avatarUrl => _avatarUrl;
   bool get isLoading => _isLoading;
 
   Future<void> load() async {
@@ -38,6 +40,7 @@ class LocalProfileController extends ChangeNotifier {
     _displayName = localData.displayName ?? _displayName;
     _email = localData.email ?? '';
     _avatarBase64 = localData.avatarBase64;
+    _avatarUrl = localData.avatarUrl;
 
     final token = await _sessionStorage.readAccessToken();
     if (token != null) {
@@ -66,9 +69,13 @@ class LocalProfileController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> applyRemoteIdentity({String? displayName, String? email}) async {
+  Future<void> applyRemoteIdentity({String? displayName, String? email, String? avatarUrl}) async {
     if (displayName != null && displayName.trim().isNotEmpty) {
       _displayName = displayName.trim();
+    }
+    if (avatarUrl != null && avatarUrl.trim().isNotEmpty) {
+      _avatarUrl = avatarUrl.trim();
+      await _profileStorage.saveAvatarUrl(_avatarUrl!);
     }
     if (email != null && email.trim().isNotEmpty) {
       _email = email.trim();

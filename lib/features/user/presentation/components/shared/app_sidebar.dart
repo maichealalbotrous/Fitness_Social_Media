@@ -299,7 +299,10 @@ class _CurrentUserTileState extends State<_CurrentUserTile> {
     final displayName = _controller?.displayName ?? 'Repflow athlete';
     return Row(
       children: [
-        LocalProfileAvatar(base64Image: _controller?.avatarBase64),
+        LocalProfileAvatar(
+          base64Image: _controller?.avatarBase64,
+          imageUrl: _controller?.avatarUrl,
+        ),
         const SizedBox(width: 12),
         Expanded(
           child: Column(

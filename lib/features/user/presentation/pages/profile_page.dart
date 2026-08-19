@@ -58,6 +58,7 @@ class _ProfilePageState extends State<ProfilePage> {
         await controller.applyRemoteIdentity(
           displayName: profile.username,
           email: profile.email,
+          avatarUrl: profile.profilePictureUrl,
         );
       }
     }
