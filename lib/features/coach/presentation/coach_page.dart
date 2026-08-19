@@ -1,18 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:fitness_social_app/features/coach/presentation/coach_controller.dart';
 
-class CoachPage extends StatefulWidget { const CoachPage({super.key, required this.controller}); final CoachController controller; @override State<CoachPage> createState() => _CoachPageState(); }
+class CoachPage extends StatefulWidget {
+  const CoachPage({super.key, required this.controller});
+  final CoachController controller;
+  @override State<CoachPage> createState() => _CoachPageState();
+}
+
 class _CoachPageState extends State<CoachPage> {
-  final cert = TextEditingController(); final coachId = TextEditingController(); final requestMessage = TextEditingController(); final reviewNote = TextEditingController();
-  @override void initState() { super.initState(); widget.controller.loadAll(); }
-  @override void dispose() { cert.dispose(); coachId.dispose(); requestMessage.dispose(); reviewNote.dispose(); super.dispose(); }
-  @override Widget build(BuildContext context) => Scaffold(backgroundColor: const Color(0xFF030403), appBar: AppBar(title: const Text('Coach'), backgroundColor: Colors.black, foregroundColor: Colors.white), body: AnimatedBuilder(animation: widget.controller, builder: (_, __) => ListView(padding: const EdgeInsets.all(18), children: [
-    _panel('Become a coach', Column(children: [TextField(controller: cert, style: const TextStyle(color: Colors.white), decoration: _decoration('Certification URL')), const SizedBox(height: 10), FilledButton(onPressed: widget.controller.isLoading ? null : () => widget.controller.submitApplication(cert.text), child: const Text('SUBMIT APPLICATION')), if (widget.controller.myApplication != null) _status(widget.controller.myApplication!.status)])),
-    _panel('Request a coach', Column(children: [TextField(controller: coachId, style: const TextStyle(color: Colors.white), decoration: _decoration('Coach ID')), const SizedBox(height: 10), TextField(controller: requestMessage, style: const TextStyle(color: Colors.white), decoration: _decoration('Message')), const SizedBox(height: 10), FilledButton(onPressed: widget.controller.isLoading ? null : () => widget.controller.createTrainingRequest(coachId.text, requestMessage.text), child: const Text('SEND TRAINING REQUEST'))])),
-    _panel('Training requests', Column(children: widget.controller.trainingRequests.isEmpty ? [const Text('No requests.', style: TextStyle(color: Colors.white54))] : widget.controller.trainingRequests.map((r) => ListTile(title: Text('Athlete: ${r.athleteId}', style: const TextStyle(color: Colors.white)), subtitle: Text(r.message ?? r.status, style: const TextStyle(color: Colors.white60)), trailing: r.status == 'Pending' ? Wrap(children: [IconButton(onPressed: () => widget.controller.reviewTrainingRequest(r.id!, true), icon: const Icon(Icons.check, color: Colors.green)), IconButton(onPressed: () => widget.controller.reviewTrainingRequest(r.id!, false), icon: const Icon(Icons.close, color: Colors.red))]) : Text(r.status, style: const TextStyle(color: Colors.white54)))).toList())])),
-    if (widget.controller.error != null) Text(widget.controller.error!, style: const TextStyle(color: Colors.redAccent)), if (widget.controller.message != null) Text(widget.controller.message!, style: const TextStyle(color: Colors.greenAccent)),
-  ])));
-  Widget _panel(String title, Widget child) => Container(margin: const EdgeInsets.only(bottom: 16), padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: const Color(0xFF111111), borderRadius: BorderRadius.circular(16)), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)), const SizedBox(height: 12), child]));
-  Widget _status(String s) => Align(alignment: Alignment.centerLeft, child: Text('Status: $s', style: const TextStyle(color: Colors.amber)));
-  InputDecoration _decoration(String label) => InputDecoration(labelText: label, labelStyle: const TextStyle(color: Colors.white54), filled: true, fillColor: const Color(0xFF1B1B1B));
+  final _coachId = TextEditingController();
+  final _message = TextEditingController();
+  @override void dispose() { _coachId.dispose(); _message.dispose(); super.dispose(); }
+  @override Widget build(BuildContext context) => Scaffold(
+    backgroundColor: const Color(0xFF030403),
+    appBar: AppBar(title: const Text('Coach'), backgroundColor: Colors.black, foregroundColor: Colors.white),
+    body: AnimatedBuilder(animation: widget.controller, builder: (_, __) => ListView(padding: const EdgeInsets.all(18), children: [
+      _panel('Request a coach', Column(children: [
+        const Text('Send a training request to an approved coach.', style: TextStyle(color: Colors.white70)),
+        const SizedBox(height: 14),
+        TextField(controller: _coachId, style: const TextStyle(color: Colors.white), decoration: _decoration('Coach ID')),
+        const SizedBox(height: 10),
+        TextField(controller: _message, maxLines: 3, style: const TextStyle(color: Colors.white), decoration: _decoration('Message (optional)')),
+        const SizedBox(height: 12),
+        SizedBox(width: double.infinity, child: FilledButton(onPressed: widget.controller.isLoading ? null : () => widget.controller.createTrainingRequest(_coachId.text.trim(), _message.text.trim()), child: const Text('SEND TRAINING REQUEST'))),
+      ])),
+      if (widget.controller.error != null) Text(widget.controller.error!, style: const TextStyle(color: Colors.redAccent)),
+      if (widget.controller.message != null) Text(widget.controller.message!, style: const TextStyle(color: Colors.greenAccent)),
+    ])),
+  );
+  Widget _panel(String title, Widget child) => Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: const Color(0xFF111111), borderRadius: BorderRadius.circular(16)), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)), const SizedBox(height: 14), child]));
+  InputDecoration _decoration(String label) => InputDecoration(labelText: label, labelStyle: const TextStyle(color: Colors.white54), filled: true, fillColor: const Color(0xFF1B1B1B), border: const OutlineInputBorder());
 }
