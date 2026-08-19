@@ -61,6 +61,7 @@ class _FitnessSocialAppState extends State<FitnessSocialApp> {
         AppRoutes.challenges: (_) => const ChallengesPage(),
         AppRoutes.coach: (_) => CoachPage(controller: CoachDependencies.createController()),
       },
+      ),
     );
   }
 }
