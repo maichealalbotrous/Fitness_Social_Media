@@ -90,6 +90,12 @@ class AppSidebar extends StatelessWidget {
                 routeName: AppRoutes.challenges,
               ),
               _SidebarItem(
+                icon: Icons.sports,
+                label: 'Coach',
+                active: false,
+                routeName: AppRoutes.coach,
+              ),
+              _SidebarItem(
                 icon: Icons.search,
                 label: 'Search users',
                 active: false,

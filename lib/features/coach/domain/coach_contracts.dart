@@ -1,0 +1,14 @@
+import 'package:fitness_social_app/features/coach/domain/entities/coach_entities.dart';
+import 'package:fitness_social_app/features/coach/data/datasources/coach_remote_data_source.dart';
+
+class CoachRepository {
+  const CoachRepository(this.remote);
+  final CoachRemoteDataSource remote;
+  Future<CoachApplication> submitApplication(String url) => remote.submitApplication(url);
+  Future<CoachApplication?> getMyApplication() => remote.getMyApplication();
+  Future<List<CoachApplication>> getPendingApplications() => remote.getPendingApplications();
+  Future<CoachApplication> reviewApplication(String id, bool approved, String? note) => remote.reviewApplication(id, approved: approved, reviewNote: note);
+  Future<TrainingRequest> createTrainingRequest(String coachId, String? message) => remote.createTrainingRequest(coachId: coachId, message: message);
+  Future<List<TrainingRequest>> getTrainingRequests() => remote.getTrainingRequests();
+  Future<TrainingRequest> reviewTrainingRequest(String id, bool approved) => remote.reviewTrainingRequest(id, approved: approved);
+}
