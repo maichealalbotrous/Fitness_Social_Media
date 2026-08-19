@@ -1,7 +1,5 @@
 import 'package:fitness_social_app/features/auth/presentation/auth_dependencies.dart';
 import 'package:fitness_social_app/features/user/presentation/components/shared/app_routes.dart';
-import 'package:fitness_social_app/core/settings/app_settings.dart';
-import 'package:fitness_social_app/core/settings/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 import 'package:fitness_social_app/core/storage/session_storage.dart';
@@ -106,17 +104,6 @@ class AppSidebar extends StatelessWidget {
               const _StaticSidebarItem(
                 icon: Icons.notifications_none,
                 label: 'Notifications',
-              ),
-              ListTile(
-                leading: Icon(AppSettings.instance.themeMode == ThemeMode.dark ? Icons.light_mode : Icons.dark_mode, color: _muted),
-                title: Text(AppLocalizations.of(context).text(AppSettings.instance.themeMode == ThemeMode.dark ? 'lightMode' : 'darkMode'), style: const TextStyle(color: _muted)),
-                onTap: () => AppSettings.instance.toggleTheme(),
-              ),
-              ListTile(
-                leading: const Icon(Icons.translate, color: _muted),
-                title: Text(AppLocalizations.of(context).text('language'), style: const TextStyle(color: _muted)),
-                trailing: Text(AppSettings.instance.isArabic ? 'EN' : 'ع', style: const TextStyle(color: _muted)),
-                onTap: () => AppSettings.instance.setLanguage(AppSettings.instance.isArabic ? 'en' : 'ar'),
               ),
               const SizedBox(height: 28),
               SizedBox(
