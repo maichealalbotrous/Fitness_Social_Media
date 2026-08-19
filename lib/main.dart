@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import 'package:fitness_social_app/features/auth/presentation/pages/auth_page.dart';
+import 'package:fitness_social_app/features/auth/presentation/pages/auth_gate.dart';
 import 'package:fitness_social_app/features/auth/presentation/pages/forgot_password_page.dart';
 import 'package:fitness_social_app/features/auth/presentation/pages/reset_password_page.dart';
 import 'package:fitness_social_app/features/auth/presentation/pages/verify_email_page.dart';
