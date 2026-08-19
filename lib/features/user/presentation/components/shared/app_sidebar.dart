@@ -6,6 +6,8 @@ import 'package:fitness_social_app/core/storage/session_storage.dart';
 import 'package:fitness_social_app/features/user/data/local_profile_storage.dart';
 import 'package:fitness_social_app/features/user/presentation/controllers/local_profile_controller.dart';
 import 'package:fitness_social_app/features/user/presentation/components/shared/local_profile_avatar.dart';
+import 'package:fitness_social_app/features/user/presentation/user_dependencies.dart';
+import 'package:fitness_social_app/features/user/presentation/controllers/user_controller.dart';
 
 enum AppSidebarSection { feed, workouts, runs, profile, community }
 
@@ -251,6 +253,7 @@ class _CurrentUserTile extends StatefulWidget {
 
 class _CurrentUserTileState extends State<_CurrentUserTile> {
   LocalProfileController? _controller;
+  UserController? _userController;
   bool _isLoggingOut = false;
 
   @override
@@ -266,16 +269,33 @@ class _CurrentUserTileState extends State<_CurrentUserTile> {
       profileStorage: profileStorage,
     );
     await controller.load();
+    final userController = UserDependencies.createController();
+    final userId = controller.userId;
+    if (userId != null && userId.isNotEmpty) {
+      final remote = await userController.loadById(userId, forceRefresh: true);
+      if (remote != null) {
+        await controller.applyRemoteIdentity(
+          displayName: remote.username,
+          email: remote.email,
+          avatarUrl: remote.profilePictureUrl,
+        );
+      }
+    }
     if (!mounted) {
       controller.dispose();
+      userController.dispose();
       return;
     }
-    setState(() => _controller = controller);
+    setState(() {
+      _controller = controller;
+      _userController = userController;
+    });
   }
 
   @override
   void dispose() {
     _controller?.dispose();
+    _userController?.dispose();
     super.dispose();
   }
 
