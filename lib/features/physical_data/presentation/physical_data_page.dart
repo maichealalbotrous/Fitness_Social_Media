@@ -100,7 +100,7 @@ class _PhysicalDataPageState extends State<PhysicalDataPage> {
         if (widget.controller.message != null) Text(widget.controller.message!, style: const TextStyle(color: Colors.green)),
         _section('Body information', [
           TextField(controller: _height, keyboardType: const TextInputType.numberWithOptions(decimal: true), decoration: const InputDecoration(labelText: 'Height (cm)')),
-          DropdownButtonFormField<PhysicalSex>(value: _sex, decoration: const InputDecoration(labelText: 'Sex'), items: PhysicalSex.values.map((sex) => DropdownMenuItem(value: sex, child: Text(sex.label))).toList(growable: false), onChanged: (value) => setState(() => _sex = value)),
+          DropdownButtonFormField<PhysicalSex>(value: _sex, decoration: const InputDecoration(labelText: 'Gender'), items: PhysicalSex.values.map((sex) => DropdownMenuItem(value: sex, child: Text(sex.label))).toList(growable: false), onChanged: (value) => setState(() => _sex = value)),
           ListTile(contentPadding: EdgeInsets.zero, title: Text(_birthday == null ? 'Birthday' : '${_birthday!.year}-${_birthday!.month.toString().padLeft(2, '0')}-${_birthday!.day.toString().padLeft(2, '0')}'), trailing: const Icon(Icons.calendar_month), onTap: _pickBirthday),
           FilledButton.icon(onPressed: widget.controller.isLoading ? null : _save, icon: const Icon(Icons.save_outlined), label: const Text('Save physical data')),
         ]),

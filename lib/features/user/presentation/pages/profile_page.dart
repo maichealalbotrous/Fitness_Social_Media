@@ -13,6 +13,9 @@ import 'package:fitness_social_app/features/user/presentation/components/shared/
 import 'package:fitness_social_app/features/user/domain/entities/user_profile.dart';
 import 'package:fitness_social_app/features/user/presentation/controllers/user_controller.dart';
 import 'package:fitness_social_app/features/user/presentation/user_dependencies.dart';
+import 'package:fitness_social_app/features/physical_data/domain/physical_data_entities.dart';
+import 'package:fitness_social_app/features/physical_data/presentation/physical_data_controller.dart';
+import 'package:fitness_social_app/features/physical_data/presentation/physical_data_dependencies.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({this.targetUserId, this.targetDisplayName, super.key});
@@ -27,6 +30,7 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   late final FollowController _followController;
   late final UserController _userController;
+  late final PhysicalDataController _physicalDataController;
   LocalProfileController? _profileController;
   UserProfile? _remoteProfile;
   bool _isFollowing = false;
@@ -36,9 +40,10 @@ class _ProfilePageState extends State<ProfilePage> {
     super.initState();
     _followController = FollowsDependencies.createController();
     _userController = UserDependencies.createController();
+    _physicalDataController = PhysicalDataDependencies.createController();
     _loadFollowData();
     if (widget.targetUserId != null) _loadRemoteProfile();
-    _initializeProfile();
+    if (widget.targetUserId == null) _initializeProfile();
   }
 
   Future<void> _initializeProfile() async {
@@ -49,6 +54,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
     await controller.load();
     if (controller.userId != null) {
+      await _physicalDataController.load(controller.userId!);
       _remoteProfile = await _userController.loadById(
         controller.userId!,
         forceRefresh: true,
@@ -73,6 +79,7 @@ class _ProfilePageState extends State<ProfilePage> {
   void dispose() {
     _followController.dispose();
     _userController.dispose();
+    _physicalDataController.dispose();
     _profileController?.dispose();
     super.dispose();
   }
@@ -80,7 +87,7 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: Listenable.merge([_followController, _userController]),
+      animation: Listenable.merge([_followController, _userController, _physicalDataController]),
       builder: (context, _) {
         return Scaffold(
           backgroundColor: ProfileTheme.background,
@@ -109,7 +116,9 @@ class _ProfilePageState extends State<ProfilePage> {
                   SliverPadding(
                     padding: const EdgeInsets.fromLTRB(18, 0, 18, 120),
                     sliver: SliverToBoxAdapter(
-                      child: ProfileHeaderCard(
+                      child: Column(
+                        children: [
+                          ProfileHeaderCard(
                         followersCount: _followController.followers.length,
                         followingCount: _followController.following.length,
                         onFollowersTap: () => _openList(FollowListType.followers),
@@ -128,6 +137,10 @@ class _ProfilePageState extends State<ProfilePage> {
                                 _profileController != null
                             ? _pickAvatar
                             : null,
+                          ),
+                          const SizedBox(height: 18),
+                          _PhysicalDataCard(data: _physicalDataController.data),
+                        ],
                       ),
                     ),
                   ),
@@ -167,6 +180,7 @@ class _ProfilePageState extends State<ProfilePage> {
       targetUserId,
       forceRefresh: true,
     );
+    await _physicalDataController.load(targetUserId);
     if (mounted && profile != null) setState(() => _remoteProfile = profile);
   }
 
@@ -297,4 +311,45 @@ class _ProfileLogo extends StatelessWidget {
       ),
     );
   }
+}
+
+class _PhysicalDataCard extends StatelessWidget {
+  const _PhysicalDataCard({required this.data});
+  final UserPhysicalData? data;
+
+  @override
+  Widget build(BuildContext context) {
+    final physical = data;
+    if (physical == null) return const SizedBox.shrink();
+    final latestWeight = physical.weights.isEmpty ? null : physical.weights.last.weightKg;
+    final visibleFields = <Widget>[
+      if (physical.heightCm != null) _item(Icons.height, 'Height', '${physical.heightCm!.toStringAsFixed(1)} cm'),
+      if (physical.sex != null) _item(Icons.person_outline, 'Gender', physical.sex!.label),
+      if (physical.birthday != null) _item(Icons.cake_outlined, 'Birthday', '${physical.birthday!.year}-${physical.birthday!.month.toString().padLeft(2, '0')}-${physical.birthday!.day.toString().padLeft(2, '0')}'),
+      if (latestWeight != null) _item(Icons.monitor_weight_outlined, 'Latest weight', '${latestWeight.toStringAsFixed(1)} kg'),
+    ];
+    return Card(
+      color: ProfileTheme.panel,
+      child: Padding(
+        padding: const EdgeInsets.all(18),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          const Text('Physical Data', style: TextStyle(color: Colors.white, fontSize: 19, fontWeight: FontWeight.w800)),
+          const SizedBox(height: 14),
+          if (visibleFields.isEmpty) const Text('No physical data available.', style: TextStyle(color: Colors.white60)) else Wrap(spacing: 12, runSpacing: 12, children: visibleFields),
+          if (physical.personalRecords.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            const Text('Personal records', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+            const SizedBox(height: 6),
+            ...physical.personalRecords.take(5).map((record) => ListTile(contentPadding: EdgeInsets.zero, dense: true, title: Text(record.exerciseName, style: const TextStyle(color: Colors.white)), trailing: Text('${record.maxWeightKg.toStringAsFixed(1)} kg', style: const TextStyle(color: ProfileTheme.lime, fontWeight: FontWeight.bold)))),
+          ],
+        ]),
+      ),
+    );
+  }
+
+  Widget _item(IconData icon, String label, String value) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+    decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.06), borderRadius: BorderRadius.circular(12)),
+    child: Row(mainAxisSize: MainAxisSize.min, children: [Icon(icon, size: 18, color: ProfileTheme.lime), const SizedBox(width: 8), Text('$label: $value', style: const TextStyle(color: Colors.white70))]),
+  );
 }
