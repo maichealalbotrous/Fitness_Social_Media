@@ -9,7 +9,7 @@ import 'package:fitness_social_app/features/user/presentation/components/shared/
 import 'package:fitness_social_app/features/user/presentation/user_dependencies.dart';
 import 'package:fitness_social_app/features/user/presentation/controllers/user_controller.dart';
 
-enum AppSidebarSection { feed, workouts, runs, profile, community }
+enum AppSidebarSection { feed, workouts, sessions, runs, profile, community }
 
 class AppSidebar extends StatelessWidget {
   const AppSidebar({required this.activeSection, super.key});
@@ -73,7 +73,7 @@ class AppSidebar extends StatelessWidget {
               _SidebarItem(
                 icon: Icons.calendar_month_outlined,
                 label: 'Training Sessions',
-                active: false,
+                active: activeSection == AppSidebarSection.sessions,
                 routeName: AppRoutes.userSessions,
               ),
               _SidebarItem(

@@ -87,7 +87,7 @@ class _UserSessionsPageState extends State<UserSessionsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: const AppSidebar(activeSection: AppSidebarSection.workouts),
+      drawer: const AppSidebar(activeSection: AppSidebarSection.sessions),
       appBar: AppBar(
         title: const Text('Training Sessions'),
         actions: [
@@ -417,6 +417,12 @@ class _UserSessionsPageState extends State<UserSessionsPage> {
                         totalDurationMinutes: minutes!,
                         exercises: inputs,
                       );
+                    }
+                    if (!mounted || widget.controller.error != null) return;
+                    if (_filter == 'day') {
+                      await _loadSelectedDay();
+                    } else {
+                      await _loadMonth();
                     }
                   },
                   child: Text(session == null ? 'Create' : 'Save'),
