@@ -312,14 +312,17 @@ class _WorkoutPlanningPageState extends State<WorkoutPlanningPage>
                   });
                   return;
                 }
-                // Keep manually configured days even when a template is selected.
-                // Backend supports sending templateIds and days together.
+                // A plan may use a template or manually configured days.
+                // Sending both creates duplicate days because Backend appends them.
                 final planDays = days;
+                final planTemplateIds = draftExercises.isNotEmpty
+                    ? const <String>[]
+                    : selectedTemplates.toList(growable: false);
                 await widget.controller.createPlan(
                   name: name.text.trim(),
                   durationDays: value,
                   ownerUserId: selectedParticipantId,
-                  templateIds: selectedTemplates.toList(growable: false),
+                  templateIds: planTemplateIds,
                   days: planDays,
                 );
                 if (!mounted || widget.controller.error != null) return;
