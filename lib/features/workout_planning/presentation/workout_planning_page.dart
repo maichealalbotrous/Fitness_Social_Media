@@ -312,9 +312,9 @@ class _WorkoutPlanningPageState extends State<WorkoutPlanningPage>
                   });
                   return;
                 }
-                final planDays = selectedTemplates.isNotEmpty
-                    ? const <ManualPlanDayInput>[]
-                    : days;
+                // Keep manually configured days even when a template is selected.
+                // Backend supports sending templateIds and days together.
+                final planDays = days;
                 await widget.controller.createPlan(
                   name: name.text.trim(),
                   durationDays: value,
