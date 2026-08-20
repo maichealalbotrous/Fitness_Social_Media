@@ -2,6 +2,7 @@ import 'package:fitness_social_app/core/network/api_client.dart';
 import 'package:fitness_social_app/features/coach/domain/entities/coach_entities.dart';
 
 abstract interface class CoachRemoteDataSource {
+  Future<String> uploadCertification({required List<int> bytes, required String fileName});
   Future<CoachApplication> submitApplication(String certificationUrl);
   Future<CoachApplication?> getMyApplication();
   Future<List<CoachApplication>> getPendingApplications();
@@ -14,6 +15,18 @@ abstract interface class CoachRemoteDataSource {
 class ApiCoachRemoteDataSource implements CoachRemoteDataSource {
   const ApiCoachRemoteDataSource(this._api);
   final ApiClient _api;
+
+  @override
+  Future<String> uploadCertification({required List<int> bytes, required String fileName}) async {
+    final response = await _api.postMultipartFiles(
+      '/api/Media/upload-post-media',
+      fieldName: 'files',
+      files: [MultipartUploadFile(fileName: fileName, bytes: bytes)],
+    );
+    final urls = response['urls'] ?? response['Urls'];
+    if (urls is List && urls.isNotEmpty && urls.first.toString().isNotEmpty) return urls.first.toString();
+    throw const ApiException(message: 'لم يعُد الخادم رابط الصورة المرفوعة.');
+  }
 
   @override
   Future<CoachApplication> submitApplication(String certificationUrl) async => _application(await _api.postJson('/api/coach/applications', body: {'certificationUrl': certificationUrl}));

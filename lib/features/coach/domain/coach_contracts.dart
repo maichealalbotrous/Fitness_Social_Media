@@ -4,6 +4,7 @@ import 'package:fitness_social_app/features/coach/data/datasources/coach_remote_
 class CoachRepository {
   const CoachRepository(this.remote);
   final CoachRemoteDataSource remote;
+  Future<String> uploadCertification({required List<int> bytes, required String fileName}) => remote.uploadCertification(bytes: bytes, fileName: fileName);
   Future<CoachApplication> submitApplication(String url) => remote.submitApplication(url);
   Future<CoachApplication?> getMyApplication() => remote.getMyApplication();
   Future<List<CoachApplication>> getPendingApplications() => remote.getPendingApplications();

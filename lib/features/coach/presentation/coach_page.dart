@@ -1,4 +1,6 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:fitness_social_app/features/coach/presentation/coach_controller.dart';
 
 class CoachPage extends StatefulWidget {
@@ -8,11 +10,20 @@ class CoachPage extends StatefulWidget {
 }
 
 class _CoachPageState extends State<CoachPage> {
-  final _certification = TextEditingController();
   final _coachId = TextEditingController();
+  final _imagePicker = ImagePicker();
+  Uint8List? _certificationBytes;
+  String? _certificationFileName;
   final _message = TextEditingController();
   @override void initState() { super.initState(); widget.controller.loadAll(); }
-  @override void dispose() { _certification.dispose(); _coachId.dispose(); _message.dispose(); super.dispose(); }
+  @override void dispose() { _coachId.dispose(); _message.dispose(); super.dispose(); }
+  Future<void> _pickCertification() async {
+    final file = await _imagePicker.pickImage(source: ImageSource.gallery, imageQuality: 85, maxWidth: 1600, maxHeight: 1600);
+    if (file == null) return;
+    final bytes = await file.readAsBytes();
+    if (!mounted) return;
+    setState(() { _certificationBytes = bytes; _certificationFileName = file.name; });
+  }
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -35,9 +46,11 @@ class _CoachPageState extends State<CoachPage> {
     ),
     body: AnimatedBuilder(animation: widget.controller, builder: (_, __) => ListView(padding: const EdgeInsets.all(18), children: [
       _panel('Become a coach', Column(children: [
-        TextField(controller: _certification, style: const TextStyle(color: Colors.white), decoration: _decoration('Certification URL')),
+        if (_certificationBytes != null) ClipRRect(borderRadius: BorderRadius.circular(10), child: Image.memory(_certificationBytes!, height: 150, width: double.infinity, fit: BoxFit.cover)),
+        if (_certificationBytes != null) const SizedBox(height: 8),
+        SizedBox(width: double.infinity, child: OutlinedButton.icon(onPressed: widget.controller.isLoading ? null : _pickCertification, icon: const Icon(Icons.upload_file), label: Text(_certificationFileName ?? 'Choose certification image'))),
         const SizedBox(height: 10),
-        SizedBox(width: double.infinity, child: FilledButton(onPressed: widget.controller.isLoading ? null : () => widget.controller.submitApplication(_certification.text.trim()), child: const Text('SUBMIT APPLICATION'))),
+        SizedBox(width: double.infinity, child: FilledButton(onPressed: widget.controller.isLoading || _certificationBytes == null ? null : () => widget.controller.submitApplicationWithImage(bytes: _certificationBytes!, fileName: _certificationFileName ?? 'certification.jpg'), child: const Text('UPLOAD AND SUBMIT APPLICATION'))),
         if (widget.controller.myApplication != null) Align(alignment: Alignment.centerLeft, child: Text('Your application: ${widget.controller.myApplication!.status}', style: const TextStyle(color: Colors.amber))),
       ])),
       _panel('Request a coach', Column(children: [
