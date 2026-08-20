@@ -43,10 +43,11 @@ class _UserSessionsPageState extends State<UserSessionsPage> {
   }
 
   Future<void> _loadSelectedDay() async {
-    final day = _selectedDay;
-    if (day != null) {
-      await widget.controller.loadByDay(day);
+    final day = _selectedDay ?? DateTime.now();
+    if (_selectedDay == null && mounted) {
+      setState(() => _selectedDay = day);
     }
+    await widget.controller.loadByDay(day);
   }
 
   Future<void> _pickMonth() async {
@@ -139,7 +140,7 @@ class _UserSessionsPageState extends State<UserSessionsPage> {
                           setState(() => _filter = selected);
                           if (selected == 'month') {
                             _loadMonth();
-                          } else if (_selectedDay != null) {
+                          } else {
                             _loadSelectedDay();
                           }
                         },
@@ -158,11 +159,9 @@ class _UserSessionsPageState extends State<UserSessionsPage> {
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    _filter == 'month'
-                        ? '${_selectedMonth.year}-${_selectedMonth.month.toString().padLeft(2, '0')}'
-                        : (_selectedDay == null
-                            ? 'Select a day'
-                            : _formatDate(_selectedDay!)),
+                        _filter == 'month'
+                            ? '${_selectedMonth.year}-${_selectedMonth.month.toString().padLeft(2, '0')}'
+                            : _formatDate(_selectedDay ?? DateTime.now()),
                   ),
                 ),
               ),
