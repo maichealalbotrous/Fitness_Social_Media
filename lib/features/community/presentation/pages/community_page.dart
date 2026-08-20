@@ -115,14 +115,15 @@ class _CommunityPageState extends State<CommunityPage> {
                 requestIdController: _requestIdController,
                 isLoading: _controller.isLoading,
                 members: _controller.members,
+                requests: _controller.requests,
                 onLoadMembers: () => _controller.loadMembers(community.id),
                 onMakeAdmin: _controller.makeAdmin,
                 onRemoveAdmin: _controller.removeAdmin,
                 onRemoveMember: _controller.removeMember,
                 onJoin: _join,
                 onLeave: _leave,
-                onAcceptRequest: () => _handleRequest(true),
-                onRejectRequest: () => _handleRequest(false),
+                onAcceptRequest: (requestId) => _handleRequest(requestId, true),
+                onRejectRequest: (requestId) => _handleRequest(requestId, false),
               ),
           ],
         ),
@@ -149,16 +150,10 @@ class _CommunityPageState extends State<CommunityPage> {
     }
   }
 
-  Future<void> _handleRequest(bool accepted) async {
-    final requestId = _requestIdController.text.trim();
-    if (requestId.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('أدخل Request ID أولاً.')),
-      );
-      return;
-    }
+  Future<void> _handleRequest(String requestId, bool accepted) async {
     await _controller.handleRequest(requestId: requestId, accepted: accepted);
-    _requestIdController.clear();
+    if (!mounted || _controller.community == null) return;
+    await _controller.loadRequests(_controller.community!.id);
   }
 
   Future<void> _pickImage() async {
@@ -385,6 +380,7 @@ class _CommunityDetails extends StatelessWidget {
     required this.requestIdController,
     required this.isLoading,
     required this.members,
+    required this.requests,
     required this.onLoadMembers,
     required this.onMakeAdmin,
     required this.onRemoveAdmin,
@@ -400,14 +396,15 @@ class _CommunityDetails extends StatelessWidget {
   final TextEditingController requestIdController;
   final bool isLoading;
   final List<CommunityMember> members;
+  final List<CommunityJoinRequest> requests;
   final VoidCallback onLoadMembers;
   final Future<void> Function(String userId) onMakeAdmin;
   final Future<void> Function(String userId) onRemoveAdmin;
   final Future<void> Function(String userId) onRemoveMember;
   final Future<void> Function() onJoin;
   final Future<void> Function() onLeave;
-  final Future<void> Function() onAcceptRequest;
-  final Future<void> Function() onRejectRequest;
+  final Future<void> Function(String requestId) onAcceptRequest;
+  final Future<void> Function(String requestId) onRejectRequest;
 
   @override
   Widget build(BuildContext context) {
@@ -512,34 +509,29 @@ class _CommunityDetails extends StatelessWidget {
             const Divider(color: Colors.white24),
             const SizedBox(height: 10),
             const Text(
-              'Manage join request',
+              'Join requests',
               style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            _Input(controller: requestIdController, label: 'Request ID من القائمة'),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Expanded(
-                  child: FilledButton(
-                    onPressed: isLoading ? null : onAcceptRequest,
-                    child: const Text('ACCEPT'),
+            if (requests.isEmpty)
+              const Text('No pending requests.', style: TextStyle(color: Colors.white54))
+            else
+              ...requests.map((request) => Card(
+                color: const Color(0xFF1A1A1A),
+                child: ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+                  leading: CircleAvatar(
+                    backgroundImage: request.imageUrl?.isNotEmpty == true ? NetworkImage(request.imageUrl!) : null,
+                    child: request.imageUrl?.isNotEmpty == true ? null : Text(request.username.isEmpty ? '?' : request.username[0].toUpperCase()),
                   ),
+                  title: Text(request.username.isEmpty ? request.userId : request.username, style: const TextStyle(color: Colors.white)),
+                  subtitle: Text(request.id, style: const TextStyle(color: Colors.white38, fontSize: 11)),
+                  trailing: Wrap(spacing: 2, children: [
+                    IconButton(onPressed: isLoading ? null : () => onAcceptRequest(request.id), icon: const Icon(Icons.check, color: Colors.greenAccent)),
+                    IconButton(onPressed: isLoading ? null : () => onRejectRequest(request.id), icon: const Icon(Icons.close, color: Colors.redAccent)),
+                  ]),
                 ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: isLoading ? null : onRejectRequest,
-                    child: const Text('REJECT'),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 6),
-            const Text(
-              'Backend لا يوفر حالياً endpoint لجلب قائمة الطلبات، لذلك يجب إدخال Request ID المتاح لديك.',
-              style: TextStyle(color: Colors.white38, fontSize: 12),
-            ),
+              )),
           ],
         ],
       ),
