@@ -18,4 +18,5 @@ class AppRoutes {
   static const exercises = '/exercises';
   static const physicalData = '/physical-data';
   static const userSessions = '/user-sessions';
+  static const workoutPlanning = '/workout-planning';
 }
