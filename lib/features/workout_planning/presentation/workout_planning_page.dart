@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:fitness_social_app/core/storage/session_storage.dart';
 import 'package:fitness_social_app/features/exercises/presentation/exercise_controller.dart';
 import 'package:fitness_social_app/features/exercises/presentation/exercise_dependencies.dart';
 import 'package:fitness_social_app/features/user/presentation/components/shared/app_sidebar.dart';
@@ -22,6 +24,7 @@ class _WorkoutPlanningPageState extends State<WorkoutPlanningPage>
   late final TabController _tabs;
   late final ExerciseController _exerciseController;
   late final CoachController _coachController;
+  String? _currentUserId;
 
   @override
   void initState() {
@@ -29,8 +32,22 @@ class _WorkoutPlanningPageState extends State<WorkoutPlanningPage>
     _tabs = TabController(length: 2, vsync: this);
     _exerciseController = ExerciseDependencies.createController();
     _coachController = CoachDependencies.createController();
+    _loadCurrentUserId();
     widget.controller.loadTemplates();
     widget.controller.loadPlans();
+  }
+
+  Future<void> _loadCurrentUserId() async {
+    final token = await SecureSessionStorage().readAccessToken();
+    if (!mounted || token == null) return;
+    try {
+      final parts = token.split('.');
+      if (parts.length != 3) return;
+      final claims = jsonDecode(utf8.decode(base64Url.decode(base64Url.normalize(parts[1]))));
+      if (claims is! Map<String, dynamic>) return;
+      final id = claims['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'] ?? claims['nameid'] ?? claims['sub'];
+      if (id is String && id.isNotEmpty) setState(() => _currentUserId = id);
+    } catch (_) {}
   }
 
   @override
@@ -122,12 +139,14 @@ class _WorkoutPlanningPageState extends State<WorkoutPlanningPage>
 
   Widget _planCard(WorkoutPlan plan) {
     final actions = <Widget>[];
-    if (plan.status == WorkoutPlanStatus.pendingAcceptance) {
+    if (plan.status == WorkoutPlanStatus.pendingAcceptance && _currentUserId == plan.createdByUserId) {
       actions.add(TextButton(onPressed: () => widget.controller.sendPlan(plan.id), child: const Text('Send')));
+    }
+    if (plan.status == WorkoutPlanStatus.pendingAcceptance && _currentUserId == plan.ownerUserId) {
       actions.add(TextButton(onPressed: () => widget.controller.acceptPlan(plan.id), child: const Text('Accept')));
       actions.add(TextButton(onPressed: () => widget.controller.rejectPlan(plan.id), child: const Text('Reject')));
     }
-    if (plan.status == WorkoutPlanStatus.draft || plan.status == WorkoutPlanStatus.accepted) {
+    if ((plan.status == WorkoutPlanStatus.draft || plan.status == WorkoutPlanStatus.accepted) && _currentUserId == plan.ownerUserId) {
       actions.add(TextButton(onPressed: () => _startPlan(plan), child: const Text('Start')));
     }
     return Card(
@@ -183,13 +202,18 @@ class _WorkoutPlanningPageState extends State<WorkoutPlanningPage>
   }
 
   Future<void> _createPlanDialog() async {
-    await _coachController.loadApprovedParticipants();
+    await Future.wait([_coachController.loadApprovedParticipants(), _exerciseController.loadAll()]);
     if (!mounted) return;
     final name = TextEditingController();
     final duration = TextEditingController(text: '7');
     String? selectedParticipantId;
     final selectedTemplates = <String>{};
-    final days = [const ManualPlanDayInput(name: 'Day 1', isRestDay: false, exercises: [])];
+    final draftExercises = <PlannedExerciseInput>[];
+    final days = <ManualPlanDayInput>[const ManualPlanDayInput(name: 'Day 1', isRestDay: false, exercises: [])];
+    String? selectedExerciseId;
+    final sets = TextEditingController(text: '3');
+    final reps = TextEditingController(text: '10');
+    final weight = TextEditingController(text: '0');
     String? validationError;
     await showDialog<void>(
       context: context,
@@ -223,6 +247,38 @@ class _WorkoutPlanningPageState extends State<WorkoutPlanningPage>
                   padding: EdgeInsets.symmetric(vertical: 8),
                   child: Text('No approved participants found. Leave this empty for a personal plan.'),
                 ),
+              if (_exerciseController.exercises.isNotEmpty) ...[
+                DropdownButtonFormField<String>(
+                  value: selectedExerciseId,
+                  decoration: const InputDecoration(labelText: 'Exercise for Day 1'),
+                  hint: const Text('Choose an exercise'),
+                  items: _exerciseController.exercises.map((exercise) => DropdownMenuItem(value: exercise.id, child: Text(exercise.name))).toList(growable: false),
+                  onChanged: (value) => setDialogState(() => selectedExerciseId = value),
+                ),
+                Row(children: [
+                  Expanded(child: TextField(controller: sets, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Sets'))),
+                  const SizedBox(width: 8),
+                  Expanded(child: TextField(controller: reps, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Reps'))),
+                  const SizedBox(width: 8),
+                  Expanded(child: TextField(controller: weight, keyboardType: const TextInputType.numberWithOptions(decimal: true), decoration: const InputDecoration(labelText: 'Weight'))),
+                ]),
+                Align(alignment: Alignment.centerLeft, child: TextButton.icon(
+                  onPressed: selectedExerciseId == null ? null : () {
+                    final item = PlannedExerciseInput(exerciseId: selectedExerciseId!, plannedSets: int.tryParse(sets.text) ?? 0, plannedReps: int.tryParse(reps.text) ?? 0, plannedWeight: double.tryParse(weight.text) ?? 0);
+                    if (item.plannedSets <= 0 || item.plannedReps <= 0 || item.plannedWeight < 0) return;
+                    setDialogState(() {
+                      draftExercises.add(item);
+                      days[0] = ManualPlanDayInput(name: 'Day 1', isRestDay: false, exercises: List.unmodifiable(draftExercises));
+                      selectedExerciseId = null;
+                    });
+                  },
+                  icon: const Icon(Icons.add), label: const Text('Add exercise'),
+                )),
+                ...draftExercises.asMap().entries.map((entry) {
+                  final exercise = _exerciseController.exercises.firstWhere((item) => item.id == entry.value.exerciseId);
+                  return ListTile(dense: true, title: Text(exercise.name), subtitle: Text('${entry.value.plannedSets} sets • ${entry.value.plannedReps} reps • ${entry.value.plannedWeight} kg'), trailing: IconButton(icon: const Icon(Icons.delete_outline), onPressed: () => setDialogState(() { draftExercises.removeAt(entry.key); days[0] = ManualPlanDayInput(name: 'Day 1', isRestDay: false, exercises: List.unmodifiable(draftExercises)); })));
+                }),
+              ],
               if (widget.controller.templates.isNotEmpty) ...[
                 const SizedBox(height: 10),
                 const Align(alignment: Alignment.centerLeft, child: Text('Use templates')),
@@ -277,6 +333,9 @@ class _WorkoutPlanningPageState extends State<WorkoutPlanningPage>
     );
     name.dispose();
     duration.dispose();
+    sets.dispose();
+    reps.dispose();
+    weight.dispose();
   }
 
   Future<void> _startPlan(WorkoutPlan plan) async {
