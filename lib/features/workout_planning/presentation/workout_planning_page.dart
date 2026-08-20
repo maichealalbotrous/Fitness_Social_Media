@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fitness_social_app/features/exercises/domain/exercise_controller.dart';
+import 'package:fitness_social_app/features/exercises/presentation/exercise_controller.dart';
 import 'package:fitness_social_app/features/exercises/presentation/exercise_dependencies.dart';
 import 'package:fitness_social_app/features/user/presentation/components/shared/app_sidebar.dart';
 import 'package:fitness_social_app/features/user_sessions/domain/user_session_entities.dart';
