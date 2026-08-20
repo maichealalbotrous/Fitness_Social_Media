@@ -20,4 +20,5 @@ class AppRoutes {
   static const userSessions = '/user-sessions';
   static const workoutPlanning = '/workout-planning';
   static const notifications = '/notifications';
+  static const chat = '/chat';
 }
