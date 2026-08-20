@@ -10,8 +10,6 @@ import 'package:fitness_social_app/features/user/presentation/components/shared/
 import 'package:fitness_social_app/features/user/presentation/pages/feed_page.dart';
 import 'package:fitness_social_app/features/user/presentation/pages/profile_page.dart';
 import 'package:fitness_social_app/features/user/presentation/pages/user_search_page.dart';
-import 'package:fitness_social_app/features/user/presentation/pages/run_page.dart';
-import 'package:fitness_social_app/features/user/presentation/pages/workout_page.dart';
 import 'package:fitness_social_app/features/community/presentation/pages/community_page.dart';
 import 'package:fitness_social_app/features/community/presentation/pages/my_communities_page.dart';
 import 'package:fitness_social_app/features/challenges/presentation/pages/challenges_page.dart';
@@ -58,8 +56,6 @@ class FitnessSocialApp extends StatelessWidget {
         AppRoutes.resetPassword: (_) => const ResetPasswordPage(),
         AppRoutes.verifyEmail: (_) => const VerifyEmailPage(),
         AppRoutes.feed: (_) => const FeedPage(),
-        AppRoutes.workouts: (_) => const WorkoutPage(),
-        AppRoutes.runs: (_) => const RunPage(),
         AppRoutes.profile: (_) => const ProfilePage(),
         AppRoutes.community: (_) => const CommunityPage(),
         AppRoutes.myCommunities: (_) => const MyCommunitiesPage(),

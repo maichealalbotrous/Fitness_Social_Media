@@ -1,7 +1,5 @@
 import 'package:fitness_social_app/features/user/presentation/components/feed/feed_theme.dart';
 import 'package:fitness_social_app/features/user/presentation/pages/profile_page.dart';
-import 'package:fitness_social_app/features/user/presentation/pages/run_page.dart';
-import 'package:fitness_social_app/features/user/presentation/pages/workout_page.dart';
 import 'package:flutter/material.dart';
 
 class FeedMobileNavigation extends StatelessWidget {
@@ -18,32 +16,12 @@ class FeedMobileNavigation extends StatelessWidget {
         if (index == 1) {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (_) => const WorkoutPage()),
-          );
-        }
-        if (index == 2) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) => const RunPage()),
-          );
-        }
-        if (index == 3) {
-          Navigator.pushReplacement(
-            context,
             MaterialPageRoute(builder: (_) => const ProfilePage()),
           );
         }
       },
       destinations: const [
         NavigationDestination(icon: Icon(Icons.home_outlined), label: 'Feed'),
-        NavigationDestination(
-          icon: Icon(Icons.fitness_center),
-          label: 'Workout',
-        ),
-        NavigationDestination(
-          icon: Icon(Icons.monitor_heart_outlined),
-          label: 'Runs',
-        ),
         NavigationDestination(
           icon: Icon(Icons.person_outline),
           label: 'Profile',

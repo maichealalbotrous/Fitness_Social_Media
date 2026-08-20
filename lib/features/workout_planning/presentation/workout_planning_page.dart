@@ -61,7 +61,7 @@ class _WorkoutPlanningPageState extends State<WorkoutPlanningPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: const AppSidebar(activeSection: AppSidebarSection.workouts),
+      drawer: const AppSidebar(activeSection: AppSidebarSection.none),
       appBar: AppBar(
         title: const Text('Workout Planning'),
         bottom: TabBar(

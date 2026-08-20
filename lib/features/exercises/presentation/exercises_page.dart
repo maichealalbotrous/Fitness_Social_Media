@@ -49,7 +49,7 @@ class _ExercisesPageState extends State<ExercisesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: const AppSidebar(activeSection: AppSidebarSection.workouts),
+      drawer: const AppSidebar(activeSection: AppSidebarSection.none),
       appBar: AppBar(
         title: const Text('Exercises'),
         actions: [
