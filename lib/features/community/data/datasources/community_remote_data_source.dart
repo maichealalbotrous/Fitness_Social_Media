@@ -82,9 +82,16 @@ class ApiCommunityRemoteDataSource implements CommunityRemoteDataSource {
     final value = await _apiClient.getJsonValue(
       '/api/Community/${Uri.encodeComponent(communityId)}/members',
     );
-    return _listOfMaps(value, const ['members', 'Members', 'data', 'Data'])
-        .map(CommunityMemberModel.fromJson)
-        .toList(growable: false);
+    final raw = value is List
+        ? value
+        : value is Map<String, dynamic>
+            ? (value['members'] ?? value['Members'] ?? value['data'] ?? value['Data'] ?? const [])
+            : const [];
+    if (raw is! List) return const <CommunityMemberModel>[];
+    return raw.map((item) {
+      if (item is Map<String, dynamic>) return CommunityMemberModel.fromJson(item);
+      return CommunityMemberModel(userId: item.toString(), userName: item.toString(), isAdmin: false);
+    }).toList(growable: false);
   }
 
   @override

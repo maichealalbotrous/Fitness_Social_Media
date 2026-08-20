@@ -26,7 +26,11 @@ class AppSidebar extends StatelessWidget {
   }
 
   Future<void> _logout(BuildContext context) async {
-    await AuthDependencies.createLogoutUser()();
+    try {
+      await AuthDependencies.createLogoutUser()();
+    } catch (_) {
+      // Logout must still clear the local session when the API is unavailable.
+    }
     await _clearCachedProfile();
     if (!context.mounted) return;
     Navigator.of(context).pushNamedAndRemoveUntil(
@@ -308,7 +312,11 @@ class _CurrentUserTileState extends State<_CurrentUserTile> {
   Future<void> _logout(BuildContext context) async {
     setState(() => _isLoggingOut = true);
     try {
+      try {
       await AuthDependencies.createLogoutUser()();
+    } catch (_) {
+      // Logout must still clear the local session when the API is unavailable.
+    }
       await AppSidebar._clearCachedProfile();
       if (!mounted) return;
       Navigator.of(context).pushNamedAndRemoveUntil(

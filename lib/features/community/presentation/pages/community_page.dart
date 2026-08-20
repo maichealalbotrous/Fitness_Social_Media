@@ -36,7 +36,7 @@ class _CommunityPageState extends State<CommunityPage> {
     _controller = CommunityDependencies.createController();
     if (widget.initialCommunityId != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        _searchCommunity(widget.initialCommunityId!);
+        _loadCommunityById(widget.initialCommunityId!);
       });
     }
   }
@@ -129,6 +129,20 @@ class _CommunityPageState extends State<CommunityPage> {
         ),
       ),
     );
+  }
+
+  Future<void> _loadCommunityById(String id) async {
+    final trimmedId = id.trim();
+    if (trimmedId.isEmpty) return;
+    await _controller.load(trimmedId);
+    if (!mounted) return;
+    final community = _controller.community;
+    if (community != null) {
+      await _controller.loadMembers(community.id);
+      if (community.isAdmin || community.isOwner) {
+        await _controller.loadRequests(community.id);
+      }
+    }
   }
 
   Future<void> _searchCommunity(String name) async {
