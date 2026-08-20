@@ -55,7 +55,7 @@ class ApiCommunityRemoteDataSource implements CommunityRemoteDataSource {
 
   @override
   Future<CommunityModel> getByName(String name) async {
-    final response = await _apiClient.getJson('/api/Community/name/${Uri.encodeComponent(name.trim())}');
+    final response = await _apiClient.getJson('/name/${Uri.encodeComponent(name.trim())}');
     return CommunityModel.fromJson(response);
   }
 
