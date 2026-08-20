@@ -47,10 +47,11 @@ class _ChallengeDetailsPageState extends State<ChallengeDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final challenge = _controller.selected ?? widget.challenge;
     return AnimatedBuilder(
       animation: _controller,
-      builder: (context, _) => Scaffold(
+      builder: (context, _) {
+        final challenge = _controller.selected ?? widget.challenge;
+        return Scaffold(
         backgroundColor: const Color(0xFF030403),
         appBar: AppBar(backgroundColor: const Color(0xFF030403), foregroundColor: Colors.white, title: const Text('Challenge details'), leading: const BackButton()),
         body: ListView(padding: const EdgeInsets.all(20), children: [
@@ -76,11 +77,11 @@ class _ChallengeDetailsPageState extends State<ChallengeDetailsPage> {
           ],
           if (_controller.error != null) Padding(padding: const EdgeInsets.only(top: 16), child: Text(_controller.error!, style: const TextStyle(color: Colors.redAccent))),
           if (_controller.message != null) Padding(padding: const EdgeInsets.only(top: 16), child: Text(_controller.message!, style: const TextStyle(color: Color(0xFFDFFF00)))),
-        ]),
-      ),
+                ]),
+        );
+      },
     );
   }
-
   String _date(DateTime date) => '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
 }
 
