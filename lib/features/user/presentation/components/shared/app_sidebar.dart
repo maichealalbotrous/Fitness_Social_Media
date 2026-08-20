@@ -71,6 +71,12 @@ class AppSidebar extends StatelessWidget {
                 routeName: AppRoutes.exercises,
               ),
               _SidebarItem(
+                icon: Icons.calendar_month_outlined,
+                label: 'Training Sessions',
+                active: false,
+                routeName: AppRoutes.userSessions,
+              ),
+              _SidebarItem(
                 icon: Icons.monitor_heart_outlined,
                 label: 'Runs',
                 active: activeSection == AppSidebarSection.runs,
