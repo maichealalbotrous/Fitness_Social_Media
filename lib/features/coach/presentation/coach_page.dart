@@ -2,6 +2,8 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:fitness_social_app/features/coach/presentation/coach_controller.dart';
+import 'package:fitness_social_app/features/user/presentation/user_dependencies.dart';
+import 'package:fitness_social_app/features/user/presentation/controllers/user_controller.dart';
 
 class CoachPage extends StatefulWidget {
   const CoachPage({super.key, required this.controller});
@@ -15,8 +17,35 @@ class _CoachPageState extends State<CoachPage> {
   Uint8List? _certificationBytes;
   String? _certificationFileName;
   final _message = TextEditingController();
-  @override void initState() { super.initState(); widget.controller.loadAll(); }
-  @override void dispose() { _coachId.dispose(); _message.dispose(); super.dispose(); }
+  late final UserController _userController;
+  final Map<String, String> _athleteNames = <String, String>{};
+
+  @override
+  void initState() {
+    super.initState();
+    _userController = UserDependencies.createController();
+    _loadCoachData();
+  }
+
+  @override
+  void dispose() {
+    _coachId.dispose();
+    _message.dispose();
+    _userController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadCoachData() async {
+    await widget.controller.loadAll();
+    if (!mounted) return;
+    for (final request in widget.controller.trainingRequests) {
+      final profile = await _userController.loadById(request.athleteId);
+      if (profile != null && mounted) {
+        _athleteNames[request.athleteId] = profile.username;
+      }
+    }
+    if (mounted) setState(() {});
+  }
   Future<void> _pickCertification() async {
     final file = await _imagePicker.pickImage(source: ImageSource.gallery, imageQuality: 85, maxWidth: 1600, maxHeight: 1600);
     if (file == null) return;
@@ -66,7 +95,7 @@ class _CoachPageState extends State<CoachPage> {
               ? const Text('No training requests.', style: TextStyle(color: Colors.white54))
               : Column(children: widget.controller.trainingRequests.map((request) => ListTile(
         contentPadding: EdgeInsets.zero,
-        title: Text('Athlete: ${request.athleteId}', style: const TextStyle(color: Colors.white)),
+        title: Text(_athleteNames[request.athleteId] ?? 'Loading user...', style: const TextStyle(color: Colors.white)),
         subtitle: Text(request.message ?? request.status, style: const TextStyle(color: Colors.white60)),
         trailing: request.status.toLowerCase() == 'pending' ? Wrap(children: [
           IconButton(onPressed: () => widget.controller.reviewTrainingRequest(request.id!, true), icon: const Icon(Icons.check, color: Colors.green)),
