@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:fitness_social_app/features/exercises/presentation/exercise_controller.dart';
 import 'package:fitness_social_app/features/exercises/presentation/exercise_dependencies.dart';
 import 'package:fitness_social_app/features/user/presentation/components/shared/app_sidebar.dart';
+import 'package:fitness_social_app/features/coach/domain/entities/coach_entities.dart';
+import 'package:fitness_social_app/features/coach/presentation/coach_controller.dart';
+import 'package:fitness_social_app/features/coach/presentation/coach_dependencies.dart';
 import 'package:fitness_social_app/features/user_sessions/domain/user_session_entities.dart';
 import 'package:fitness_social_app/features/workout_planning/domain/workout_planning_entities.dart';
 import 'package:fitness_social_app/features/workout_planning/presentation/workout_planning_controller.dart';
@@ -18,12 +21,14 @@ class _WorkoutPlanningPageState extends State<WorkoutPlanningPage>
     with SingleTickerProviderStateMixin {
   late final TabController _tabs;
   late final ExerciseController _exerciseController;
+  late final CoachController _coachController;
 
   @override
   void initState() {
     super.initState();
     _tabs = TabController(length: 2, vsync: this);
     _exerciseController = ExerciseDependencies.createController();
+    _coachController = CoachDependencies.createController();
     widget.controller.loadTemplates();
     widget.controller.loadPlans();
   }
@@ -32,6 +37,7 @@ class _WorkoutPlanningPageState extends State<WorkoutPlanningPage>
   void dispose() {
     _tabs.dispose();
     _exerciseController.dispose();
+    _coachController.dispose();
     super.dispose();
   }
 
@@ -177,9 +183,11 @@ class _WorkoutPlanningPageState extends State<WorkoutPlanningPage>
   }
 
   Future<void> _createPlanDialog() async {
+    await _coachController.loadApprovedParticipants();
+    if (!mounted) return;
     final name = TextEditingController();
     final duration = TextEditingController(text: '7');
-    final ownerUserId = TextEditingController();
+    String? selectedParticipantId;
     final selectedTemplates = <String>{};
     final days = [const ManualPlanDayInput(name: 'Day 1', isRestDay: false, exercises: [])];
     String? validationError;
@@ -197,7 +205,24 @@ class _WorkoutPlanningPageState extends State<WorkoutPlanningPage>
                 ),
               TextField(controller: name, decoration: const InputDecoration(labelText: 'Name')),
               TextField(controller: duration, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Duration days')),
-              TextField(controller: ownerUserId, decoration: const InputDecoration(labelText: 'Participant user ID (for a coach plan)', helperText: 'Leave empty to create a personal plan.')),
+              if (_coachController.approvedParticipants.isNotEmpty)
+                DropdownButtonFormField<String>(
+                  value: selectedParticipantId,
+                  decoration: const InputDecoration(labelText: 'Participant'),
+                  hint: const Text('Choose a participant you train'),
+                  items: _coachController.approvedParticipants
+                      .map((participant) => DropdownMenuItem<String>(
+                            value: participant.id,
+                            child: Text(participant.username),
+                          ))
+                      .toList(growable: false),
+                  onChanged: (value) => setDialogState(() => selectedParticipantId = value),
+                )
+              else
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8),
+                  child: Text('No approved participants found. Leave this empty for a personal plan.'),
+                ),
               if (widget.controller.templates.isNotEmpty) ...[
                 const SizedBox(height: 10),
                 const Align(alignment: Alignment.centerLeft, child: Text('Use templates')),
@@ -237,7 +262,7 @@ class _WorkoutPlanningPageState extends State<WorkoutPlanningPage>
                 await widget.controller.createPlan(
                   name: name.text.trim(),
                   durationDays: value,
-                  ownerUserId: ownerUserId.text.trim().isEmpty ? null : ownerUserId.text.trim(),
+                  ownerUserId: selectedParticipantId,
                   templateIds: selectedTemplates.toList(growable: false),
                   days: planDays,
                 );
@@ -252,7 +277,6 @@ class _WorkoutPlanningPageState extends State<WorkoutPlanningPage>
     );
     name.dispose();
     duration.dispose();
-    ownerUserId.dispose();
   }
 
   Future<void> _startPlan(WorkoutPlan plan) async {

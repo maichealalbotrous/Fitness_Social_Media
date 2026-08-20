@@ -17,4 +17,5 @@ class CoachRepository {
   Future<TrainingRequest> createTrainingRequest(String coachId, String? message) => remote.createTrainingRequest(coachId: coachId, message: message);
   Future<List<TrainingRequest>> getTrainingRequests() => remote.getTrainingRequests();
   Future<TrainingRequest> reviewTrainingRequest(String id, bool approved) => remote.reviewTrainingRequest(id, approved: approved);
+  Future<CoachUser> getUser(String userId) => remote.getUser(userId);
 }

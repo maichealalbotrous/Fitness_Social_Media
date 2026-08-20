@@ -15,6 +15,7 @@ abstract interface class CoachRemoteDataSource {
   Future<TrainingRequest> createTrainingRequest({required String coachId, String? message});
   Future<List<TrainingRequest>> getTrainingRequests();
   Future<TrainingRequest> reviewTrainingRequest(String id, {required bool approved});
+  Future<CoachUser> getUser(String userId);
 }
 
 class ApiCoachRemoteDataSource implements CoachRemoteDataSource {
@@ -53,6 +54,12 @@ class ApiCoachRemoteDataSource implements CoachRemoteDataSource {
   Future<List<TrainingRequest>> getTrainingRequests() async => _trainings(await _api.getJsonValue('/api/coach/training-requests'));
   @override
   Future<TrainingRequest> reviewTrainingRequest(String id, {required bool approved}) async => _training(await _api.patchJson('/api/coach/training-requests/${Uri.encodeComponent(id)}', body: {'approved': approved}));
+  @override
+  Future<CoachUser> getUser(String userId) async {
+    final json = await _api.getJson('/api/Users/${Uri.encodeComponent(userId)}');
+    final item = _map(json);
+    return CoachUser(id: s(item, 'id'), username: s(item, 'username').isEmpty ? userId : s(item, 'username'));
+  }
 
   Map<String, dynamic> _map(dynamic value) { if (value is! Map<String, dynamic>) return <String, dynamic>{}; for (final key in const ['data','request','trainingRequest','application','coach']) { final nested = value[key]; if (nested is Map<String, dynamic>) return nested; } return value; }
   List<dynamic> _list(dynamic value) { if (value is List) return value; if (value is Map<String, dynamic>) { for (final key in const ['data','coaches','items','results','requests','trainingRequests']) { final nested = value[key]; if (nested is List) return nested; } } return const []; }

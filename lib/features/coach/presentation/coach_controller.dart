@@ -16,6 +16,7 @@ class CoachController extends ChangeNotifier {
   List<CoachProfile> coaches = const [];
   List<CoachProfile> topRatedCoaches = const [];
   List<CoachProfile> participantCoaches = const [];
+  List<CoachUser> approvedParticipants = const [];
   bool canManageTrainingRequests = false;
 
   Future<void> loadAll() async {
@@ -78,6 +79,22 @@ class CoachController extends ChangeNotifier {
     participantCoaches = allCoaches.where((coach) => approvedCoachIds.contains(coach.userId)).toList(growable: false);
   });
   Future<void> rateCoach(String coachId, int rating) async => _run(() async { await repository.rateCoach(coachId, rating); message = 'تم إرسال التقييم.'; });
+
+  Future<void> loadApprovedParticipants() async {
+    await _run(() async {
+      final requests = await repository.getTrainingRequests();
+      final ids = requests
+          .where((request) => request.status.toLowerCase() == 'approved')
+          .map((request) => request.athleteId)
+          .toSet()
+          .toList(growable: false);
+      final users = <CoachUser>[];
+      for (final id in ids) {
+        users.add(await repository.getUser(id));
+      }
+      approvedParticipants = users;
+    });
+  }
 
   Future<void> createTrainingRequest(String coachId, String? text) async {
     await _run(() async {
