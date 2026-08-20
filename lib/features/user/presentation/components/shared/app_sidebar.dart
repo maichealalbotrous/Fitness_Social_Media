@@ -46,10 +46,11 @@ class AppSidebar extends StatelessWidget {
       child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(22, 20, 16, 18),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const _SidebarLogo(),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const _SidebarLogo(),
               const SizedBox(height: 42),
               _SidebarItem(
                 icon: Icons.home_outlined,
@@ -128,9 +129,10 @@ class AppSidebar extends StatelessWidget {
                   ),
                 ),
               ),
-              const Spacer(),
+              const SizedBox(height: 24),
               const _CurrentUserTile(),
-            ],
+              ],
+            ),
           ),
         ),
       ),

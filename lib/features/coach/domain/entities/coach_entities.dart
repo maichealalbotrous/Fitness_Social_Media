@@ -25,3 +25,20 @@ class CoachUser {
   final String id;
   final String username;
 }
+
+class CoachProfile {
+  const CoachProfile({required this.userId, required this.username, this.bio, this.profilePictureUrl, required this.certificationUrl, required this.approvedAt, required this.averageRating, required this.totalParticipants});
+  final String userId;
+  final String username;
+  final String? bio;
+  final String? profilePictureUrl;
+  final String certificationUrl;
+  final DateTime approvedAt;
+  final double averageRating;
+  final int totalParticipants;
+}
+
+class CoachRating {
+  const CoachRating({required this.rating});
+  final int rating;
+}

@@ -9,6 +9,11 @@ class CoachRepository {
   Future<CoachApplication?> getMyApplication() => remote.getMyApplication();
   Future<List<CoachApplication>> getPendingApplications() => remote.getPendingApplications();
   Future<CoachApplication> reviewApplication(String id, bool approved, String? note) => remote.reviewApplication(id, approved: approved, reviewNote: note);
+  Future<List<CoachProfile>> getAllCoaches() => remote.getAllCoaches();
+  Future<List<CoachProfile>> getTopRatedCoaches() => remote.getTopRatedCoaches();
+  Future<List<CoachProfile>> findCoachesByName(String name) => remote.findCoachesByName(name);
+  Future<List<CoachProfile>> getParticipantCoaches(String participantId) => remote.getParticipantCoaches(participantId);
+  Future<void> rateCoach(String coachId, int rating) => remote.rateCoach(coachId, rating);
   Future<TrainingRequest> createTrainingRequest(String coachId, String? message) => remote.createTrainingRequest(coachId: coachId, message: message);
   Future<List<TrainingRequest>> getTrainingRequests() => remote.getTrainingRequests();
   Future<TrainingRequest> reviewTrainingRequest(String id, bool approved) => remote.reviewTrainingRequest(id, approved: approved);

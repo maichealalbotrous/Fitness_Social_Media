@@ -13,6 +13,9 @@ class CoachController extends ChangeNotifier {
   CoachApplication? myApplication;
   List<CoachApplication> pendingApplications = const [];
   List<TrainingRequest> trainingRequests = const [];
+  List<CoachProfile> coaches = const [];
+  List<CoachProfile> topRatedCoaches = const [];
+  List<CoachProfile> participantCoaches = const [];
   bool canManageTrainingRequests = false;
 
   Future<void> loadAll() async {
@@ -60,6 +63,12 @@ class CoachController extends ChangeNotifier {
       message = approved ? 'تم قبول الطلب.' : 'تم رفض الطلب.';
     });
   }
+
+  Future<void> loadCoaches() async => _run(() async { coaches = await repository.getAllCoaches(); });
+  Future<void> loadTopRatedCoaches() async => _run(() async { topRatedCoaches = await repository.getTopRatedCoaches(); });
+  Future<void> searchCoaches(String name) async => _run(() async { coaches = await repository.findCoachesByName(name); });
+  Future<void> loadParticipantCoaches(String participantId) async => _run(() async { participantCoaches = await repository.getParticipantCoaches(participantId); });
+  Future<void> rateCoach(String coachId, int rating) async => _run(() async { await repository.rateCoach(coachId, rating); message = 'تم إرسال التقييم.'; });
 
   Future<void> createTrainingRequest(String coachId, String? text) async {
     await _run(() async {

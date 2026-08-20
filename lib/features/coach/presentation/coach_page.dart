@@ -13,6 +13,7 @@ class CoachPage extends StatefulWidget {
 
 class _CoachPageState extends State<CoachPage> {
   final _coachId = TextEditingController();
+  final _coachSearch = TextEditingController();
   final _imagePicker = ImagePicker();
   Uint8List? _certificationBytes;
   String? _certificationFileName;
@@ -30,6 +31,7 @@ class _CoachPageState extends State<CoachPage> {
   @override
   void dispose() {
     _coachId.dispose();
+    _coachSearch.dispose();
     _message.dispose();
     _userController.dispose();
     super.dispose();
@@ -37,6 +39,8 @@ class _CoachPageState extends State<CoachPage> {
 
   Future<void> _loadCoachData() async {
     await widget.controller.loadAll();
+    await widget.controller.loadCoaches();
+    await widget.controller.loadTopRatedCoaches();
     if (!mounted) return;
     for (final request in widget.controller.trainingRequests) {
       final profile = await _userController.loadById(request.athleteId);
@@ -81,6 +85,12 @@ class _CoachPageState extends State<CoachPage> {
         const SizedBox(height: 10),
         SizedBox(width: double.infinity, child: FilledButton(onPressed: widget.controller.isLoading || _certificationBytes == null ? null : () => widget.controller.submitApplicationWithImage(bytes: _certificationBytes!, fileName: _certificationFileName ?? 'certification.jpg'), child: const Text('UPLOAD AND SUBMIT APPLICATION'))),
         if (widget.controller.myApplication != null) Align(alignment: Alignment.centerLeft, child: Text('Your application: ${widget.controller.myApplication!.status}', style: const TextStyle(color: Colors.amber))),
+      ])),
+      _panel('Discover coaches', Column(children: [
+        TextField(controller: _coachSearch, style: const TextStyle(color: Colors.white), decoration: _decoration('Search coach by name').copyWith(suffixIcon: IconButton(icon: const Icon(Icons.search), onPressed: () => widget.controller.searchCoaches(_coachSearch.text.trim())))),
+        const SizedBox(height: 8),
+        if (widget.controller.coaches.isEmpty) const Text('No coaches found.', style: TextStyle(color: Colors.white54))
+        else ...widget.controller.coaches.map((coach) => ListTile(contentPadding: EdgeInsets.zero, leading: CircleAvatar(backgroundImage: coach.profilePictureUrl == null || coach.profilePictureUrl!.isEmpty ? null : NetworkImage(coach.profilePictureUrl!), child: coach.profilePictureUrl == null || coach.profilePictureUrl!.isEmpty ? const Icon(Icons.person) : null), title: Text(coach.username, style: const TextStyle(color: Colors.white)), subtitle: Text('${coach.averageRating.toStringAsFixed(1)} / 5  •  ${coach.totalParticipants} participants', style: const TextStyle(color: Colors.white60)), trailing: PopupMenuButton<int>(icon: const Icon(Icons.star, color: Colors.amber), onSelected: (rating) => widget.controller.rateCoach(coach.userId, rating), itemBuilder: (_) => List.generate(5, (index) => PopupMenuItem(value: index + 1, child: Text('${index + 1} star'))))).toList(growable: false),
       ])),
       _panel('Request a coach', Column(children: [
         TextField(controller: _coachId, style: const TextStyle(color: Colors.white), decoration: _decoration('Coach ID')),
