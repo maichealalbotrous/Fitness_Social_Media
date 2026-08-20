@@ -89,8 +89,34 @@ class ChallengesController extends ChangeNotifier {
       final result = await _updateParticipant(challengeId, progress);
       message = result.message;
       success = true;
-      await loadDetails(challengeId);
-      await loadMyChallenges();
+      final current = selected;
+      if (current != null && current.id == challengeId) {
+        selected = Challenge(
+          id: current.id,
+          creatorId: current.creatorId,
+          communityId: current.communityId,
+          name: current.name,
+          description: current.description,
+          startDate: current.startDate,
+          endDate: current.endDate,
+          goal: current.goal,
+          progress: progress,
+        );
+      }
+      myChallenges = myChallenges.map((item) {
+        if (item.id != challengeId) return item;
+        return Challenge(
+          id: item.id,
+          creatorId: item.creatorId,
+          communityId: item.communityId,
+          name: item.name,
+          description: item.description,
+          startDate: item.startDate,
+          endDate: item.endDate,
+          goal: item.goal,
+          progress: progress,
+        );
+      }).toList(growable: false);
     });
     return success;
   }
