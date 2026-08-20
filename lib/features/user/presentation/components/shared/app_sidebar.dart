@@ -65,6 +65,12 @@ class AppSidebar extends StatelessWidget {
                 routeName: AppRoutes.workouts,
               ),
               _SidebarItem(
+                icon: Icons.accessibility_new,
+                label: 'Exercises',
+                active: false,
+                routeName: AppRoutes.exercises,
+              ),
+              _SidebarItem(
                 icon: Icons.monitor_heart_outlined,
                 label: 'Runs',
                 active: activeSection == AppSidebarSection.runs,

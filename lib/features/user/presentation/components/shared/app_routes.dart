@@ -15,4 +15,5 @@ class AppRoutes {
   static const challenges = '/challenges';
   static const coach = '/coach';
   static const myCoaches = '/my-coaches';
+  static const exercises = '/exercises';
 }
