@@ -17,6 +17,7 @@ class AuthLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       backgroundColor: AuthTheme.background,
       body: SafeArea(
         child: LayoutBuilder(
@@ -28,9 +29,20 @@ class AuthLayout extends StatelessWidget {
             );
 
             if (!isWide) {
-              return SingleChildScrollView(
-                padding: const EdgeInsets.all(24),
-                child: form,
+              return LayoutBuilder(
+                builder: (context, innerConstraints) => SingleChildScrollView(
+                  keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                  padding: EdgeInsets.fromLTRB(
+                    24,
+                    24,
+                    24,
+                    24 + MediaQuery.viewInsetsOf(context).bottom,
+                  ),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(minHeight: innerConstraints.maxHeight - 48),
+                    child: form,
+                  ),
+                ),
               );
             }
 
@@ -40,7 +52,13 @@ class AuthLayout extends StatelessWidget {
                 Expanded(
                   flex: 5,
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(48),
+                    keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                    padding: EdgeInsets.fromLTRB(
+                      48,
+                      48,
+                      48,
+                      48 + MediaQuery.viewInsetsOf(context).bottom,
+                    ),
                     child: form,
                   ),
                 ),
