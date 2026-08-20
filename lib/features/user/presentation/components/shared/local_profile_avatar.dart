@@ -18,17 +18,30 @@ class LocalProfileAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final provider = _imageProvider;
     final avatar = CircleAvatar(
       radius: radius,
-      backgroundColor: const Color(0xFF151515),
-      backgroundImage: _imageProvider,
-      onBackgroundImageError: _imageProvider == null ? null : (_, __) {},
-      child: _imageProvider == null
-          ? Icon(Icons.person, color: Colors.grey.shade500, size: radius * 1.1)
-          : null,
+      backgroundColor: const Color(0xFF242424),
+      child: provider == null
+          ? _fallbackIcon()
+          : ClipOval(
+              child: Image(
+                image: provider,
+                width: radius * 2,
+                height: radius * 2,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => _fallbackIcon(),
+              ),
+            ),
     );
     return onTap == null ? avatar : InkWell(onTap: onTap, child: avatar);
   }
+
+  Widget _fallbackIcon() => Icon(
+        Icons.person,
+        color: Colors.grey.shade400,
+        size: radius * 1.1,
+      );
 
   ImageProvider<Object>? get _imageProvider {
     if (base64Image != null && base64Image!.isNotEmpty) {
@@ -39,10 +52,8 @@ class LocalProfileAvatar extends StatelessWidget {
       }
     }
     final remoteUrl = _normalizeRemoteUrl(imageUrl);
-    if (remoteUrl != null) {
-      return NetworkImage(remoteUrl);
-    }
-    return null;
+    if (remoteUrl == null) return null;
+    return NetworkImage(remoteUrl);
   }
 
   String? _normalizeRemoteUrl(String? value) {

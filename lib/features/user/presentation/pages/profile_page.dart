@@ -19,6 +19,7 @@ import 'package:fitness_social_app/features/physical_data/presentation/physical_
 import 'package:fitness_social_app/features/posts/presentation/controllers/posts_controller.dart';
 import 'package:fitness_social_app/features/posts/presentation/posts_dependencies.dart';
 import 'package:fitness_social_app/features/posts/presentation/widgets/post_card.dart';
+import 'package:fitness_social_app/features/posts/presentation/widgets/post_details_page.dart';
 import 'package:fitness_social_app/features/posts/domain/entities/post.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -38,6 +39,7 @@ class _ProfilePageState extends State<ProfilePage> {
   late final PostsController _postsController;
   LocalProfileController? _profileController;
   UserProfile? _remoteProfile;
+  final Map<String, UserProfile> _postProfiles = <String, UserProfile>{};
   bool _isFollowing = false;
 
   @override
@@ -156,6 +158,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           _ProfilePostsSection(
                             posts: _profilePosts,
                             controller: _postsController,
+                            profiles: _postProfiles,
                             currentUserId: widget.targetUserId == null ? _profileController?.userId : null,
                           ),
                         ],
@@ -193,7 +196,20 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> _loadProfilePosts(String userId) async {
     await _postsController.loadFeed();
+    final authorIds = _postsController.posts.map((post) => post.authorId).toSet();
+    final profiles = await Future.wait(
+      authorIds.map((authorId) async {
+        try {
+          return await _userController.loadById(authorId, forceRefresh: true);
+        } catch (_) {
+          return null;
+        }
+      }),
+    );
     if (!mounted) return;
+    for (final profile in profiles) {
+      if (profile != null) _postProfiles[profile.id] = profile;
+    }
     setState(() {});
   }
 
@@ -394,11 +410,13 @@ class _ProfilePostsSection extends StatelessWidget {
   const _ProfilePostsSection({
     required this.posts,
     required this.controller,
+    required this.profiles,
     this.currentUserId,
   });
 
   final List<Post> posts;
   final PostsController controller;
+  final Map<String, UserProfile> profiles;
   final String? currentUserId;
 
   @override
@@ -426,8 +444,14 @@ class _ProfilePostsSection extends StatelessWidget {
               child: PostCard(
                 post: post,
                 currentUserId: currentUserId,
-                currentUserName: post.authorName,
+                currentUserName: profiles[post.authorId]?.username ?? post.authorName,
+                authorAvatar: profiles[post.authorId]?.profilePictureUrl,
                 onLike: () => controller.toggleLike(post),
+                onComment: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => PostDetailsPage(post: post),
+                  ),
+                ),
               ),
             ),
           ),
