@@ -116,14 +116,12 @@ class _WorkoutPlanningPageState extends State<WorkoutPlanningPage>
 
   Widget _planCard(WorkoutPlan plan) {
     final actions = <Widget>[];
-    if (plan.status == WorkoutPlanStatus.draft) {
-      actions.add(TextButton(onPressed: () => widget.controller.sendPlan(plan.id), child: const Text('Send')));
-    }
     if (plan.status == WorkoutPlanStatus.pendingAcceptance) {
+      actions.add(TextButton(onPressed: () => widget.controller.sendPlan(plan.id), child: const Text('Send')));
       actions.add(TextButton(onPressed: () => widget.controller.acceptPlan(plan.id), child: const Text('Accept')));
       actions.add(TextButton(onPressed: () => widget.controller.rejectPlan(plan.id), child: const Text('Reject')));
     }
-    if (plan.status == WorkoutPlanStatus.accepted) {
+    if (plan.status == WorkoutPlanStatus.draft || plan.status == WorkoutPlanStatus.accepted) {
       actions.add(TextButton(onPressed: () => _startPlan(plan), child: const Text('Start')));
     }
     return Card(
@@ -181,6 +179,7 @@ class _WorkoutPlanningPageState extends State<WorkoutPlanningPage>
   Future<void> _createPlanDialog() async {
     final name = TextEditingController();
     final duration = TextEditingController(text: '7');
+    final ownerUserId = TextEditingController();
     final selectedTemplates = <String>{};
     final days = [const ManualPlanDayInput(name: 'Day 1', isRestDay: false, exercises: [])];
     String? validationError;
@@ -198,6 +197,7 @@ class _WorkoutPlanningPageState extends State<WorkoutPlanningPage>
                 ),
               TextField(controller: name, decoration: const InputDecoration(labelText: 'Name')),
               TextField(controller: duration, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Duration days')),
+              TextField(controller: ownerUserId, decoration: const InputDecoration(labelText: 'Participant user ID (for a coach plan)', helperText: 'Leave empty to create a personal plan.')),
               if (widget.controller.templates.isNotEmpty) ...[
                 const SizedBox(height: 10),
                 const Align(alignment: Alignment.centerLeft, child: Text('Use templates')),
@@ -237,6 +237,7 @@ class _WorkoutPlanningPageState extends State<WorkoutPlanningPage>
                 await widget.controller.createPlan(
                   name: name.text.trim(),
                   durationDays: value,
+                  ownerUserId: ownerUserId.text.trim().isEmpty ? null : ownerUserId.text.trim(),
                   templateIds: selectedTemplates.toList(growable: false),
                   days: planDays,
                 );
@@ -251,6 +252,7 @@ class _WorkoutPlanningPageState extends State<WorkoutPlanningPage>
     );
     name.dispose();
     duration.dispose();
+    ownerUserId.dispose();
   }
 
   Future<void> _startPlan(WorkoutPlan plan) async {
