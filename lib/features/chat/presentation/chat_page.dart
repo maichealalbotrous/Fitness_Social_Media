@@ -12,12 +12,12 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
-  final _userIdController = TextEditingController();
+  final _usernameController = TextEditingController();
   final _messageController = TextEditingController();
 
   @override
   void dispose() {
-    _userIdController.dispose();
+    _usernameController.dispose();
     _messageController.dispose();
     super.dispose();
   }
@@ -35,14 +35,44 @@ class _ChatPageState extends State<ChatPage> {
               padding: const EdgeInsets.all(12),
               child: Row(
                 children: [
-                  Expanded(child: TextField(controller: _userIdController, decoration: const InputDecoration(labelText: 'Other user ID'))),
+                  Expanded(
+                    child: TextField(
+                      controller: _usernameController,
+                      decoration: const InputDecoration(labelText: 'Search by username'),
+                      onSubmitted: (_) => _searchUser(),
+                    ),
+                  ),
                   const SizedBox(width: 8),
-                  FilledButton(onPressed: _loadConversation, child: const Text('Open')),
+                  FilledButton(
+                    onPressed: widget.controller.isSearchingUser ? null : _searchUser,
+                    child: const Text('Search'),
+                  ),
                 ],
               ),
             ),
+            if (widget.controller.searchError != null)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Text(widget.controller.searchError!, style: const TextStyle(color: Colors.redAccent)),
+              ),
+            if (widget.controller.selectedUser != null)
+              Card(
+                margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                child: ListTile(
+                  leading: const CircleAvatar(child: Icon(Icons.person)),
+                  title: Text(widget.controller.selectedUser!.username),
+                  subtitle: const Text('User found'),
+                  trailing: FilledButton(
+                    onPressed: () => widget.controller.loadHistory(widget.controller.selectedUser!.id),
+                    child: const Text('Open chat'),
+                  ),
+                ),
+              ),
             if (widget.controller.error != null)
-              Padding(padding: const EdgeInsets.symmetric(horizontal: 12), child: Text(widget.controller.error!, style: const TextStyle(color: Colors.redAccent))),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Text(widget.controller.error!, style: const TextStyle(color: Colors.redAccent)),
+              ),
             if (widget.controller.isLoading) const LinearProgressIndicator(),
             Expanded(child: _conversation()),
             _composer(),
@@ -54,7 +84,7 @@ class _ChatPageState extends State<ChatPage> {
 
   Widget _conversation() {
     if (widget.controller.otherUserId == null) {
-      return const Center(child: Text('Enter a user ID to open a conversation.'));
+      return const Center(child: Text('Search for a username to open a conversation.'));
     }
     if (widget.controller.messages.isEmpty && !widget.controller.isLoading) {
       return const Center(child: Text('No messages yet.'));
@@ -101,17 +131,15 @@ class _ChatPageState extends State<ChatPage> {
           children: [
             Expanded(child: TextField(controller: _messageController, minLines: 1, maxLines: 4, decoration: const InputDecoration(hintText: 'Write a message...'))),
             const SizedBox(width: 8),
-            IconButton(onPressed: widget.controller.isSending ? null : _send, icon: const Icon(Icons.send)),
+            IconButton(onPressed: widget.controller.isSending || widget.controller.otherUserId == null ? null : _send, icon: const Icon(Icons.send)),
           ],
         ),
       ),
     );
   }
 
-  Future<void> _loadConversation() async {
-    final id = _userIdController.text.trim();
-    if (id.isEmpty) return;
-    await widget.controller.loadHistory(id);
+  Future<void> _searchUser() async {
+    await widget.controller.searchUser(_usernameController.text);
   }
 
   Future<void> _send() async {

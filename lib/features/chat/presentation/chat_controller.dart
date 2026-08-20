@@ -2,16 +2,42 @@ import 'package:flutter/foundation.dart';
 import 'package:fitness_social_app/core/network/api_client.dart';
 import 'package:fitness_social_app/features/chat/domain/chat_entities.dart';
 import 'package:fitness_social_app/features/chat/domain/chat_repository.dart';
+import 'package:fitness_social_app/features/user/domain/entities/user_profile.dart';
+import 'package:fitness_social_app/features/user/domain/repositories/user_repository.dart';
 
 class ChatController extends ChangeNotifier {
-  ChatController(this.repository);
+  ChatController(this.repository, this.userRepository);
   final ChatRepository repository;
+  final UserRepository userRepository;
 
   List<ChatMessage> messages = const [];
   String? otherUserId;
+  UserProfile? selectedUser;
+  bool isSearchingUser = false;
+  String? searchError;
   bool isLoading = false;
   bool isSending = false;
   String? error;
+
+  Future<void> searchUser(String username) async {
+    final query = username.trim();
+    if (query.isEmpty) return;
+    isSearchingUser = true;
+    searchError = null;
+    notifyListeners();
+    try {
+      selectedUser = await userRepository.getByUsername(query);
+    } on ApiException catch (exception) {
+      selectedUser = null;
+      searchError = exception.message;
+    } catch (_) {
+      selectedUser = null;
+      searchError = 'Unable to find this user.';
+    } finally {
+      isSearchingUser = false;
+      notifyListeners();
+    }
+  }
 
   Future<void> loadHistory(String userId) async {
     otherUserId = userId;
