@@ -16,6 +16,7 @@ import 'package:fitness_social_app/features/community/presentation/pages/communi
 import 'package:fitness_social_app/features/community/presentation/pages/my_communities_page.dart';
 import 'package:fitness_social_app/features/challenges/presentation/pages/challenges_page.dart';
 import 'package:fitness_social_app/features/coach/presentation/coach_page.dart';
+import 'package:fitness_social_app/features/coach/presentation/my_coaches_page.dart';
 import 'package:fitness_social_app/features/coach/presentation/coach_dependencies.dart';
 
 void main() {
@@ -53,6 +54,7 @@ class FitnessSocialApp extends StatelessWidget {
         AppRoutes.userSearch: (_) => const UserSearchPage(),
         AppRoutes.challenges: (_) => const ChallengesPage(),
         AppRoutes.coach: (_) => CoachPage(controller: CoachDependencies.createController()),
+        AppRoutes.myCoaches: (_) => MyCoachesPage(controller: CoachDependencies.createController()),
       },
     );
   }

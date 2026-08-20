@@ -14,4 +14,5 @@ class AppRoutes {
   static const userSearch = '/users/search';
   static const challenges = '/challenges';
   static const coach = '/coach';
+  static const myCoaches = '/my-coaches';
 }

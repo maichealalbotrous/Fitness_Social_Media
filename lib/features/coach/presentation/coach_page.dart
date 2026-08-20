@@ -2,8 +2,10 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:fitness_social_app/features/coach/presentation/coach_controller.dart';
+import 'package:fitness_social_app/features/coach/domain/entities/coach_entities.dart';
 import 'package:fitness_social_app/features/user/presentation/user_dependencies.dart';
 import 'package:fitness_social_app/features/user/presentation/controllers/user_controller.dart';
+import 'package:fitness_social_app/features/user/presentation/components/shared/app_routes.dart';
 
 class CoachPage extends StatefulWidget {
   const CoachPage({super.key, required this.controller});
@@ -12,12 +14,10 @@ class CoachPage extends StatefulWidget {
 }
 
 class _CoachPageState extends State<CoachPage> {
-  final _coachId = TextEditingController();
   final _coachSearch = TextEditingController();
   final _imagePicker = ImagePicker();
   Uint8List? _certificationBytes;
   String? _certificationFileName;
-  final _message = TextEditingController();
   late final UserController _userController;
   final Map<String, String> _athleteNames = <String, String>{};
 
@@ -30,9 +30,7 @@ class _CoachPageState extends State<CoachPage> {
 
   @override
   void dispose() {
-    _coachId.dispose();
     _coachSearch.dispose();
-    _message.dispose();
     _userController.dispose();
     super.dispose();
   }
@@ -50,6 +48,24 @@ class _CoachPageState extends State<CoachPage> {
     }
     if (mounted) setState(() {});
   }
+  Future<void> _requestTraining(CoachProfile coach) async {
+    final messageController = TextEditingController();
+    final message = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Request ${coach.username}'),
+        content: TextField(controller: messageController, maxLines: 3, decoration: const InputDecoration(labelText: 'Message (optional)')),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          FilledButton(onPressed: () => Navigator.pop(context, messageController.text.trim()), child: const Text('Send request')),
+        ],
+      ),
+    );
+    messageController.dispose();
+    if (message == null || !mounted) return;
+    await widget.controller.createTrainingRequest(coach.userId, message.isEmpty ? null : message);
+  }
+
   Future<void> _pickCertification() async {
     final file = await _imagePicker.pickImage(source: ImageSource.gallery, imageQuality: 85, maxWidth: 1600, maxHeight: 1600);
     if (file == null) return;
@@ -107,27 +123,38 @@ class _CoachPageState extends State<CoachPage> {
                 '${coach.averageRating.toStringAsFixed(1)} / 5 • ${coach.totalParticipants} participants',
                 style: const TextStyle(color: Colors.white60),
               ),
-              trailing: PopupMenuButton<int>(
-                icon: const Icon(Icons.star, color: Colors.amber),
-                onSelected: (rating) => widget.controller.rateCoach(coach.userId, rating),
-                itemBuilder: (_) => List.generate(
-                  5,
-                  (index) => PopupMenuItem(
-                    value: index + 1,
-                    child: Text('${index + 1} star'),
+              trailing: Wrap(
+                spacing: 6,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  OutlinedButton(
+                    onPressed: widget.controller.isLoading ? null : () => _requestTraining(coach),
+                    child: const Text('Send training request'),
                   ),
-                ),
+                  PopupMenuButton<int>(
+                    icon: const Icon(Icons.star, color: Colors.amber),
+                    onSelected: (rating) => widget.controller.rateCoach(coach.userId, rating),
+                    itemBuilder: (_) => List.generate(
+                      5,
+                      (index) => PopupMenuItem(
+                        value: index + 1,
+                        child: Text('${index + 1} star'),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
       ])),
-      _panel('Request a coach', Column(children: [
-        TextField(controller: _coachId, style: const TextStyle(color: Colors.white), decoration: _decoration('Coach ID')),
-        const SizedBox(height: 10),
-        TextField(controller: _message, maxLines: 3, style: const TextStyle(color: Colors.white), decoration: _decoration('Message (optional)')),
-        const SizedBox(height: 10),
-        SizedBox(width: double.infinity, child: FilledButton(onPressed: widget.controller.isLoading ? null : () => widget.controller.createTrainingRequest(_coachId.text.trim(), _message.text.trim()), child: const Text('SEND TRAINING REQUEST'))),
-      ])),
+      _panel('My coaches', SizedBox(
+        width: double.infinity,
+        child: FilledButton.icon(
+          onPressed: () => Navigator.of(context).pushNamed(AppRoutes.myCoaches),
+          icon: const Icon(Icons.people_alt_outlined),
+          label: const Text('View my coaches'),
+        ),
+      )),
       _panel('Training requests', !widget.controller.canManageTrainingRequests
           ? const Text('This section is available after your Coach application is approved.', style: TextStyle(color: Colors.white54))
           : widget.controller.trainingRequests.isEmpty

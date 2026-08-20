@@ -68,6 +68,15 @@ class CoachController extends ChangeNotifier {
   Future<void> loadTopRatedCoaches() async => _run(() async { topRatedCoaches = await repository.getTopRatedCoaches(); });
   Future<void> searchCoaches(String name) async => _run(() async { coaches = await repository.findCoachesByName(name); });
   Future<void> loadParticipantCoaches(String participantId) async => _run(() async { participantCoaches = await repository.getParticipantCoaches(participantId); });
+  Future<void> loadMyCoaches() async => _run(() async {
+    final requests = await repository.getTrainingRequests();
+    final approvedCoachIds = requests
+        .where((request) => request.status.toLowerCase() == 'approved')
+        .map((request) => request.coachId)
+        .toSet();
+    final allCoaches = await repository.getAllCoaches();
+    participantCoaches = allCoaches.where((coach) => approvedCoachIds.contains(coach.userId)).toList(growable: false);
+  });
   Future<void> rateCoach(String coachId, int rating) async => _run(() async { await repository.rateCoach(coachId, rating); message = 'تم إرسال التقييم.'; });
 
   Future<void> createTrainingRequest(String coachId, String? text) async {

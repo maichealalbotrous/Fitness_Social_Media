@@ -101,6 +101,12 @@ class AppSidebar extends StatelessWidget {
                 routeName: AppRoutes.coach,
               ),
               _SidebarItem(
+                icon: Icons.people_alt_outlined,
+                label: 'My Coaches',
+                active: false,
+                routeName: AppRoutes.myCoaches,
+              ),
+              _SidebarItem(
                 icon: Icons.search,
                 label: 'Search users',
                 active: false,
