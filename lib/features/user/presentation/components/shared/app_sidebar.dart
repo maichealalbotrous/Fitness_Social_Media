@@ -9,7 +9,7 @@ import 'package:fitness_social_app/features/user/presentation/components/shared/
 import 'package:fitness_social_app/features/user/presentation/user_dependencies.dart';
 import 'package:fitness_social_app/features/user/presentation/controllers/user_controller.dart';
 
-enum AppSidebarSection { feed, workouts, sessions, runs, profile, community }
+enum AppSidebarSection { feed, workouts, sessions, runs, profile, community, notifications }
 
 class AppSidebar extends StatelessWidget {
   const AppSidebar({required this.activeSection, super.key});
@@ -136,9 +136,11 @@ class AppSidebar extends StatelessWidget {
                 active: false,
                 routeName: AppRoutes.userSearch,
               ),
-              const _StaticSidebarItem(
+              _SidebarItem(
                 icon: Icons.notifications_none,
                 label: 'Notifications',
+                active: activeSection == AppSidebarSection.notifications,
+                routeName: AppRoutes.notifications,
               ),
               const SizedBox(height: 28),
               SizedBox(

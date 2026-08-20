@@ -26,6 +26,8 @@ import 'package:fitness_social_app/features/user_sessions/presentation/user_sess
 import 'package:fitness_social_app/features/user_sessions/presentation/user_session_dependencies.dart';
 import 'package:fitness_social_app/features/workout_planning/presentation/workout_planning_page.dart';
 import 'package:fitness_social_app/features/workout_planning/presentation/workout_planning_dependencies.dart';
+import 'package:fitness_social_app/features/notifications/presentation/notifications_page.dart';
+import 'package:fitness_social_app/features/notifications/presentation/notification_dependencies.dart';
 
 void main() {
   runApp(const FitnessSocialApp());
@@ -67,6 +69,7 @@ class FitnessSocialApp extends StatelessWidget {
         AppRoutes.physicalData: (_) => PhysicalDataPage(controller: PhysicalDataDependencies.createController()),
         AppRoutes.userSessions: (_) => UserSessionsPage(controller: UserSessionDependencies.createController()),
         AppRoutes.workoutPlanning: (_) => WorkoutPlanningPage(controller: WorkoutPlanningDependencies.createController()),
+        AppRoutes.notifications: (_) => NotificationsPage(controller: NotificationDependencies.createController()),
       },
     );
   }
