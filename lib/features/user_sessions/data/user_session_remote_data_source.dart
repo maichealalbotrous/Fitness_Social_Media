@@ -15,11 +15,11 @@ class ApiUserSessionRemoteDataSource implements UserSessionRemoteDataSource {
   final ApiClient _api;
 
   @override
-  Future<List<UserSession>> getAll() async => _parseList(await _api.getJson('/api/UserSessions'));
+  Future<List<UserSession>> getAll() async => _parseList(await _api.getListJson('/api/UserSessions'));
   @override
-  Future<List<UserSession>> getByDay(DateTime date) async => _parseList(await _api.getJson('/api/UserSessions/day/${_date(date)}'));
+  Future<List<UserSession>> getByDay(DateTime date) async => _parseList(await _api.getListJson('/api/UserSessions/day/${_date(date)}'));
   @override
-  Future<List<UserSession>> getByMonth(int year, int month) async => _parseList(await _api.getJson('/api/UserSessions/month/$year/$month'));
+  Future<List<UserSession>> getByMonth(int year, int month) async => _parseList(await _api.getListJson('/api/UserSessions/month/$year/$month'));
   @override
   Future<UserSession> create({required String? description, required List<ExerciseMuscle> muscles, required int totalDurationMinutes, required List<UserExerciseInput> exercises}) async => _parse(await _api.postJson('/api/UserSessions', body: _body(description, muscles, totalDurationMinutes, exercises)));
   @override
