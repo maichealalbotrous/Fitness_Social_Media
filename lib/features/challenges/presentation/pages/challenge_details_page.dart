@@ -37,11 +37,23 @@ class _ChallengeDetailsPageState extends State<ChallengeDetailsPage> {
 
   Future<void> _updateProgress() async {
     final value = double.tryParse(_progressController.text.trim());
+    final current = _controller.selected ?? widget.challenge;
     if (value == null || value < 0) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Enter a valid positive number.')));
       return;
     }
-    await _controller.updateProgress(widget.challenge.id, value);
+    if (current.progress >= current.goal) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('لقد حققت هدف التحدي بالفعل ولا يمكنك تسجيل تقدم إضافي.')));
+      return;
+    }
+    if (value > current.goal) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('لا يمكن أن يتجاوز التقدم الهدف ${current.goal.toStringAsFixed(1)}.')));
+      return;
+    }
+    final success = await _controller.updateProgress(widget.challenge.id, value);
+    if (success && mounted && value >= current.goal) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تهانينا، لقد حققت هدف التحدي بالكامل.')));
+    }
     if (mounted && _controller.error == null) _progressController.clear();
   }
 

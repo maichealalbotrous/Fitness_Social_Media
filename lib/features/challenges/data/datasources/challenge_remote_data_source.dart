@@ -34,7 +34,7 @@ class ApiChallengeRemoteDataSource implements ChallengeRemoteDataSource {
   @override
   Future<ChallengeModel> getById(String challengeId) async {
     final response = await _apiClient.getJson('/api/Challenge/$challengeId');
-    return ChallengeModel.fromJson(response);
+    return ChallengeModel.fromJson(_unwrapChallenge(response));
   }
 
   @override
@@ -65,6 +65,11 @@ class ApiChallengeRemoteDataSource implements ChallengeRemoteDataSource {
       return _message(response, fallback: 'تم تحديث تقدمك في التحدي.');
     }
     return 'تم تحديث تقدمك في التحدي.';
+  }
+
+  Map<String, dynamic> _unwrapChallenge(Map<String, dynamic> response) {
+    final value = response['data'] ?? response['challenge'] ?? response['Challenge'];
+    return value is Map<String, dynamic> ? value : response;
   }
 
   Future<List<ChallengeModel>> _list(String path) async {
