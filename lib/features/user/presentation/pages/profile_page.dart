@@ -323,10 +323,10 @@ class _PhysicalDataCard extends StatelessWidget {
     if (physical == null) return const SizedBox.shrink();
     final latestWeight = physical.weights.isEmpty ? null : physical.weights.last.weightKg;
     final visibleFields = <Widget>[
-      if (physical.heightCm != null) _item(Icons.height, 'Height', '${physical.heightCm!.toStringAsFixed(1)} cm'),
-      if (physical.sex != null) _item(Icons.person_outline, 'Gender', physical.sex!.label),
-      if (physical.birthday != null) _item(Icons.cake_outlined, 'Birthday', '${physical.birthday!.year}-${physical.birthday!.month.toString().padLeft(2, '0')}-${physical.birthday!.day.toString().padLeft(2, '0')}'),
-      if (latestWeight != null) _item(Icons.monitor_weight_outlined, 'Latest weight', '${latestWeight.toStringAsFixed(1)} kg'),
+      if (!physical.heightIsPrivate && physical.heightCm != null) _item(Icons.height, 'Height', '${physical.heightCm!.toStringAsFixed(1)} cm'),
+      if (!physical.sexIsPrivate && physical.sex != null) _item(Icons.person_outline, 'Gender', physical.sex!.label),
+      if (!physical.birthdayIsPrivate && physical.birthday != null) _item(Icons.cake_outlined, 'Birthday', '${physical.birthday!.year}-${physical.birthday!.month.toString().padLeft(2, '0')}-${physical.birthday!.day.toString().padLeft(2, '0')}'),
+      if (!physical.weightsIsPrivate && latestWeight != null) _item(Icons.monitor_weight_outlined, 'Latest weight', '${latestWeight.toStringAsFixed(1)} kg'),
     ];
     return Card(
       color: ProfileTheme.panel,
@@ -336,7 +336,7 @@ class _PhysicalDataCard extends StatelessWidget {
           const Text('Physical Data', style: TextStyle(color: Colors.white, fontSize: 19, fontWeight: FontWeight.w800)),
           const SizedBox(height: 14),
           if (visibleFields.isEmpty) const Text('No physical data available.', style: TextStyle(color: Colors.white60)) else Wrap(spacing: 12, runSpacing: 12, children: visibleFields),
-          if (physical.personalRecords.isNotEmpty) ...[
+          if (!physical.personalRecordsIsPrivate && physical.personalRecords.isNotEmpty) ...[
             const SizedBox(height: 16),
             const Text('Personal records', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
             const SizedBox(height: 6),
