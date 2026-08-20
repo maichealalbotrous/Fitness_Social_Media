@@ -90,7 +90,36 @@ class _CoachPageState extends State<CoachPage> {
         TextField(controller: _coachSearch, style: const TextStyle(color: Colors.white), decoration: _decoration('Search coach by name').copyWith(suffixIcon: IconButton(icon: const Icon(Icons.search), onPressed: () => widget.controller.searchCoaches(_coachSearch.text.trim())))),
         const SizedBox(height: 8),
         if (widget.controller.coaches.isEmpty) const Text('No coaches found.', style: TextStyle(color: Colors.white54))
-        else ...widget.controller.coaches.map((coach) => ListTile(contentPadding: EdgeInsets.zero, leading: CircleAvatar(backgroundImage: coach.profilePictureUrl == null || coach.profilePictureUrl!.isEmpty ? null : NetworkImage(coach.profilePictureUrl!), child: coach.profilePictureUrl == null || coach.profilePictureUrl!.isEmpty ? const Icon(Icons.person) : null), title: Text(coach.username, style: const TextStyle(color: Colors.white)), subtitle: Text('${coach.averageRating.toStringAsFixed(1)} / 5  •  ${coach.totalParticipants} participants', style: const TextStyle(color: Colors.white60)), trailing: PopupMenuButton<int>(icon: const Icon(Icons.star, color: Colors.amber), onSelected: (rating) => widget.controller.rateCoach(coach.userId, rating), itemBuilder: (_) => List.generate(5, (index) => PopupMenuItem(value: index + 1, child: Text('${index + 1} star'))))).toList(growable: false),
+        else
+          ...widget.controller.coaches.map(
+            (coach) => ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: CircleAvatar(
+                backgroundImage: coach.profilePictureUrl == null || coach.profilePictureUrl!.isEmpty
+                    ? null
+                    : NetworkImage(coach.profilePictureUrl!),
+                child: coach.profilePictureUrl == null || coach.profilePictureUrl!.isEmpty
+                    ? const Icon(Icons.person)
+                    : null,
+              ),
+              title: Text(coach.username, style: const TextStyle(color: Colors.white)),
+              subtitle: Text(
+                '${coach.averageRating.toStringAsFixed(1)} / 5 • ${coach.totalParticipants} participants',
+                style: const TextStyle(color: Colors.white60),
+              ),
+              trailing: PopupMenuButton<int>(
+                icon: const Icon(Icons.star, color: Colors.amber),
+                onSelected: (rating) => widget.controller.rateCoach(coach.userId, rating),
+                itemBuilder: (_) => List.generate(
+                  5,
+                  (index) => PopupMenuItem(
+                    value: index + 1,
+                    child: Text('${index + 1} star'),
+                  ),
+                ),
+              ),
+            ),
+          ),
       ])),
       _panel('Request a coach', Column(children: [
         TextField(controller: _coachId, style: const TextStyle(color: Colors.white), decoration: _decoration('Coach ID')),
