@@ -183,6 +183,7 @@ class _WorkoutPlanningPageState extends State<WorkoutPlanningPage>
     final duration = TextEditingController(text: '7');
     final selectedTemplates = <String>{};
     final days = [const ManualPlanDayInput(name: 'Day 1', isRestDay: false, exercises: [])];
+    String? validationError;
     await showDialog<void>(
       context: context,
       builder: (dialogContext) => StatefulBuilder(
@@ -190,6 +191,11 @@ class _WorkoutPlanningPageState extends State<WorkoutPlanningPage>
           title: const Text('Create plan'),
           content: SingleChildScrollView(
             child: Column(mainAxisSize: MainAxisSize.min, children: [
+              if (validationError != null)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Text(validationError!, style: const TextStyle(color: Colors.redAccent)),
+                ),
               TextField(controller: name, decoration: const InputDecoration(labelText: 'Name')),
               TextField(controller: duration, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Duration days')),
               if (widget.controller.templates.isNotEmpty) ...[
@@ -216,10 +222,26 @@ class _WorkoutPlanningPageState extends State<WorkoutPlanningPage>
             TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Cancel')),
             FilledButton(
               onPressed: () async {
-                final value = int.tryParse(duration.text) ?? 0;
-                if (name.text.trim().isEmpty || value <= 0) return;
+                final value = int.tryParse(duration.text.trim()) ?? 0;
+                if (name.text.trim().isEmpty || value <= 0) {
+                  setDialogState(() {
+                    validationError = name.text.trim().isEmpty
+                        ? 'Please enter a plan name.'
+                        : 'Duration must be greater than zero.';
+                  });
+                  return;
+                }
+                final planDays = selectedTemplates.isNotEmpty
+                    ? const <ManualPlanDayInput>[]
+                    : days;
+                await widget.controller.createPlan(
+                  name: name.text.trim(),
+                  durationDays: value,
+                  templateIds: selectedTemplates.toList(growable: false),
+                  days: planDays,
+                );
+                if (!mounted || widget.controller.error != null) return;
                 Navigator.pop(dialogContext);
-                await widget.controller.createPlan(name: name.text.trim(), durationDays: value, templateIds: selectedTemplates.toList(growable: false), days: days);
               },
               child: const Text('Create'),
             ),
