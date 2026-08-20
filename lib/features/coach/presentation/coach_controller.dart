@@ -5,6 +5,7 @@ import 'package:fitness_social_app/features/coach/domain/entities/coach_entities
 
 class CoachController extends ChangeNotifier {
   CoachController(this.repository);
+
   final CoachRepository repository;
   bool isLoading = false;
   String? error;
@@ -12,9 +13,34 @@ class CoachController extends ChangeNotifier {
   CoachApplication? myApplication;
   List<CoachApplication> pendingApplications = const [];
   List<TrainingRequest> trainingRequests = const [];
+  bool canManageTrainingRequests = false;
 
-  Future<void> loadAll() async { await _run(() async { myApplication = await repository.getMyApplication(); trainingRequests = await repository.getTrainingRequests(); }); }
-  Future<void> submitApplication(String url) async { await _run(() async { myApplication = await repository.submitApplication(url); message = 'تم إرسال طلب المدرب.'; }); }
+  Future<void> loadAll() async {
+    await _run(() async {
+      try {
+        myApplication = await repository.getMyApplication();
+      } on ApiException catch (exception) {
+        if (exception.statusCode != 404) rethrow;
+        myApplication = null;
+      }
+      try {
+        trainingRequests = await repository.getTrainingRequests();
+        canManageTrainingRequests = true;
+      } on ApiException catch (exception) {
+        if (exception.statusCode != 401 && exception.statusCode != 403) rethrow;
+        trainingRequests = const [];
+        canManageTrainingRequests = false;
+      }
+    });
+  }
+
+  Future<void> submitApplication(String url) async {
+    await _run(() async {
+      myApplication = await repository.submitApplication(url);
+      message = 'تم إرسال طلب المدرب.';
+    });
+  }
+
   Future<void> submitApplicationWithImage({required List<int> bytes, required String fileName}) async {
     await _run(() async {
       final url = await repository.uploadCertification(bytes: bytes, fileName: fileName);
@@ -22,9 +48,48 @@ class CoachController extends ChangeNotifier {
       message = 'تم رفع الشهادة وإرسال طلب المدرب.';
     });
   }
-  Future<void> loadPendingApplications() async { await _run(() async { pendingApplications = await repository.getPendingApplications(); }); }
-  Future<void> reviewApplication(String id, bool approved, String? note) async { await _run(() async { await repository.reviewApplication(id, approved, note); await loadPendingApplications(); message = approved ? 'تم قبول الطلب.' : 'تم رفض الطلب.'; }); }
-  Future<void> createTrainingRequest(String coachId, String? text) async { await _run(() async { await repository.createTrainingRequest(coachId, text); message = 'تم إرسال طلب التدريب.'; }); }
-  Future<void> reviewTrainingRequest(String id, bool approved) async { await _run(() async { await repository.reviewTrainingRequest(id, approved); await loadAll(); message = approved ? 'تم قبول طلب التدريب.' : 'تم رفض الطلب.'; }); }
-  Future<void> _run(Future<void> Function() action) async { isLoading = true; error = null; message = null; notifyListeners(); try { await action(); } on ApiException catch (e) { error = e.message; } catch (_) { error = 'تعذر تنفيذ عملية المدرب.'; } finally { isLoading = false; notifyListeners(); } }
+
+  Future<void> loadPendingApplications() async {
+    await _run(() async => pendingApplications = await repository.getPendingApplications());
+  }
+
+  Future<void> reviewApplication(String id, bool approved, String? note) async {
+    await _run(() async {
+      await repository.reviewApplication(id, approved, note);
+      await loadPendingApplications();
+      message = approved ? 'تم قبول الطلب.' : 'تم رفض الطلب.';
+    });
+  }
+
+  Future<void> createTrainingRequest(String coachId, String? text) async {
+    await _run(() async {
+      await repository.createTrainingRequest(coachId, text);
+      message = 'تم إرسال طلب التدريب.';
+    });
+  }
+
+  Future<void> reviewTrainingRequest(String id, bool approved) async {
+    await _run(() async {
+      await repository.reviewTrainingRequest(id, approved);
+      trainingRequests = trainingRequests.where((request) => request.id != id).toList(growable: false);
+      message = approved ? 'تم قبول طلب التدريب.' : 'تم رفض طلب التدريب.';
+    });
+  }
+
+  Future<void> _run(Future<void> Function() action) async {
+    isLoading = true;
+    error = null;
+    message = null;
+    notifyListeners();
+    try {
+      await action();
+    } on ApiException catch (exception) {
+      error = exception.message;
+    } catch (_) {
+      error = 'تعذر تنفيذ عملية المدرب.';
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
 }

@@ -60,7 +60,11 @@ class _CoachPageState extends State<CoachPage> {
         const SizedBox(height: 10),
         SizedBox(width: double.infinity, child: FilledButton(onPressed: widget.controller.isLoading ? null : () => widget.controller.createTrainingRequest(_coachId.text.trim(), _message.text.trim()), child: const Text('SEND TRAINING REQUEST'))),
       ])),
-      _panel('Training requests', widget.controller.trainingRequests.isEmpty ? const Text('No training requests.', style: TextStyle(color: Colors.white54)) : Column(children: widget.controller.trainingRequests.map((request) => ListTile(
+      _panel('Training requests', !widget.controller.canManageTrainingRequests
+          ? const Text('This section is available after your Coach application is approved.', style: TextStyle(color: Colors.white54))
+          : widget.controller.trainingRequests.isEmpty
+              ? const Text('No training requests.', style: TextStyle(color: Colors.white54))
+              : Column(children: widget.controller.trainingRequests.map((request) => ListTile(
         contentPadding: EdgeInsets.zero,
         title: Text('Athlete: ${request.athleteId}', style: const TextStyle(color: Colors.white)),
         subtitle: Text(request.message ?? request.status, style: const TextStyle(color: Colors.white60)),
@@ -68,7 +72,7 @@ class _CoachPageState extends State<CoachPage> {
           IconButton(onPressed: () => widget.controller.reviewTrainingRequest(request.id!, true), icon: const Icon(Icons.check, color: Colors.green)),
           IconButton(onPressed: () => widget.controller.reviewTrainingRequest(request.id!, false), icon: const Icon(Icons.close, color: Colors.red)),
         ]) : Text(request.status, style: const TextStyle(color: Colors.white54)),
-      )).toList(growable: false))),
+      )).toList(growable: false)),),
       if (widget.controller.error != null) Text(widget.controller.error!, style: const TextStyle(color: Colors.redAccent)),
       if (widget.controller.message != null) Text(widget.controller.message!, style: const TextStyle(color: Colors.greenAccent)),
     ])),

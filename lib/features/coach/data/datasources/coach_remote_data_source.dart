@@ -45,8 +45,25 @@ class ApiCoachRemoteDataSource implements CoachRemoteDataSource {
   @override
   Future<TrainingRequest> reviewTrainingRequest(String id, {required bool approved}) async => _training(await _api.patchJson('/api/coach/training-requests/${Uri.encodeComponent(id)}', body: {'approved': approved}));
 
-  Map<String, dynamic> _map(dynamic value) => value is Map<String, dynamic> ? (value['data'] is Map<String, dynamic> ? value['data'] : value) : <String, dynamic>{};
-  List<dynamic> _list(dynamic value) => value is List ? value : value is Map<String, dynamic> && value['data'] is List ? value['data'] : const [];
+  Map<String, dynamic> _map(dynamic value) {
+    if (value is! Map<String, dynamic>) return <String, dynamic>{};
+    for (final key in const ['data', 'request', 'trainingRequest', 'application']) {
+      final nested = value[key];
+      if (nested is Map<String, dynamic>) return nested;
+    }
+    return value;
+  }
+
+  List<dynamic> _list(dynamic value) {
+    if (value is List) return value;
+    if (value is Map<String, dynamic>) {
+      for (final key in const ['data', 'requests', 'trainingRequests', 'items', 'results']) {
+        final nested = value[key];
+        if (nested is List) return nested;
+      }
+    }
+    return const [];
+  }
   String s(Map<String, dynamic> j, String k) => (j[k] ?? j[_pascal(k)] ?? '').toString();
   DateTime date(Map<String, dynamic> j, String k) => DateTime.tryParse(s(j, k)) ?? DateTime.fromMillisecondsSinceEpoch(0);
   String _pascal(String k) => k[0].toUpperCase() + k.substring(1);
