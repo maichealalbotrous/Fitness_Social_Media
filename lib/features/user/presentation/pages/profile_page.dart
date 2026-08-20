@@ -16,6 +16,10 @@ import 'package:fitness_social_app/features/user/presentation/user_dependencies.
 import 'package:fitness_social_app/features/physical_data/domain/physical_data_entities.dart';
 import 'package:fitness_social_app/features/physical_data/presentation/physical_data_controller.dart';
 import 'package:fitness_social_app/features/physical_data/presentation/physical_data_dependencies.dart';
+import 'package:fitness_social_app/features/posts/presentation/controllers/posts_controller.dart';
+import 'package:fitness_social_app/features/posts/presentation/posts_dependencies.dart';
+import 'package:fitness_social_app/features/posts/presentation/widgets/post_card.dart';
+import 'package:fitness_social_app/features/posts/domain/entities/post.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({this.targetUserId, this.targetDisplayName, super.key});
@@ -31,6 +35,7 @@ class _ProfilePageState extends State<ProfilePage> {
   late final FollowController _followController;
   late final UserController _userController;
   late final PhysicalDataController _physicalDataController;
+  late final PostsController _postsController;
   LocalProfileController? _profileController;
   UserProfile? _remoteProfile;
   bool _isFollowing = false;
@@ -41,8 +46,12 @@ class _ProfilePageState extends State<ProfilePage> {
     _followController = FollowsDependencies.createController();
     _userController = UserDependencies.createController();
     _physicalDataController = PhysicalDataDependencies.createController();
+    _postsController = PostsDependencies.createController();
     _loadFollowData();
-    if (widget.targetUserId != null) _loadRemoteProfile();
+    if (widget.targetUserId != null) {
+      _loadRemoteProfile();
+      _loadProfilePosts(widget.targetUserId!);
+    }
     if (widget.targetUserId == null) _initializeProfile();
   }
 
@@ -54,6 +63,8 @@ class _ProfilePageState extends State<ProfilePage> {
     );
     await controller.load();
     if (controller.userId != null) {
+      _loadProfilePosts(controller.userId!);
+
       await _physicalDataController.load(controller.userId!);
       _remoteProfile = await _userController.loadById(
         controller.userId!,
@@ -80,6 +91,7 @@ class _ProfilePageState extends State<ProfilePage> {
     _followController.dispose();
     _userController.dispose();
     _physicalDataController.dispose();
+    _postsController.dispose();
     _profileController?.dispose();
     super.dispose();
   }
@@ -87,7 +99,7 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: Listenable.merge([_followController, _userController, _physicalDataController]),
+      animation: Listenable.merge([_followController, _userController, _physicalDataController, _postsController]),
       builder: (context, _) {
         return Scaffold(
           backgroundColor: ProfileTheme.background,
@@ -140,6 +152,12 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                           const SizedBox(height: 18),
                           _PhysicalDataCard(data: _physicalDataController.data),
+                          const SizedBox(height: 18),
+                          _ProfilePostsSection(
+                            posts: _profilePosts,
+                            controller: _postsController,
+                            currentUserId: widget.targetUserId == null ? _profileController?.userId : null,
+                          ),
                         ],
                       ),
                     ),
@@ -171,6 +189,18 @@ class _ProfilePageState extends State<ProfilePage> {
     return _remoteProfile?.email.isNotEmpty == true
         ? _remoteProfile!.email
         : '@user_${_shortId(widget.targetUserId!)}';
+  }
+
+  Future<void> _loadProfilePosts(String userId) async {
+    await _postsController.loadFeed();
+    if (!mounted) return;
+    setState(() {});
+  }
+
+  List<Post> get _profilePosts {
+    final userId = widget.targetUserId ?? _profileController?.userId;
+    if (userId == null) return const [];
+    return _postsController.posts.where((post) => post.authorId == userId).toList(growable: false);
   }
 
   Future<void> _loadRemoteProfile() async {
@@ -265,7 +295,12 @@ class _ProfilePageState extends State<ProfilePage> {
     });
   }
 
-  Future<void> _reload() => _loadFollowData();
+  Future<void> _reload() async {
+    await Future.wait([
+      _loadFollowData(),
+      _postsController.loadFeed(),
+    ]);
+  }
 
   Future<void> _openList(FollowListType type) async {
     final controller = FollowsDependencies.createController();
@@ -352,4 +387,51 @@ class _PhysicalDataCard extends StatelessWidget {
     decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.06), borderRadius: BorderRadius.circular(12)),
     child: Row(mainAxisSize: MainAxisSize.min, children: [Icon(icon, size: 18, color: ProfileTheme.lime), const SizedBox(width: 8), Text('$label: $value', style: const TextStyle(color: Colors.white70))]),
   );
+}
+
+
+class _ProfilePostsSection extends StatelessWidget {
+  const _ProfilePostsSection({
+    required this.posts,
+    required this.controller,
+    this.currentUserId,
+  });
+
+  final List<Post> posts;
+  final PostsController controller;
+  final String? currentUserId;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            'Posts',
+            style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800),
+          ),
+        ),
+        const SizedBox(height: 12),
+        if (posts.isEmpty)
+          const Align(
+            alignment: Alignment.centerLeft,
+            child: Text('No posts yet.', style: TextStyle(color: Colors.white60)),
+          )
+        else
+          ...posts.map(
+            (post) => Padding(
+              padding: const EdgeInsets.only(bottom: 14),
+              child: PostCard(
+                post: post,
+                currentUserId: currentUserId,
+                currentUserName: post.authorName,
+                onLike: () => controller.toggleLike(post),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
 }

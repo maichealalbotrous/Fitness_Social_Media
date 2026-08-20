@@ -107,15 +107,34 @@ class _ChatPageState extends State<ChatPage> {
           margin: const EdgeInsets.only(bottom: 8),
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
           decoration: BoxDecoration(
-            color: mine ? Theme.of(context).colorScheme.primary : Colors.white12,
+            color: mine ? const Color(0xFFB9D97A) : const Color(0xFF263238),
             borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: mine ? const Color(0xFFD9F3A3) : const Color(0xFF546E7A),
+            ),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Align(alignment: Alignment.centerLeft, child: Text(message.content)),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  message.content,
+                  style: TextStyle(
+                    color: mine ? const Color(0xFF102000) : Colors.white,
+                    fontSize: 16,
+                    height: 1.25,
+                  ),
+                ),
+              ),
               const SizedBox(height: 4),
-              Text(_formatDate(message.sentAt), style: const TextStyle(fontSize: 11, color: Colors.white60)),
+              Text(
+                _formatDate(message.sentAt),
+                style: TextStyle(
+                  fontSize: 11,
+                  color: mine ? const Color(0xFF38521A) : const Color(0xFFCFD8DC),
+                ),
+              ),
             ],
           ),
         ),
