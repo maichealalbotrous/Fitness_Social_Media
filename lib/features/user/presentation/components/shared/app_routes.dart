@@ -16,4 +16,5 @@ class AppRoutes {
   static const coach = '/coach';
   static const myCoaches = '/my-coaches';
   static const exercises = '/exercises';
+  static const physicalData = '/physical-data';
 }

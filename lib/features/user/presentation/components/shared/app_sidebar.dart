@@ -83,6 +83,12 @@ class AppSidebar extends StatelessWidget {
                 routeName: AppRoutes.profile,
               ),
               _SidebarItem(
+                icon: Icons.monitor_weight_outlined,
+                label: 'Physical Data',
+                active: false,
+                routeName: AppRoutes.physicalData,
+              ),
+              _SidebarItem(
                 icon: Icons.groups_outlined,
                 label: 'Community',
                 active: activeSection == AppSidebarSection.community,
