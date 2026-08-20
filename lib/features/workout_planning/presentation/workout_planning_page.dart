@@ -344,6 +344,13 @@ class _WorkoutPlanningPageState extends State<WorkoutPlanningPage>
   }
 
   Future<void> _completeDay(WorkoutPlan plan, WorkoutDay day) async {
+    if (day.exercises.isEmpty) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('لا يمكن إكمال هذا اليوم لأنه لا يحتوي على أي تمرين. أضف تمريناً إلى الخطة أولاً.')),
+      );
+      return;
+    }
     final duration = TextEditingController(text: '30');
     await showDialog<void>(
       context: context,
