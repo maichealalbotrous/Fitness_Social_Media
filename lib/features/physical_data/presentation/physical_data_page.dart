@@ -4,6 +4,7 @@ import 'package:fitness_social_app/features/physical_data/domain/physical_data_e
 import 'package:fitness_social_app/features/physical_data/presentation/physical_data_controller.dart';
 import 'package:fitness_social_app/features/user/data/local_profile_storage.dart';
 import 'package:fitness_social_app/features/user/presentation/controllers/local_profile_controller.dart';
+import 'package:fitness_social_app/features/user/presentation/components/shared/app_routes.dart';
 import 'package:fitness_social_app/features/user/presentation/components/shared/app_sidebar.dart';
 
 class PhysicalDataPage extends StatefulWidget {
@@ -93,7 +94,19 @@ class _PhysicalDataPageState extends State<PhysicalDataPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: const AppSidebar(activeSection: AppSidebarSection.profile),
-      appBar: AppBar(title: const Text('Physical Data'), leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => Navigator.of(context).pop())),
+      appBar: AppBar(
+        title: const Text('Physical Data'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            } else {
+              Navigator.of(context).pushReplacementNamed(AppRoutes.feed);
+            }
+          },
+        ),
+      ),
       body: AnimatedBuilder(animation: widget.controller, builder: (_, __) => ListView(padding: const EdgeInsets.all(16), children: [
         if (widget.controller.isLoading) const LinearProgressIndicator(),
         if (widget.controller.error != null) Text(widget.controller.error!, style: const TextStyle(color: Colors.redAccent)),

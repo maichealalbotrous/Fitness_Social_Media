@@ -4,6 +4,7 @@ import '../../domain/entities/challenge.dart';
 import '../challenges_dependencies.dart';
 import '../controllers/challenges_controller.dart';
 import 'challenge_details_page.dart';
+import 'package:fitness_social_app/features/user/presentation/components/shared/app_routes.dart';
 import 'create_challenge_page.dart';
 
 class ChallengesPage extends StatefulWidget {
@@ -50,7 +51,16 @@ class _ChallengesPageState extends State<ChallengesPage> with SingleTickerProvid
             backgroundColor: const Color(0xFF030403),
             foregroundColor: Colors.white,
             title: const Text('Challenges', style: TextStyle(fontWeight: FontWeight.w900)),
-            leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => Navigator.maybePop(context)),
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () {
+                if (Navigator.of(context).canPop()) {
+                  Navigator.of(context).pop();
+                } else {
+                  Navigator.of(context).pushReplacementNamed(AppRoutes.feed);
+                }
+              },
+            ),
             actions: [
               IconButton(onPressed: _refresh, icon: const Icon(Icons.refresh)),
               IconButton(

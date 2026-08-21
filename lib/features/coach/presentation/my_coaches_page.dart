@@ -3,6 +3,7 @@ import 'package:fitness_social_app/features/coach/presentation/coach_controller.
 import 'package:fitness_social_app/core/storage/session_storage.dart';
 import 'package:fitness_social_app/features/user/data/local_profile_storage.dart';
 import 'package:fitness_social_app/features/user/presentation/controllers/local_profile_controller.dart';
+import 'package:fitness_social_app/features/user/presentation/components/shared/app_routes.dart';
 
 class MyCoachesPage extends StatefulWidget {
   const MyCoachesPage({super.key, required this.controller});
@@ -53,7 +54,16 @@ class _MyCoachesPageState extends State<MyCoachesPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('My Coaches'),
-        leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => Navigator.of(context).pop()),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            } else {
+              Navigator.of(context).pushReplacementNamed(AppRoutes.feed);
+            }
+          },
+        ),
       ),
       body: AnimatedBuilder(
         animation: widget.controller,
