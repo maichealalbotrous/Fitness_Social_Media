@@ -328,10 +328,14 @@ class _WorkoutPlanningPageState extends State<WorkoutPlanningPage>
                   });
                   return;
                 }
-                // A plan may use a template or manually configured days.
-                // Sending both creates duplicate days because Backend appends them.
-                final planDays = days;
-                final planTemplateIds = draftExercises.isNotEmpty
+                // A plan may use templates or manually configured days.
+                // Sending an empty Day 1 together with templates creates extra
+                // days without exercises when the backend appends both lists.
+                final usesManualExercises = draftExercises.isNotEmpty;
+                final planDays = usesManualExercises
+                    ? days
+                    : const <ManualPlanDayInput>[];
+                final planTemplateIds = usesManualExercises
                     ? const <String>[]
                     : selectedTemplates.toList(growable: false);
                 await widget.controller.createPlan(
