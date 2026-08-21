@@ -6,6 +6,7 @@ import 'package:fitness_social_app/features/user/presentation/components/shared/
 import 'package:fitness_social_app/features/user/presentation/components/shared/app_sidebar.dart';
 import 'package:fitness_social_app/features/user_sessions/domain/user_session_entities.dart';
 import 'package:fitness_social_app/features/user_sessions/presentation/user_session_controller.dart';
+import 'package:fitness_social_app/core/ui/deferred_controller_disposal.dart';
 
 class UserSessionsPage extends StatefulWidget {
   const UserSessionsPage({super.key, required this.controller});
@@ -433,8 +434,7 @@ class _UserSessionsPageState extends State<UserSessionsPage> {
       },
     );
 
-    description.dispose();
-    duration.dispose();
+    await disposeTextControllersAfterDialog([description, duration]);
   }
 
   Widget _draftRow(

@@ -4,6 +4,7 @@ import 'package:fitness_social_app/core/storage/session_storage.dart';
 import 'package:fitness_social_app/features/exercises/presentation/exercise_controller.dart';
 import 'package:fitness_social_app/features/exercises/presentation/exercise_dependencies.dart';
 import 'package:fitness_social_app/features/user/presentation/components/shared/app_sidebar.dart';
+import 'package:fitness_social_app/core/ui/deferred_controller_disposal.dart';
 import 'package:fitness_social_app/features/coach/domain/entities/coach_entities.dart';
 import 'package:fitness_social_app/features/coach/presentation/coach_controller.dart';
 import 'package:fitness_social_app/features/coach/presentation/coach_dependencies.dart';
@@ -198,8 +199,7 @@ class _WorkoutPlanningPageState extends State<WorkoutPlanningPage>
         ],
       ),
     );
-    name.dispose();
-    duration.dispose();
+    await disposeTextControllersAfterDialog([name, duration]);
   }
 
   Future<void> _createPlanDialog() async {
@@ -335,11 +335,7 @@ class _WorkoutPlanningPageState extends State<WorkoutPlanningPage>
         ),
       ),
     );
-    name.dispose();
-    duration.dispose();
-    sets.dispose();
-    reps.dispose();
-    weight.dispose();
+    await disposeTextControllersAfterDialog([name, duration, sets, reps, weight]);
   }
 
   Future<void> _startPlan(WorkoutPlan plan) async {
@@ -392,6 +388,6 @@ class _WorkoutPlanningPageState extends State<WorkoutPlanningPage>
         ],
       ),
     );
-    duration.dispose();
+    await disposeTextControllersAfterDialog([duration]);
   }
 }

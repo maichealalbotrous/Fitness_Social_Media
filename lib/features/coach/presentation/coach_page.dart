@@ -49,51 +49,16 @@ class _CoachPageState extends State<CoachPage> {
     if (mounted) setState(() {});
   }
   Future<void> _requestTraining(CoachProfile coach) async {
-    final messageController = TextEditingController();
-    var isSubmitting = false;
-    final message = await showDialog<String>(
+    await showDialog<void>(
       context: context,
-      builder: (dialogContext) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
-          title: Text('Request ${coach.username}'),
-          content: TextField(
-            controller: messageController,
-            maxLines: 3,
-            decoration: const InputDecoration(labelText: 'Message (optional)'),
-          ),
-          actions: [
-            TextButton(
-              onPressed: isSubmitting ? null : () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-            FilledButton(
-              onPressed: isSubmitting
-                  ? null
-                  : () async {
-                      final requestMessage = messageController.text.trim();
-                      setDialogState(() => isSubmitting = true);
-                      await widget.controller.createTrainingRequest(
-                        coach.userId,
-                        requestMessage.isEmpty ? null : requestMessage,
-                      );
-                      if (!context.mounted) return;
-                      if (widget.controller.error != null) {
-                        setDialogState(() => isSubmitting = false);
-                        return;
-                      }
-                      Navigator.pop(context, requestMessage);
-                    },
-              child: Text(isSubmitting ? 'Sending...' : 'Send request'),
-            ),
-          ],
+      builder: (_) => _TrainingRequestDialog(
+        coachName: coach.username,
+        onSubmit: (message) => widget.controller.createTrainingRequest(
+          coach.userId,
+          message,
         ),
       ),
     );
-    messageController.dispose();
-    if (message == null || !mounted) return;
-    // The request is submitted inside the dialog so the dialog is closed only
-    // after the controller has finished notifying its listeners.
-    if (widget.controller.error != null) return;
   }
 
   Future<void> _pickCertification() async {
@@ -238,4 +203,78 @@ class _CoachPageState extends State<CoachPage> {
 
   Widget _panel(String title, Widget child) => Container(margin: const EdgeInsets.only(bottom: 16), padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: const Color(0xFF111111), borderRadius: BorderRadius.circular(16)), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)), const SizedBox(height: 14), child]));
   InputDecoration _decoration(String label) => InputDecoration(labelText: label, labelStyle: const TextStyle(color: Colors.white54), filled: true, fillColor: const Color(0xFF1B1B1B), border: const OutlineInputBorder());
+}
+
+
+class _TrainingRequestDialog extends StatefulWidget {
+  const _TrainingRequestDialog({required this.coachName, required this.onSubmit});
+
+  final String coachName;
+  final Future<void> Function(String? message) onSubmit;
+
+  @override
+  State<_TrainingRequestDialog> createState() => _TrainingRequestDialogState();
+}
+
+class _TrainingRequestDialogState extends State<_TrainingRequestDialog> {
+  final _messageController = TextEditingController();
+  bool _isSubmitting = false;
+  String? _error;
+
+  @override
+  void dispose() {
+    _messageController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    if (_isSubmitting) return;
+    setState(() {
+      _isSubmitting = true;
+      _error = null;
+    });
+    try {
+      final message = _messageController.text.trim();
+      await widget.onSubmit(message.isEmpty ? null : message);
+      if (!mounted) return;
+      Navigator.of(context).pop();
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _isSubmitting = false;
+        _error = error.toString();
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text('Request ${widget.coachName}'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextField(
+            controller: _messageController,
+            maxLines: 3,
+            decoration: const InputDecoration(labelText: 'Message (optional)'),
+          ),
+          if (_error != null) ...[
+            const SizedBox(height: 8),
+            Text(_error!, style: const TextStyle(color: Colors.redAccent)),
+          ],
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: _isSubmitting ? null : () => Navigator.of(context).pop(),
+          child: const Text('Cancel'),
+        ),
+        FilledButton(
+          onPressed: _isSubmitting ? null : _submit,
+          child: Text(_isSubmitting ? 'Sending...' : 'Send request'),
+        ),
+      ],
+    );
+  }
 }
