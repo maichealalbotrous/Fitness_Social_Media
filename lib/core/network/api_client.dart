@@ -39,7 +39,7 @@ class ApiClient {
     final decodedBody = _decodeValue(response.body);
     _ensureSuccess(response, decodedBody);
     if (decodedBody is! List) {
-      throw const ApiException(message: 'استجابة القائمة غير صالحة.');
+      throw const ApiException(message: 'Invalid list response.');
     }
     return decodedBody.toList(growable: false);
   }
@@ -52,7 +52,7 @@ class ApiClient {
     final decodedBody = _decodeValue(response.body);
     _ensureSuccess(response, decodedBody);
     if (decodedBody is! List) {
-      throw const ApiException(message: 'استجابة القائمة غير صالحة.');
+      throw const ApiException(message: 'Invalid list response.');
     }
     return decodedBody.map((item) => item.toString()).toList(growable: false);
   }
@@ -66,7 +66,7 @@ class ApiClient {
     _ensureSuccess(response, decodedBody);
 
     if (decodedBody is! List) {
-      throw const ApiException(message: 'استجابة المنشورات غير صالحة.');
+      throw const ApiException(message: 'Invalid posts response.');
     }
 
     return decodedBody
@@ -144,11 +144,11 @@ class ApiClient {
       return _decodeObjectResponse(response);
     } on TimeoutException {
       throw const ApiException(
-        message: 'انتهت مهلة الاتصال بالخادم. حاول مرة أخرى.',
+        message: 'The server connection timed out. Please try again.',
       );
     } on http.ClientException {
       throw const ApiException(
-        message: 'تعذر الاتصال بالخادم. تحقق من عنوان API والاتصال بالشبكة.',
+        message: 'Unable to connect to the server. Check the API URL and network connection.',
       );
     }
   }
@@ -175,9 +175,9 @@ class ApiClient {
       final response = await http.Response.fromStream(streamedResponse);
       return _decodeObjectResponse(response);
     } on TimeoutException {
-      throw const ApiException(message: 'انتهت مهلة رفع الملفات. حاول مرة أخرى.');
+      throw const ApiException(message: 'File upload timed out. Please try again.');
     } on http.ClientException {
-      throw const ApiException(message: 'تعذر الاتصال بالخادم أثناء رفع الملفات.');
+      throw const ApiException(message: 'Unable to connect to the server while uploading files.');
     }
   }
 
@@ -227,11 +227,11 @@ class ApiClient {
       return http.Response.fromStream(streamedResponse);
     } on TimeoutException {
       throw const ApiException(
-        message: 'انتهت مهلة الاتصال بالخادم. حاول مرة أخرى.',
+        message: 'The server connection timed out. Please try again.',
       );
     } on http.ClientException {
       throw const ApiException(
-        message: 'تعذر الاتصال بالخادم. تحقق من عنوان API والاتصال بالشبكة.',
+        message: 'Unable to connect to the server. Check the API URL and network connection.',
       );
     }
   }
@@ -294,7 +294,7 @@ class ApiClient {
       return title;
     }
 
-    return 'تعذر إتمام الطلب. حاول مرة أخرى.';
+    return 'Unable to complete the request. Please try again.';
   }
 
   dynamic _decodeValue(String body) {

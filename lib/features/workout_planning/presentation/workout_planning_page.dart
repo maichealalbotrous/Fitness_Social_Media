@@ -350,7 +350,7 @@ class _WorkoutPlanningPageState extends State<WorkoutPlanningPage>
     if (day.exercises.isEmpty) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('لا يمكن إكمال هذا اليوم لأنه لا يحتوي على أي تمرين. أضف تمريناً إلى الخطة أولاً.')),
+        const SnackBar(content: Text('This day cannot be completed because it has no exercises. Add an exercise to the plan first.')),
       );
       return;
     }

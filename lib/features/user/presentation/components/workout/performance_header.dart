@@ -30,7 +30,7 @@ class PerformanceHeader extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 22),
-        // الارقام السريعة الموجودة في يمين الهيدر في تصميم الويب.
+        // The quick metrics shown on the right side of the web header.
         const Row(
           children: [
             Expanded(

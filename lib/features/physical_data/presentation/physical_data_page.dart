@@ -39,7 +39,7 @@ class _PhysicalDataPageState extends State<PhysicalDataPage> {
     setState(() => _profile = profile);
     final userId = profile.userId;
     if (userId == null || userId.isEmpty) {
-      setState(() => widget.controller.error = 'تعذر تحديد المستخدم الحالي.');
+      setState(() => widget.controller.error = 'Unable to determine the current user.');
       widget.controller.notifyListeners();
       return;
     }

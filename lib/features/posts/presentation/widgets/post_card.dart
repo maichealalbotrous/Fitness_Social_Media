@@ -58,7 +58,7 @@ class PostCard extends StatelessWidget {
                     itemBuilder: (context) => const [
                       PopupMenuItem(
                         value: 'delete',
-                        child: Text('حذف المنشور'),
+                        child: Text('Delete post'),
                       ),
                     ],
                   ),
@@ -267,8 +267,8 @@ String _authorLabel(
 
 String _formatDate(DateTime date) {
   final difference = DateTime.now().difference(date);
-  if (difference.inMinutes < 1) return 'الآن';
-  if (difference.inMinutes < 60) return 'منذ ${difference.inMinutes} دقيقة';
-  if (difference.inHours < 24) return 'منذ ${difference.inHours} ساعة';
-  return 'منذ ${difference.inDays} يوم';
+  if (difference.inMinutes < 1) return 'Just now';
+  if (difference.inMinutes < 60) return '${difference.inMinutes} minutes ago';
+  if (difference.inHours < 24) return '${difference.inHours} hours ago';
+  return '${difference.inDays} days ago';
 }

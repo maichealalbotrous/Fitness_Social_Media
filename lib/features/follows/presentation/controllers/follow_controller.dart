@@ -36,7 +36,7 @@ class FollowController extends ChangeNotifier {
     } on ApiException catch (exception) {
       _errorMessage = exception.message;
     } catch (_) {
-      _errorMessage = 'تعذر تحديث المتابعة. حاول مرة أخرى.';
+      _errorMessage = 'Unable to update follow status. Please try again.';
     }
     notifyListeners();
     return null;
@@ -59,7 +59,7 @@ class FollowController extends ChangeNotifier {
     } on ApiException catch (exception) {
       _errorMessage = exception.message;
     } catch (_) {
-      _errorMessage = 'تعذر تحميل بيانات المتابعة. حاول مرة أخرى.';
+      _errorMessage = 'Unable to load follow data. Please try again.';
     } finally {
       _isLoading = false;
       notifyListeners();

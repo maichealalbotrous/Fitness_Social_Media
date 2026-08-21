@@ -16,7 +16,7 @@ class PasswordVisibilityButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return IconButton(
       onPressed: onPressed,
-      tooltip: isObscured ? 'إظهار كلمة المرور' : 'إخفاء كلمة المرور',
+      tooltip: isObscured ? 'Show password' : 'Hide password',
       icon: Icon(
         isObscured ? Icons.visibility_outlined : Icons.visibility_off_outlined,
         color: AuthTheme.textMuted,

@@ -46,10 +46,10 @@ class _AuthFormState extends State<AuthForm> {
   @override
   Widget build(BuildContext context) {
     final isSubmitting = widget.controller.isSubmitting;
-    final title = _isRegistering ? 'أنشئ حسابك' : 'مرحباً بعودتك';
+    final title = _isRegistering ? 'Create your account' : 'Welcome back';
     final subtitle = _isRegistering
-        ? 'انضم إلى مجتمع Repflow الرياضي.'
-        : 'سجّل الدخول لمتابعة تقدمك وتحدياتك.';
+        ? 'Join the Repflow fitness community.'
+        : 'Sign in to track your progress and challenges.';
 
     return AutofillGroup(
       child: Form(
@@ -86,8 +86,8 @@ class _AuthFormState extends State<AuthForm> {
             if (_isRegistering) ...[
               AuthTextField(
                 controller: _usernameController,
-                label: 'اسم المستخدم',
-                hintText: 'مثال: michael_fit',
+                label: 'Username',
+                hintText: 'Example: michael_fit',
                 icon: Icons.person_outline,
                 textInputAction: TextInputAction.next,
                 autofillHints: const [AutofillHints.username],
@@ -97,7 +97,7 @@ class _AuthFormState extends State<AuthForm> {
             ],
             AuthTextField(
               controller: _emailController,
-              label: 'البريد الإلكتروني',
+              label: 'Email address',
               hintText: 'name@example.com',
               icon: Icons.email_outlined,
               keyboardType: TextInputType.emailAddress,
@@ -108,7 +108,7 @@ class _AuthFormState extends State<AuthForm> {
             const SizedBox(height: 14),
             AuthTextField(
               controller: _passwordController,
-              label: 'كلمة المرور',
+              label: 'Password',
               icon: Icons.lock_outline,
               obscureText: _obscurePassword,
               textInputAction: _isRegistering
@@ -142,14 +142,14 @@ class _AuthFormState extends State<AuthForm> {
                             AppRoutes.forgotPassword,
                           ),
                   style: TextButton.styleFrom(foregroundColor: AuthTheme.lime),
-                  child: const Text('هل نسيت كلمة المرور؟'),
+                  child: const Text('Forgot your password?'),
                 ),
               ),
             if (_isRegistering) ...[
               const SizedBox(height: 14),
               AuthTextField(
                 controller: _confirmPasswordController,
-                label: 'تأكيد كلمة المرور',
+                label: 'Confirm password',
                 icon: Icons.lock_reset_outlined,
                 obscureText: _obscureConfirmation,
                 textInputAction: TextInputAction.done,
@@ -191,7 +191,7 @@ class _AuthFormState extends State<AuthForm> {
                         ),
                       )
                     : Text(
-                        _isRegistering ? 'إنشاء الحساب' : 'تسجيل الدخول',
+                        _isRegistering ? 'Create account' : 'Sign in',
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w900,
@@ -204,14 +204,14 @@ class _AuthFormState extends State<AuthForm> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  _isRegistering ? 'لديك حساب بالفعل؟' : 'ليس لديك حساب؟',
+                  _isRegistering ? 'Already have an account?' : 'Don't have an account?',
                   style: const TextStyle(color: AuthTheme.textMuted),
                 ),
                 TextButton(
                   onPressed: isSubmitting ? null : _switchMode,
                   style: TextButton.styleFrom(foregroundColor: AuthTheme.lime),
                   child: Text(
-                    _isRegistering ? 'سجّل الدخول' : 'أنشئ حساباً',
+                    _isRegistering ? 'Sign in' : 'Create an account',
                     style: const TextStyle(fontWeight: FontWeight.w900),
                   ),
                 ),
@@ -226,7 +226,7 @@ class _AuthFormState extends State<AuthForm> {
                             AppRoutes.verifyEmail,
                           ),
                   style: TextButton.styleFrom(foregroundColor: AuthTheme.lime),
-                  child: const Text('لديك رمز التحقق؟ فعّل بريدك الإلكتروني'),
+                  child: const Text('Have a verification code? Verify your email'),
                 ),
               ),
           ],

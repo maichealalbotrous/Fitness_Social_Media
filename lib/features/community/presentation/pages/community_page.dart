@@ -336,7 +336,7 @@ class _CommunityImagePicker extends StatelessWidget {
                 children: [
                   Icon(Icons.add_photo_alternate_outlined, color: Colors.white70, size: 34),
                   SizedBox(height: 8),
-                  Text('اختيار صورة المجتمع', style: TextStyle(color: Colors.white70)),
+                  Text('Choose community image', style: TextStyle(color: Colors.white70)),
                 ],
               )
             : Stack(
@@ -468,7 +468,7 @@ class _CommunityDetails extends StatelessWidget {
             const Padding(
               padding: EdgeInsets.only(top: 8),
               child: Text(
-                'سيتم إنشاء طلب انضمام يحتاج إلى موافقة أحد المدراء.',
+                'A join request will be created and require approval from an administrator.',
                 style: TextStyle(color: Colors.amber),
               ),
             ),

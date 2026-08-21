@@ -54,7 +54,7 @@ class _UserSearchPageState extends State<UserSearchPage> {
                     onSubmitted: (_) => _search(),
                     decoration: const InputDecoration(
                       labelText: 'Username',
-                      hintText: 'مثال: test_two',
+                      hintText: 'Example: test_two',
                       prefixIcon: Icon(Icons.search),
                     ),
                   ),

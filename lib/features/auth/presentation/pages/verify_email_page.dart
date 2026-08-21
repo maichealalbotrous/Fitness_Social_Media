@@ -38,8 +38,8 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
       animation: _controller,
       builder: (context, _) {
         return AuthActionLayout(
-          title: 'تحقق من بريدك الإلكتروني',
-          subtitle: 'أدخل رمز التحقق الذي وصلك لإتاحة تسجيل الدخول إلى حسابك.',
+          title: 'Verify your email',
+          subtitle: 'Enter the verification code you received to enable account access.',
           child: Form(
             key: _formKey,
             child: Column(
@@ -55,7 +55,7 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
                 ],
                 AuthTextField(
                   controller: _tokenController,
-                  label: 'رمز التحقق',
+                  label: 'Verification code',
                   icon: Icons.mark_email_read_outlined,
                   textInputAction: TextInputAction.done,
                   validator: _validateToken,
@@ -63,7 +63,7 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
                 ),
                 const SizedBox(height: 24),
                 AuthSubmitButton(
-                  label: 'تأكيد البريد الإلكتروني',
+                  label: 'Confirm email address',
                   isLoading: _controller.isSubmitting,
                   onPressed: _submit,
                 ),
@@ -85,7 +85,7 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
 
   String? _validateToken(String? value) {
     if ((value?.trim() ?? '').isEmpty) {
-      return 'أدخل رمز التحقق.';
+      return 'Enter the verification code.';
     }
     return null;
   }

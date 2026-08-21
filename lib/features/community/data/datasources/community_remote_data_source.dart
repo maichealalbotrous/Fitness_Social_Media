@@ -100,7 +100,7 @@ class ApiCommunityRemoteDataSource implements CommunityRemoteDataSource {
       '/api/Community/${Uri.encodeComponent(id)}/join?communityId=${Uri.encodeComponent(id)}',
       body: const <String, dynamic>{},
     );
-    return _message(response, fallback: 'تم تنفيذ طلب الانضمام.');
+    return _message(response, fallback: 'Join request processed.');
   }
 
   @override
@@ -108,7 +108,7 @@ class ApiCommunityRemoteDataSource implements CommunityRemoteDataSource {
     final response = await _apiClient.deleteJson(
       '/api/Community/${Uri.encodeComponent(id)}/leave',
     );
-    return _message(response, fallback: 'تمت مغادرة المجتمع.');
+    return _message(response, fallback: 'You left the community.');
   }
 
   @override
@@ -120,7 +120,7 @@ class ApiCommunityRemoteDataSource implements CommunityRemoteDataSource {
       '/requests/${Uri.encodeComponent(requestId)}?accepted=$accepted',
       body: const <String, dynamic>{},
     );
-    return _message(response, fallback: 'تمت معالجة الطلب.');
+    return _message(response, fallback: 'Request processed.');
   }
 
   @override
@@ -128,7 +128,7 @@ class ApiCommunityRemoteDataSource implements CommunityRemoteDataSource {
     final response = await _apiClient.patchJson(
       '/api/Community/${Uri.encodeComponent(communityId)}/make-admin/${Uri.encodeComponent(userId)}',
     );
-    return _message(response, fallback: 'تمت ترقية العضو إلى إداري.');
+    return _message(response, fallback: 'Member promoted to administrator.');
   }
 
   @override
@@ -136,7 +136,7 @@ class ApiCommunityRemoteDataSource implements CommunityRemoteDataSource {
     final response = await _apiClient.patchJson(
       '/api/Community/${Uri.encodeComponent(communityId)}/remove-admin/${Uri.encodeComponent(userId)}',
     );
-    return _message(response, fallback: 'تمت إزالة صلاحية الإداري.');
+    return _message(response, fallback: 'Administrator privileges removed.');
   }
 
   @override
@@ -144,7 +144,7 @@ class ApiCommunityRemoteDataSource implements CommunityRemoteDataSource {
     final response = await _apiClient.deleteJson(
       '/api/Community/${Uri.encodeComponent(communityId)}/remove-member/${Uri.encodeComponent(userId)}',
     );
-    return _message(response, fallback: 'تمت إزالة العضو.');
+    return _message(response, fallback: 'Member removed.');
   }
 
   List<Map<String, dynamic>> _listOfMaps(dynamic value, List<String> wrapperKeys) {
@@ -159,7 +159,7 @@ class ApiCommunityRemoteDataSource implements CommunityRemoteDataSource {
         }
       }
     }
-    throw const ApiException(message: 'استجابة قائمة المجتمع غير صالحة.');
+    throw const ApiException(message: 'Invalid community list response.');
   }
 
   String _message(Map<String, dynamic> response, {required String fallback}) {

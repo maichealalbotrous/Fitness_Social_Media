@@ -57,7 +57,7 @@ class AccountRecoveryController extends ChangeNotifier {
       _errorMessage = exception.message;
       return false;
     } catch (_) {
-      _errorMessage = 'حدث خطأ غير متوقع. حاول مرة أخرى.';
+      _errorMessage = 'An unexpected error occurred. Please try again.';
       return false;
     } finally {
       _isSubmitting = false;

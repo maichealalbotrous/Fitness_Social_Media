@@ -276,16 +276,16 @@ class _FeedContent extends StatelessWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('حذف المنشور؟'),
-        content: const Text('لا يمكن التراجع عن هذا الإجراء.'),
+        title: const Text('Delete post?'),
+        content: const Text('This action cannot be undone.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('إلغاء'),
+            child: const Text('Cancel'),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('حذف'),
+            child: const Text('Delete'),
           ),
         ],
       ),
@@ -318,7 +318,7 @@ class _FeedError extends StatelessWidget {
           const SizedBox(height: 16),
           OutlinedButton(
             onPressed: () => onRetry(),
-            child: const Text('إعادة المحاولة'),
+            child: const Text('Retry'),
           ),
         ],
       ),
@@ -335,7 +335,7 @@ class _EmptyFeed extends StatelessWidget {
       padding: EdgeInsets.symmetric(vertical: 60),
       child: Center(
         child: Text(
-          'لا توجد منشورات بعد. كن أول من يشارك تقدمه.',
+          'No posts yet. Be the first to share your progress.',
           textAlign: TextAlign.center,
           style: TextStyle(color: FeedTheme.muted, fontSize: 15),
         ),

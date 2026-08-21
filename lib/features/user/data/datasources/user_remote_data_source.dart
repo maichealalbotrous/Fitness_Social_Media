@@ -65,7 +65,7 @@ class ApiUserRemoteDataSource implements UserRemoteDataSource {
         response['url'] ??
         response['Url'];
     if (value is! String || value.isEmpty) {
-      throw const ApiException(message: 'لم يُرجع الخادم رابط الصورة.');
+      throw const ApiException(message: 'The server did not return an image URL.');
     }
     return value;
   }

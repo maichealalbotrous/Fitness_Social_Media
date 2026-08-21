@@ -27,7 +27,7 @@ class ApiCoachRemoteDataSource implements CoachRemoteDataSource {
     final response = await _api.postMultipartFiles('/api/Media/upload-post-media', fieldName: 'files', files: [MultipartUploadFile(fileName: fileName, bytes: bytes)]);
     final urls = response['urls'] ?? response['Urls'];
     if (urls is List && urls.isNotEmpty) return urls.first.toString();
-    throw const ApiException(message: 'لم يعُد الخادم رابط الصورة المرفوعة.');
+    throw const ApiException(message: 'The server did not return the uploaded image URL.');
   }
 
   @override

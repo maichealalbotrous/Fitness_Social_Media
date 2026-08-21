@@ -133,7 +133,7 @@ class _BrandPanel extends StatelessWidget {
             ),
             const SizedBox(height: 30),
             const Text(
-              'تدرّب بذكاء.\nتقدّم مع مجتمعك.',
+              'Train smarter.\nProgress with your community.',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 42,
@@ -145,7 +145,7 @@ class _BrandPanel extends StatelessWidget {
             const SizedBox(
               width: 420,
               child: Text(
-                'Repflow يجمع التدريب، الاستمرارية، والمجتمع الرياضي في مكان واحد.',
+                'Repflow brings training, consistency, and the fitness community together in one place.',
                 style: TextStyle(
                   color: AuthTheme.textMuted,
                   fontSize: 17,

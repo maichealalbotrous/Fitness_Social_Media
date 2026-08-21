@@ -64,7 +64,7 @@ class UserController extends ChangeNotifier {
     } on ApiException catch (error) {
       _errorMessage = error.message;
     } catch (_) {
-      _errorMessage = 'تعذر رفع صورة الملف الشخصي.';
+      _errorMessage = 'Unable to upload the profile picture.';
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -87,7 +87,7 @@ class UserController extends ChangeNotifier {
     } on ApiException catch (error) {
       _errorMessage = error.message;
     } catch (_) {
-      _errorMessage = 'تعذر تحميل بيانات المستخدم.';
+      _errorMessage = 'Unable to load user data.';
     } finally {
       _isLoading = false;
       notifyListeners();

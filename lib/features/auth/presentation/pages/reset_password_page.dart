@@ -47,8 +47,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       animation: _controller,
       builder: (context, _) {
         return AuthActionLayout(
-          title: 'تعيين كلمة مرور جديدة',
-          subtitle: 'أدخل رمز الاستعادة وكلمة المرور الجديدة لإكمال العملية.',
+          title: 'Set a new password',
+          subtitle: 'Enter the recovery code and new password to complete the process.',
           child: Form(
             key: _formKey,
             child: Column(
@@ -64,7 +64,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                 ],
                 AuthTextField(
                   controller: _tokenController,
-                  label: 'رمز الاستعادة',
+                  label: 'Recovery code',
                   icon: Icons.key_outlined,
                   textInputAction: TextInputAction.next,
                   validator: _validateToken,
@@ -72,7 +72,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                 const SizedBox(height: 14),
                 AuthTextField(
                   controller: _passwordController,
-                  label: 'كلمة المرور الجديدة',
+                  label: 'New password',
                   icon: Icons.lock_outline,
                   obscureText: _obscurePassword,
                   textInputAction: TextInputAction.next,
@@ -87,7 +87,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                 const SizedBox(height: 14),
                 AuthTextField(
                   controller: _confirmationController,
-                  label: 'تأكيد كلمة المرور الجديدة',
+                  label: 'Confirm new password',
                   icon: Icons.lock_reset_outlined,
                   obscureText: _obscureConfirmation,
                   textInputAction: TextInputAction.done,
@@ -107,7 +107,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                 ),
                 const SizedBox(height: 24),
                 AuthSubmitButton(
-                  label: 'تحديث كلمة المرور',
+                  label: 'Update password',
                   isLoading: _controller.isSubmitting,
                   onPressed: _submit,
                 ),
@@ -132,7 +132,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
   String? _validateToken(String? value) {
     if ((value?.trim() ?? '').isEmpty) {
-      return 'أدخل رمز الاستعادة.';
+      return 'Enter the recovery code.';
     }
     return null;
   }

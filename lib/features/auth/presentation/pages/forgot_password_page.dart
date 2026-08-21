@@ -41,8 +41,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       animation: _controller,
       builder: (context, _) {
         return AuthActionLayout(
-          title: 'استعادة كلمة المرور',
-          subtitle: 'أدخل بريدك الإلكتروني لإرسال تعليمات استعادة الحساب.',
+          title: 'Password recovery',
+          subtitle: 'Enter your email to receive account recovery instructions.',
           child: Form(
             key: _formKey,
             child: Column(
@@ -58,7 +58,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 ],
                 AuthTextField(
                   controller: _emailController,
-                  label: 'البريد الإلكتروني',
+                  label: 'Email address',
                   hintText: 'name@example.com',
                   icon: Icons.email_outlined,
                   keyboardType: TextInputType.emailAddress,
@@ -69,7 +69,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 ),
                 const SizedBox(height: 24),
                 AuthSubmitButton(
-                  label: 'إرسال التعليمات',
+                  label: 'Send instructions',
                   isLoading: _controller.isSubmitting,
                   onPressed: _submit,
                 ),
@@ -79,7 +79,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                     Navigator.of(context).pushNamed(AppRoutes.resetPassword);
                   },
                   style: TextButton.styleFrom(foregroundColor: AuthTheme.lime),
-                  child: const Text('لديك رمز استعادة؟ أعد تعيين كلمة المرور'),
+                  child: const Text('Have a recovery code? Reset your password'),
                 ),
               ],
             ),

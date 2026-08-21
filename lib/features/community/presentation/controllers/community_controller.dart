@@ -87,7 +87,7 @@ class CommunityController extends ChangeNotifier {
     } on ApiException catch (error) {
       _errorMessage = error.message;
     } catch (_) {
-      _errorMessage = 'تعذر تحميل المجتمع.';
+      _errorMessage = 'Unable to load the community.';
     } finally {
       _finishLoading();
     }
@@ -99,7 +99,7 @@ class CommunityController extends ChangeNotifier {
     _beginLoading();
     try { _community = await _searchCommunityByName(value); _errorMessage = null; }
     on ApiException catch (error) { _errorMessage = error.message; }
-    catch (_) { _errorMessage = 'تعذر البحث عن المجتمع.'; }
+    catch (_) { _errorMessage = 'Unable to search for the community.'; }
     finally { _finishLoading(); }
   }
 
@@ -107,7 +107,7 @@ class CommunityController extends ChangeNotifier {
     _beginLoading();
     try { _requests = await _getCommunityRequests(communityId); _errorMessage = null; }
     on ApiException catch (error) { _errorMessage = error.message; }
-    catch (_) { _errorMessage = 'تعذر تحميل طلبات الانضمام.'; }
+    catch (_) { _errorMessage = 'Unable to load join requests.'; }
     finally { _finishLoading(); }
   }
 
@@ -152,7 +152,7 @@ class CommunityController extends ChangeNotifier {
           isAdmin: current.isOwner,
         );
       }
-      _errorMessage = 'تعذر تحميل أعضاء المجتمع.';
+      _errorMessage = 'Unable to load community members.';
     } finally {
       _finishLoading();
     }
@@ -166,7 +166,7 @@ class CommunityController extends ChangeNotifier {
     } on ApiException catch (error) {
       _errorMessage = error.message;
     } catch (_) {
-      _errorMessage = 'تعذر تحميل مجتمعاتك.';
+      _errorMessage = 'Unable to load your communities.';
     } finally {
       _finishLoading();
     }
@@ -201,12 +201,12 @@ class CommunityController extends ChangeNotifier {
         isPrivate: isPrivate,
       );
       _isRequestPending = false;
-      _successMessage = 'تم إنشاء المجتمع بنجاح.';
+      _successMessage = 'Community created successfully.';
       _errorMessage = null;
     } on ApiException catch (error) {
       _errorMessage = error.message;
     } catch (_) {
-      _errorMessage = 'تعذر إنشاء المجتمع.';
+      _errorMessage = 'Unable to create the community.';
     } finally {
       _finishLoading();
     }
@@ -232,7 +232,7 @@ class CommunityController extends ChangeNotifier {
     } on ApiException catch (error) {
       _errorMessage = error.message;
     } catch (_) {
-      _errorMessage = 'تعذر تنفيذ طلب الانضمام.';
+      _errorMessage = 'Unable to process the join request.';
     } finally {
       _finishLoading();
     }
@@ -254,7 +254,7 @@ class CommunityController extends ChangeNotifier {
     } on ApiException catch (error) {
       _errorMessage = error.message;
     } catch (_) {
-      _errorMessage = 'تعذر مغادرة المجتمع.';
+      _errorMessage = 'Unable to leave the community.';
     } finally {
       _finishLoading();
     }
@@ -298,7 +298,7 @@ class CommunityController extends ChangeNotifier {
     } on ApiException catch (error) {
       _errorMessage = error.message;
     } catch (_) {
-      _errorMessage = 'تعذر تنفيذ عملية العضو.';
+      _errorMessage = 'Unable to process the member operation.';
     } finally {
       _finishLoading();
     }
@@ -320,7 +320,7 @@ class CommunityController extends ChangeNotifier {
     } on ApiException catch (error) {
       _errorMessage = error.message;
     } catch (_) {
-      _errorMessage = 'تعذر تنفيذ العملية.';
+      _errorMessage = 'Unable to complete the operation.';
     } finally {
       _finishLoading();
     }

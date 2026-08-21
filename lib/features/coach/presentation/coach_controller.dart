@@ -41,7 +41,7 @@ class CoachController extends ChangeNotifier {
   Future<void> submitApplication(String url) async {
     await _run(() async {
       myApplication = await repository.submitApplication(url);
-      message = 'تم إرسال طلب المدرب.';
+      message = 'Coach application sent.';
     });
   }
 
@@ -49,7 +49,7 @@ class CoachController extends ChangeNotifier {
     await _run(() async {
       final url = await repository.uploadCertification(bytes: bytes, fileName: fileName);
       myApplication = await repository.submitApplication(url);
-      message = 'تم رفع الشهادة وإرسال طلب المدرب.';
+      message = 'Certification uploaded and coach application sent.';
     });
   }
 
@@ -61,7 +61,7 @@ class CoachController extends ChangeNotifier {
     await _run(() async {
       await repository.reviewApplication(id, approved, note);
       await loadPendingApplications();
-      message = approved ? 'تم قبول الطلب.' : 'تم رفض الطلب.';
+      message = approved ? 'Request accepted.' : 'Request rejected.';
     });
   }
 
@@ -78,7 +78,7 @@ class CoachController extends ChangeNotifier {
     final allCoaches = await repository.getAllCoaches();
     participantCoaches = allCoaches.where((coach) => approvedCoachIds.contains(coach.userId)).toList(growable: false);
   });
-  Future<void> rateCoach(String coachId, int rating) async => _run(() async { await repository.rateCoach(coachId, rating); message = 'تم إرسال التقييم.'; });
+  Future<void> rateCoach(String coachId, int rating) async => _run(() async { await repository.rateCoach(coachId, rating); message = 'Rating submitted.'; });
 
   Future<void> loadApprovedParticipants() async {
     await _run(() async {
@@ -99,7 +99,7 @@ class CoachController extends ChangeNotifier {
   Future<void> createTrainingRequest(String coachId, String? text) async {
     await _run(() async {
       await repository.createTrainingRequest(coachId, text);
-      message = 'تم إرسال طلب التدريب.';
+      message = 'Training request sent.';
     });
   }
 
@@ -107,7 +107,7 @@ class CoachController extends ChangeNotifier {
     await _run(() async {
       await repository.reviewTrainingRequest(id, approved);
       trainingRequests = trainingRequests.where((request) => request.id != id).toList(growable: false);
-      message = approved ? 'تم قبول طلب التدريب.' : 'تم رفض طلب التدريب.';
+      message = approved ? 'Training request accepted.' : 'Training request rejected.';
     });
   }
 
@@ -121,7 +121,7 @@ class CoachController extends ChangeNotifier {
     } on ApiException catch (exception) {
       error = exception.message;
     } catch (_) {
-      error = 'تعذر تنفيذ عملية المدرب.';
+      error = 'Unable to complete the coach operation.';
     } finally {
       isLoading = false;
       notifyListeners();

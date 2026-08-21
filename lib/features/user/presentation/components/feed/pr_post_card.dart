@@ -41,7 +41,7 @@ class _PrBody extends StatelessWidget {
           colors: [Color(0xFF151A08), Color(0xFF0A0B08)],
         ),
       ),
-      // جسم المنشور يعرض الرقم الشخصي الجديد كما في صورة post.png.
+      // The post body displays the new personal metric as shown in post.png.
       child: const Column(
         mainAxisSize: MainAxisSize.min,
         children: [

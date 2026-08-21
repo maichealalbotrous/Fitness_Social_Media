@@ -188,7 +188,7 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
     if (!mounted) return;
     setState(() {
       _isSubmittingComment = false;
-      _message = comment == null ? _controller.errorMessage : 'تمت إضافة التعليق.';
+      _message = comment == null ? _controller.errorMessage : 'Comment added.';
     });
     if (comment != null) {
       UserProfile? profile;
@@ -238,7 +238,7 @@ class _CommentsList extends StatelessWidget {
       return Column(
         children: [
           Text(errorMessage!, style: const TextStyle(color: FeedTheme.muted)),
-          TextButton(onPressed: onRetry, child: const Text('إعادة المحاولة')),
+          TextButton(onPressed: onRetry, child: const Text('Retry')),
         ],
       );
     }
@@ -246,7 +246,7 @@ class _CommentsList extends StatelessWidget {
       return const Padding(
         padding: EdgeInsets.symmetric(vertical: 18),
         child: Text(
-          'لا توجد تعليقات بعد.',
+          'No comments yet.',
           style: TextStyle(color: FeedTheme.muted),
         ),
       );
@@ -331,10 +331,10 @@ String _commentAuthor(Comment comment, UserProfile? profile) {
 
 String _commentDate(DateTime date) {
   final difference = DateTime.now().difference(date);
-  if (difference.inMinutes < 1) return 'الآن';
-  if (difference.inMinutes < 60) return 'منذ ${difference.inMinutes} دقيقة';
-  if (difference.inHours < 24) return 'منذ ${difference.inHours} ساعة';
-  return 'منذ ${difference.inDays} يوم';
+  if (difference.inMinutes < 1) return 'Just now';
+  if (difference.inMinutes < 60) return '${difference.inMinutes} minutes ago';
+  if (difference.inHours < 24) return '${difference.inHours} hours ago';
+  return '${difference.inDays} days ago';
 }
 
 class _CommentComposer extends StatelessWidget {
@@ -360,7 +360,7 @@ class _CommentComposer extends StatelessWidget {
             maxLines: 4,
             style: const TextStyle(color: Colors.white),
             decoration: InputDecoration(
-              hintText: 'اكتب تعليقاً...',
+              hintText: 'Write a comment...',
               hintStyle: const TextStyle(color: FeedTheme.muted),
               filled: true,
               fillColor: FeedTheme.panel,

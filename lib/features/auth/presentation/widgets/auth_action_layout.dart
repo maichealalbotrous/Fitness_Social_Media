@@ -29,7 +29,7 @@ class AuthActionLayout extends StatelessWidget {
                 children: [
                   IconButton(
                     onPressed: () => Navigator.of(context).maybePop(),
-                    tooltip: 'رجوع',
+                    tooltip: 'Back',
                     color: AuthTheme.textMuted,
                     icon: const Icon(Icons.arrow_back),
                   ),

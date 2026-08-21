@@ -40,7 +40,7 @@ class ApiAuthRemoteDataSource implements AuthRemoteDataSource {
     final message = response['message'];
     return message is String && message.isNotEmpty
         ? message
-        : 'تم إنشاء الحساب بنجاح.';
+        : 'Account created successfully.';
   }
 
   @override
@@ -52,7 +52,7 @@ class ApiAuthRemoteDataSource implements AuthRemoteDataSource {
 
     return _message(
       response,
-      fallback: 'إذا كان الحساب موجوداً، فستصل تعليمات الاستعادة قريباً.',
+      fallback: 'If the account exists, recovery instructions will arrive shortly.',
     );
   }
 
@@ -66,7 +66,7 @@ class ApiAuthRemoteDataSource implements AuthRemoteDataSource {
       },
     );
 
-    return _message(response, fallback: 'تم تغيير كلمة المرور بنجاح.');
+    return _message(response, fallback: 'Password changed successfully.');
   }
 
   @override
@@ -76,7 +76,7 @@ class ApiAuthRemoteDataSource implements AuthRemoteDataSource {
       body: <String, dynamic>{'token': token},
     );
 
-    return _message(response, fallback: 'تم التحقق من البريد الإلكتروني بنجاح.');
+    return _message(response, fallback: 'Email verified successfully.');
   }
 
   @override
@@ -92,7 +92,7 @@ class ApiAuthRemoteDataSource implements AuthRemoteDataSource {
     final token = response['token'] ?? response['Token'];
     if (token is! String || token.isEmpty) {
       throw const ApiException(
-        message: 'لم يُرجع الخادم رمز وصول صالحاً.',
+        message: 'The server did not return a valid access token.',
       );
     }
 

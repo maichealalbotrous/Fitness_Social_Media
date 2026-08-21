@@ -60,7 +60,7 @@ class PostsController extends ChangeNotifier {
     } on ApiException catch (exception) {
       _errorMessage = exception.message;
     } catch (_) {
-      _errorMessage = 'تعذر تحميل المنشورات. حاول مرة أخرى.';
+      _errorMessage = 'Unable to load posts. Please try again.';
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -88,7 +88,7 @@ class PostsController extends ChangeNotifier {
       notifyListeners();
       return null;
     } catch (_) {
-      _errorMessage = 'تعذر تحميل المنشور. حاول مرة أخرى.';
+      _errorMessage = 'Unable to load the post. Please try again.';
       notifyListeners();
       return null;
     }
@@ -102,7 +102,7 @@ class PostsController extends ChangeNotifier {
     } on ApiException catch (exception) {
       _errorMessage = exception.message;
     } catch (_) {
-      _errorMessage = 'تعذر رفع صور المنشور.';
+      _errorMessage = 'Unable to upload post images.';
     }
     notifyListeners();
     return null;
@@ -126,7 +126,7 @@ class PostsController extends ChangeNotifier {
     } on ApiException catch (exception) {
       _errorMessage = exception.message;
     } catch (_) {
-      _errorMessage = 'تعذر إنشاء المنشور. حاول مرة أخرى.';
+      _errorMessage = 'Unable to create the post. Please try again.';
     }
     notifyListeners();
     return null;
@@ -150,7 +150,7 @@ class PostsController extends ChangeNotifier {
       _errorMessage = exception.message;
       notifyListeners();
     } catch (_) {
-      _errorMessage = 'تعذر تحديث الإعجاب. حاول مرة أخرى.';
+      _errorMessage = 'Unable to update the like. Please try again.';
       notifyListeners();
     }
     return null;
@@ -166,7 +166,7 @@ class PostsController extends ChangeNotifier {
     } on ApiException catch (exception) {
       _errorMessage = exception.message;
     } catch (_) {
-      _errorMessage = 'تعذر حذف المنشور. حاول مرة أخرى.';
+      _errorMessage = 'Unable to delete the post. Please try again.';
     }
     notifyListeners();
     return false;
@@ -190,7 +190,7 @@ class PostsController extends ChangeNotifier {
     } on ApiException catch (exception) {
       _errorMessage = exception.message;
     } catch (_) {
-      _errorMessage = 'تعذر تحميل التعليقات. حاول مرة أخرى.';
+      _errorMessage = 'Unable to load comments. Please try again.';
     } finally {
       _isLoadingComments = false;
       notifyListeners();
@@ -215,7 +215,7 @@ class PostsController extends ChangeNotifier {
     } on ApiException catch (exception) {
       _errorMessage = exception.message;
     } catch (_) {
-      _errorMessage = 'تعذر إضافة التعليق. حاول مرة أخرى.';
+      _errorMessage = 'Unable to add the comment. Please try again.';
     }
     notifyListeners();
     return null;

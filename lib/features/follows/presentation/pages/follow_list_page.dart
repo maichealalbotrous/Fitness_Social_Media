@@ -150,7 +150,7 @@ class _ListBody extends StatelessWidget {
         physics: const AlwaysScrollableScrollPhysics(),
         children: const [
           SizedBox(height: 120),
-          Center(child: Text('لا توجد حسابات بعد.', style: TextStyle(color: ProfileTheme.muted))),
+          Center(child: Text('No accounts yet.', style: TextStyle(color: ProfileTheme.muted))),
         ],
       );
     }
@@ -226,7 +226,7 @@ class _Message extends StatelessWidget {
       children: [
         Text(message, textAlign: TextAlign.center, style: const TextStyle(color: ProfileTheme.muted)),
         const SizedBox(height: 14),
-        OutlinedButton(onPressed: onRetry, child: const Text('إعادة المحاولة')),
+        OutlinedButton(onPressed: onRetry, child: const Text('Retry')),
       ],
     );
   }

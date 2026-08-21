@@ -52,7 +52,7 @@ class ApiChallengeRemoteDataSource implements ChallengeRemoteDataSource {
       '/api/Challenge/$challengeId/join',
       body: const <String, dynamic>{},
     );
-    return _message(response, fallback: 'تم إرسال طلب الانضمام إلى التحدي.');
+    return _message(response, fallback: 'Challenge join request sent.');
   }
 
   @override
@@ -62,9 +62,9 @@ class ApiChallengeRemoteDataSource implements ChallengeRemoteDataSource {
       body: progress,
     );
     if (response is Map<String, dynamic>) {
-      return _message(response, fallback: 'تم تحديث تقدمك في التحدي.');
+      return _message(response, fallback: 'Your challenge progress was updated.');
     }
-    return 'تم تحديث تقدمك في التحدي.';
+    return 'Your challenge progress was updated.';
   }
 
   Map<String, dynamic> _unwrapChallenge(Map<String, dynamic> response) {

@@ -4,7 +4,7 @@ class AuthValidators {
   static String? username(String? value) {
     final username = value?.trim() ?? '';
     if (username.length < 3 || username.length > 20) {
-      return 'يجب أن يكون اسم المستخدم بين 3 و20 حرفاً.';
+      return 'Username must be between 3 and 20 characters.';
     }
     return null;
   }
@@ -13,14 +13,14 @@ class AuthValidators {
     final email = value?.trim() ?? '';
     final pattern = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
     if (!pattern.hasMatch(email)) {
-      return 'أدخل بريداً إلكترونياً صالحاً.';
+      return 'Enter a valid email address.';
     }
     return null;
   }
 
   static String? password(String? value) {
     if ((value ?? '').length < 6) {
-      return 'يجب أن تتكون كلمة المرور من 6 أحرف على الأقل.';
+      return 'Password must be at least 6 characters long.';
     }
     return null;
   }
@@ -30,7 +30,7 @@ class AuthValidators {
     required String? confirmation,
   }) {
     if (confirmation != password) {
-      return 'كلمتا المرور غير متطابقتين.';
+      return 'Passwords do not match.';
     }
     return null;
   }

@@ -77,7 +77,7 @@ class ChallengesController extends ChangeNotifier {
       final created = await _create(communityId, body);
       communityChallenges = [created, ...communityChallenges];
       activeChallenges = [created, ...activeChallenges];
-      message = 'تم إنشاء التحدي بنجاح.';
+      message = 'Challenge created successfully.';
       success = true;
     });
     return success;

@@ -1,7 +1,7 @@
 class AppConfig {
   const AppConfig._();
 
-  /// يمرر عند التشغيل، مثال:
+  /// Pass at runtime, for example:
   /// flutter run --dart-define=API_BASE_URL=http://10.0.2.2:5024
   static const apiBaseUrl = String.fromEnvironment(
     'API_BASE_URL',

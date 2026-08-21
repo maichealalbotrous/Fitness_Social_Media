@@ -63,7 +63,7 @@ class AuthController extends ChangeNotifier {
       _errorMessage = exception.message;
       return AuthSubmissionOutcome.failed;
     } catch (_) {
-      _errorMessage = 'حدث خطأ غير متوقع. حاول مرة أخرى.';
+      _errorMessage = 'An unexpected error occurred. Please try again.';
       return AuthSubmissionOutcome.failed;
     } finally {
       _isSubmitting = false;

@@ -75,7 +75,7 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                 maxLength: 2000,
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
-                  hintText: 'شارك تقدمك مع المجتمع...',
+                  hintText: 'Share your progress with the community...',
                   hintStyle: const TextStyle(color: FeedTheme.muted),
                   filled: true,
                   fillColor: FeedTheme.panelDark,
@@ -86,7 +86,7 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                 ),
                 validator: (value) {
                   if ((value?.trim() ?? '').isEmpty && _selectedImages.isEmpty) {
-                    return 'أضف محتوى أو صورة واحدة على الأقل.';
+                    return 'Add content or at least one image.';
                   }
                   return null;
                 },
@@ -103,8 +103,8 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                     : const Icon(Icons.photo_library_outlined),
                 label: Text(
                   _selectedImages.isEmpty
-                      ? 'اختيار صور'
-                      : 'إضافة صور (${_selectedImages.length})',
+                      ? 'Choose images'
+                      : 'Add images (${_selectedImages.length})',
                 ),
               ),
               if (_selectedImages.isNotEmpty) ...[
@@ -132,7 +132,7 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
                           child: CircularProgressIndicator(color: Colors.black),
                         )
                       : const Text(
-                          'نشر',
+                          'Post',
                           style: TextStyle(fontWeight: FontWeight.w900),
                         ),
                 ),
@@ -158,7 +158,7 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('تعذر اختيار الصور.')),
+          const SnackBar(content: Text('Unable to select images.')),
         );
       }
     } finally {

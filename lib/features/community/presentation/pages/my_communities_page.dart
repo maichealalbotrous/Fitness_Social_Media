@@ -183,7 +183,7 @@ class _EmptyState extends StatelessWidget {
       child: Padding(
         padding: EdgeInsets.all(28),
         child: Text(
-          'لا توجد مجتمعات محفوظة بعد. أنشئ مجتمعاً أو افتح مجتمعاً ثم انضم إليه ليظهر هنا.',
+          'No saved communities yet. Create or open a community and join it to see it here.',
           textAlign: TextAlign.center,
           style: TextStyle(color: Colors.white60, height: 1.5),
         ),

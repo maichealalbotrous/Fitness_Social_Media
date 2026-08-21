@@ -35,7 +35,7 @@ class _MyCoachesPageState extends State<MyCoachesPage> {
     }
     setState(() => _profileController = profileController);
     if (participantId == null || participantId.isEmpty) {
-      widget.controller.error = 'تعذر تحديد المستخدم الحالي.';
+      widget.controller.error = 'Unable to determine the current user.';
       widget.controller.notifyListeners();
       return;
     }

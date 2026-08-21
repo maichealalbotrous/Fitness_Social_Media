@@ -43,16 +43,16 @@ class _ChallengeDetailsPageState extends State<ChallengeDetailsPage> {
       return;
     }
     if (current.progress >= current.goal) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('لقد حققت هدف التحدي بالفعل ولا يمكنك تسجيل تقدم إضافي.')));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('You have already reached the challenge goal and cannot record additional progress.')));
       return;
     }
     if (value > current.goal) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('لا يمكن أن يتجاوز التقدم الهدف ${current.goal.toStringAsFixed(1)}.')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Progress cannot exceed the goal of ${current.goal.toStringAsFixed(1)}.')));
       return;
     }
     final success = await _controller.updateProgress(widget.challenge.id, value);
     if (success && mounted && value >= current.goal) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تهانينا، لقد حققت هدف التحدي بالكامل.')));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Congratulations, you have fully reached the challenge goal.')));
     }
     if (mounted && _controller.error == null) _progressController.clear();
   }
