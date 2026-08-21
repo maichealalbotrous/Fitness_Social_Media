@@ -282,13 +282,28 @@ class CommunityController extends ChangeNotifier {
         ),
       );
 
-  Future<void> handleRequest({required String requestId, required bool accepted}) =>
-      _runAction(
-        action: () => _handleRequest(
-          requestId: requestId,
-          accepted: accepted,
-        ),
+  Future<void> handleRequest({required String requestId, required bool accepted}) async {
+    _beginLoading();
+    try {
+      _successMessage = await _handleRequest(
+        requestId: requestId,
+        accepted: accepted,
       );
+      _requests = _requests
+          .where((request) => request.id != requestId)
+          .toList(growable: false);
+      _errorMessage = null;
+      if (_community != null) {
+        await loadMembers(_community!.id);
+      }
+    } on ApiException catch (error) {
+      _errorMessage = error.message;
+    } catch (_) {
+      _errorMessage = 'Unable to process the join request.';
+    } finally {
+      _finishLoading();
+    }
+  }
 
   Future<void> _runMemberAction({required Future<String> Function() action}) async {
     _beginLoading();

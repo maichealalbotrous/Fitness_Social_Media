@@ -65,7 +65,7 @@ class ApiCommunityRemoteDataSource implements CommunityRemoteDataSource {
     final raw = value is List ? value : value is Map<String, dynamic> ? (value['data'] ?? value['requests'] ?? const []) : const [];
     if (raw is! List) return const [];
     return raw.whereType<Map<String, dynamic>>().map((json) => CommunityJoinRequest(
-      id: (json['id'] ?? json['Id'] ?? '').toString(), communityId: (json['communityId'] ?? json['CommunityId'] ?? '').toString(), userId: (json['userId'] ?? json['UserId'] ?? '').toString(), username: (json['username'] ?? json['Username'] ?? '').toString(), imageUrl: json['imageUrl'] ?? json['ImageUrl'],
+      id: (json['id'] ?? json['Id'] ?? json['_id'] ?? json['requestId'] ?? json['RequestId'] ?? '').toString(), communityId: (json['communityId'] ?? json['CommunityId'] ?? '').toString(), userId: (json['userId'] ?? json['UserId'] ?? '').toString(), username: (json['username'] ?? json['Username'] ?? '').toString(), imageUrl: json['imageUrl'] ?? json['ImageUrl'],
     )).toList(growable: false);
   }
 
@@ -117,7 +117,7 @@ class ApiCommunityRemoteDataSource implements CommunityRemoteDataSource {
     required bool accepted,
   }) async {
     final response = await _apiClient.postJson(
-      '/api/Community/requests/${Uri.encodeComponent(requestId)}?accepted=$accepted',
+      '/requests/${Uri.encodeComponent(requestId)}?accepted=$accepted',
       body: const <String, dynamic>{},
     );
     return _message(response, fallback: 'Request processed.');
