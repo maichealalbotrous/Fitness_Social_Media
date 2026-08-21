@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fitness_social_app/features/chat/domain/chat_entities.dart';
 import 'package:fitness_social_app/features/chat/presentation/chat_controller.dart';
 import 'package:fitness_social_app/features/user/presentation/components/shared/app_sidebar.dart';
+import 'package:fitness_social_app/features/user/presentation/components/shared/app_routes.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({super.key, required this.controller});
@@ -38,15 +39,24 @@ class _ChatPageState extends State<ChatPage> {
               ? null
               : const AppSidebar(activeSection: AppSidebarSection.chat),
           appBar: AppBar(
-            leading: conversationOpen
-                ? IconButton(
-                    tooltip: 'Back',
-                    icon: const Icon(Icons.arrow_back),
-                    onPressed: widget.controller.isSending
-                        ? null
-                        : widget.controller.closeConversation,
-                  )
-                : null,
+            leading: IconButton(
+              tooltip: 'Back',
+              icon: const Icon(Icons.arrow_back),
+              onPressed: widget.controller.isSending
+                  ? null
+                  : () {
+                      if (conversationOpen) {
+                        widget.controller.closeConversation();
+                        return;
+                      }
+                      final navigator = Navigator.of(context);
+                      if (navigator.canPop()) {
+                        navigator.pop();
+                      } else {
+                        navigator.pushReplacementNamed(AppRoutes.feed);
+                      }
+                    },
+            ),
             title: Text(
               conversationOpen ? selectedUser?.username ?? 'Chat' : 'Chat',
             ),
