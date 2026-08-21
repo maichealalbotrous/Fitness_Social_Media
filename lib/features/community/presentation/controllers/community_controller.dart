@@ -218,11 +218,12 @@ class CommunityController extends ChangeNotifier {
     _beginLoading();
     try {
       final message = await _joinCommunity(community.id);
-      final normalized = message.toLowerCase();
-      final joined = normalized.contains('successfully joined') ||
-          normalized == 'joined' ||
-          normalized.contains('joined the community');
-      _isRequestPending = !joined && normalized.contains('request');
+      // A successful join call adds the user immediately for a public
+      // community and creates a pending request for a private community.
+      // The API message can vary by backend version, so use the community
+      // privacy flag instead of parsing response text.
+      final joined = !community.isPrivate;
+      _isRequestPending = community.isPrivate;
       _community = community.copyWith(
         isMember: joined,
         memberCount: joined ? community.memberCount + 1 : community.memberCount,

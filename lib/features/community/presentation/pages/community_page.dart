@@ -150,11 +150,6 @@ class _CommunityPageState extends State<CommunityPage> {
     if (trimmedId.isEmpty) return;
     await _controller.searchByName(trimmedId);
     if (!mounted) return;
-    final cached = await _localStorage.read();
-    final matching = cached.where((item) => item.name.toLowerCase() == trimmedId.toLowerCase()).toList();
-    if (matching.isNotEmpty) {
-      _controller.restoreLocalMembership(matching.first);
-    }
     final community = _controller.community;
     if (community != null) {
       await _controller.loadMembers(community.id);

@@ -117,7 +117,7 @@ class ApiCommunityRemoteDataSource implements CommunityRemoteDataSource {
     required bool accepted,
   }) async {
     final response = await _apiClient.postJson(
-      '/requests/${Uri.encodeComponent(requestId)}?accepted=$accepted',
+      '/api/Community/requests/${Uri.encodeComponent(requestId)}?accepted=$accepted',
       body: const <String, dynamic>{},
     );
     return _message(response, fallback: 'Request processed.');

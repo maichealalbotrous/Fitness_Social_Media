@@ -69,7 +69,7 @@ class _ExercisesPageState extends State<ExercisesPage> {
               child: LayoutBuilder(
                 builder: (context, constraints) {
                   final filterType = DropdownButtonFormField<String>(
-                    value: _filterType,
+                    value: const {'all', 'main', 'secondary'}.contains(_filterType) ? _filterType : 'all',
                     decoration: const InputDecoration(labelText: 'Filter by'),
                     items: const [
                       DropdownMenuItem(value: 'all', child: Text('All exercises')),

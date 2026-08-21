@@ -231,7 +231,7 @@ class _WorkoutPlanningPageState extends State<WorkoutPlanningPage>
               TextField(controller: duration, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Duration days')),
               if (_coachController.approvedParticipants.isNotEmpty)
                 DropdownButtonFormField<String>(
-                  value: selectedParticipantId,
+                  value: _coachController.approvedParticipants.any((item) => item.id == selectedParticipantId) ? selectedParticipantId : null,
                   decoration: const InputDecoration(labelText: 'Participant'),
                   hint: const Text('Choose a participant you train'),
                   items: _coachController.approvedParticipants
@@ -249,7 +249,7 @@ class _WorkoutPlanningPageState extends State<WorkoutPlanningPage>
                 ),
               if (_exerciseController.exercises.isNotEmpty) ...[
                 DropdownButtonFormField<String>(
-                  value: selectedExerciseId,
+                  value: _exerciseController.exercises.any((item) => item.id == selectedExerciseId) ? selectedExerciseId : null,
                   decoration: const InputDecoration(labelText: 'Exercise for Day 1'),
                   hint: const Text('Choose an exercise'),
                   items: _exerciseController.exercises.map((exercise) => DropdownMenuItem(value: exercise.id, child: Text(exercise.name))).toList(growable: false),

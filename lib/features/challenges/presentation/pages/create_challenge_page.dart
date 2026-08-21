@@ -49,8 +49,9 @@ class _CreateChallengePageState extends State<CreateChallengePage> {
       _communities = _communityController.myCommunities
           .where((community) => community.isOwner || community.isAdmin)
           .toList(growable: false);
-      if (_selectedCommunityId == null && _communities.isNotEmpty) {
-        _selectedCommunityId = _communities.first.id;
+      final hasSelectedCommunity = _communities.any((item) => item.id == _selectedCommunityId);
+      if (!hasSelectedCommunity) {
+        _selectedCommunityId = _communities.isEmpty ? null : _communities.first.id;
       }
     });
   }
@@ -124,7 +125,7 @@ class _CreateChallengePageState extends State<CreateChallengePage> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: DropdownButtonFormField<String>(
-        value: _selectedCommunityId,
+        value: _communities.any((item) => item.id == _selectedCommunityId) ? _selectedCommunityId : null,
         dropdownColor: const Color(0xFF171A17),
         style: const TextStyle(color: Colors.white),
         decoration: const InputDecoration(labelText: 'Community', labelStyle: TextStyle(color: Colors.white60), enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white24)), focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xFFDFFF00))), prefixIcon: Icon(Icons.groups_outlined, color: Color(0xFFDFFF00))),

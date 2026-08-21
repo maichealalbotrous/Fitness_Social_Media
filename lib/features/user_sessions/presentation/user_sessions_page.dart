@@ -449,7 +449,7 @@ class _UserSessionsPageState extends State<UserSessionsPage> {
         child: Column(
           children: [
             DropdownButtonFormField<String>(
-              value: draft.exerciseId,
+              value: _exerciseController.exercises.any((item) => item.id == draft.exerciseId) ? draft.exerciseId : null,
               decoration: const InputDecoration(labelText: 'Exercise'),
               items: _exerciseController.exercises
                   .map(
