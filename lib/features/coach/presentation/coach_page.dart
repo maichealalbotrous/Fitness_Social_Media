@@ -108,39 +108,72 @@ class _CoachPageState extends State<CoachPage> {
         if (widget.controller.coaches.isEmpty) const Text('No coaches found.', style: TextStyle(color: Colors.white54))
         else
           ...widget.controller.coaches.map(
-            (coach) => ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: CircleAvatar(
-                backgroundImage: coach.profilePictureUrl == null || coach.profilePictureUrl!.isEmpty
-                    ? null
-                    : NetworkImage(coach.profilePictureUrl!),
-                child: coach.profilePictureUrl == null || coach.profilePictureUrl!.isEmpty
-                    ? const Icon(Icons.person)
-                    : null,
+            (coach) => Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFF171717),
+                borderRadius: BorderRadius.circular(12),
               ),
-              title: Text(coach.username, style: const TextStyle(color: Colors.white)),
-              subtitle: Text(
-                '${coach.averageRating.toStringAsFixed(1)} / 5 • ${coach.totalParticipants} participants',
-                style: const TextStyle(color: Colors.white60),
-              ),
-              trailing: Wrap(
-                spacing: 6,
-                crossAxisAlignment: WrapCrossAlignment.center,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  OutlinedButton(
-                    onPressed: widget.controller.isLoading ? null : () => _requestTraining(coach),
-                    child: const Text('Send training request'),
-                  ),
-                  PopupMenuButton<int>(
-                    icon: const Icon(Icons.star, color: Colors.amber),
-                    onSelected: (rating) => widget.controller.rateCoach(coach.userId, rating),
-                    itemBuilder: (_) => List.generate(
-                      5,
-                      (index) => PopupMenuItem(
-                        value: index + 1,
-                        child: Text('${index + 1} star'),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      CircleAvatar(
+                        backgroundImage: coach.profilePictureUrl == null || coach.profilePictureUrl!.isEmpty
+                            ? null
+                            : NetworkImage(coach.profilePictureUrl!),
+                        child: coach.profilePictureUrl == null || coach.profilePictureUrl!.isEmpty
+                            ? const Icon(Icons.person)
+                            : null,
                       ),
-                    ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              coach.username,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              '${coach.averageRating.toStringAsFixed(1)} / 5 • ${coach.totalParticipants} participants',
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(color: Colors.white60),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Wrap(
+                    alignment: WrapAlignment.end,
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      OutlinedButton(
+                        onPressed: widget.controller.isLoading ? null : () => _requestTraining(coach),
+                        child: const Text('Send training request'),
+                      ),
+                      PopupMenuButton<int>(
+                        icon: const Icon(Icons.star, color: Colors.amber),
+                        onSelected: (rating) => widget.controller.rateCoach(coach.userId, rating),
+                        itemBuilder: (_) => List.generate(
+                          5,
+                          (index) => PopupMenuItem(
+                            value: index + 1,
+                            child: Text('${index + 1} star'),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

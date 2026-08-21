@@ -66,43 +66,50 @@ class _ExercisesPageState extends State<ExercisesPage> {
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: DropdownButtonFormField<String>(
-                      value: _filterType,
-                      decoration: const InputDecoration(labelText: 'Filter by'),
-                      items: const [
-                        DropdownMenuItem(value: 'all', child: Text('All exercises')),
-                        DropdownMenuItem(value: 'main', child: Text('Main muscle')),
-                        DropdownMenuItem(value: 'secondary', child: Text('Secondary muscle')),
-                      ],
-                      onChanged: (value) {
-                        setState(() {
-                          _filterType = value ?? 'all';
-                          if (_filterType == 'all') _filterMuscle = null;
-                        });
-                        _applyFilter();
-                      },
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: DropdownButtonFormField<ExerciseMuscle>(
-                      value: _filterMuscle,
-                      decoration: const InputDecoration(labelText: 'Muscle'),
-                      items: ExerciseMuscle.values
-                          .map((muscle) => DropdownMenuItem(value: muscle, child: Text(muscle.label)))
-                          .toList(growable: false),
-                      onChanged: _filterType == 'all'
-                          ? null
-                          : (value) {
-                              setState(() => _filterMuscle = value);
-                              _applyFilter();
-                            },
-                    ),
-                  ),
-                ],
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final filterType = DropdownButtonFormField<String>(
+                    value: _filterType,
+                    decoration: const InputDecoration(labelText: 'Filter by'),
+                    items: const [
+                      DropdownMenuItem(value: 'all', child: Text('All exercises')),
+                      DropdownMenuItem(value: 'main', child: Text('Main muscle')),
+                      DropdownMenuItem(value: 'secondary', child: Text('Secondary muscle')),
+                    ],
+                    onChanged: (value) {
+                      setState(() {
+                        _filterType = value ?? 'all';
+                        if (_filterType == 'all') _filterMuscle = null;
+                      });
+                      _applyFilter();
+                    },
+                  );
+                  final muscle = DropdownButtonFormField<ExerciseMuscle>(
+                    value: _filterMuscle,
+                    decoration: const InputDecoration(labelText: 'Muscle'),
+                    items: ExerciseMuscle.values
+                        .map((item) => DropdownMenuItem(value: item, child: Text(item.label)))
+                        .toList(growable: false),
+                    onChanged: _filterType == 'all'
+                        ? null
+                        : (value) {
+                            setState(() => _filterMuscle = value);
+                            _applyFilter();
+                          },
+                  );
+                  if (constraints.maxWidth < 520) {
+                    return Column(
+                      children: [filterType, const SizedBox(height: 10), muscle],
+                    );
+                  }
+                  return Row(
+                    children: [
+                      Expanded(child: filterType),
+                      const SizedBox(width: 10),
+                      Expanded(child: muscle),
+                    ],
+                  );
+                },
               ),
             ),
             if (widget.controller.isLoading) const LinearProgressIndicator(),
