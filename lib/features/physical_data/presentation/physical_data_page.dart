@@ -120,7 +120,7 @@ class _PhysicalDataPageState extends State<PhysicalDataPage> {
         _section('Privacy settings', [
           SwitchListTile(contentPadding: EdgeInsets.zero, title: const Text('Keep height private'), value: _heightPrivate, onChanged: (value) => setState(() => _heightPrivate = value)),
           SwitchListTile(contentPadding: EdgeInsets.zero, title: const Text('Keep weights private'), value: _weightsPrivate, onChanged: (value) => setState(() => _weightsPrivate = value)),
-          SwitchListTile(contentPadding: EdgeInsets.zero, title: const Text('Keep sex private'), value: _sexPrivate, onChanged: (value) => setState(() => _sexPrivate = value)),
+          SwitchListTile(contentPadding: EdgeInsets.zero, title: const Text('Keep gender private'), value: _sexPrivate, onChanged: (value) => setState(() => _sexPrivate = value)),
           SwitchListTile(contentPadding: EdgeInsets.zero, title: const Text('Keep birthday private'), value: _birthdayPrivate, onChanged: (value) => setState(() => _birthdayPrivate = value)),
           SwitchListTile(contentPadding: EdgeInsets.zero, title: const Text('Keep personal records private'), value: _recordsPrivate, onChanged: (value) => setState(() => _recordsPrivate = value)),
         ]),

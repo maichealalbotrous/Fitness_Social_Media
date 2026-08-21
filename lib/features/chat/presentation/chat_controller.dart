@@ -39,6 +39,13 @@ class ChatController extends ChangeNotifier {
     }
   }
 
+  void closeConversation() {
+    otherUserId = null;
+    messages = const [];
+    error = null;
+    notifyListeners();
+  }
+
   Future<void> loadHistory(String userId) async {
     otherUserId = userId;
     await _run(() async {

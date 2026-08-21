@@ -5,6 +5,7 @@ import 'package:fitness_social_app/features/user/presentation/components/shared/
 
 class ChatPage extends StatefulWidget {
   const ChatPage({super.key, required this.controller});
+
   final ChatController controller;
 
   @override
@@ -22,69 +23,116 @@ class _ChatPageState extends State<ChatPage> {
     super.dispose();
   }
 
+  bool get _conversationOpen => widget.controller.otherUserId != null;
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      drawer: const AppSidebar(activeSection: AppSidebarSection.chat),
-      appBar: AppBar(title: const Text('Chat')),
-      body: AnimatedBuilder(
-        animation: widget.controller,
-        builder: (_, __) => Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _usernameController,
-                      decoration: const InputDecoration(labelText: 'Search by username'),
-                      onSubmitted: (_) => _searchUser(),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  FilledButton(
-                    onPressed: widget.controller.isSearchingUser ? null : _searchUser,
-                    child: const Text('Search'),
-                  ),
-                ],
-              ),
+    return AnimatedBuilder(
+      animation: widget.controller,
+      builder: (_, __) {
+        final conversationOpen = widget.controller.otherUserId != null;
+        final selectedUser = widget.controller.selectedUser;
+
+        return Scaffold(
+          drawer: conversationOpen
+              ? null
+              : const AppSidebar(activeSection: AppSidebarSection.chat),
+          appBar: AppBar(
+            leading: conversationOpen
+                ? IconButton(
+                    tooltip: 'Back',
+                    icon: const Icon(Icons.arrow_back),
+                    onPressed: widget.controller.isSending
+                        ? null
+                        : widget.controller.closeConversation,
+                  )
+                : null,
+            title: Text(
+              conversationOpen ? selectedUser?.username ?? 'Chat' : 'Chat',
             ),
-            if (widget.controller.searchError != null)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: Text(widget.controller.searchError!, style: const TextStyle(color: Colors.redAccent)),
-              ),
-            if (widget.controller.selectedUser != null)
-              Card(
-                margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                child: ListTile(
-                  leading: const CircleAvatar(child: Icon(Icons.person)),
-                  title: Text(widget.controller.selectedUser!.username),
-                  subtitle: const Text('User found'),
-                  trailing: FilledButton(
-                    onPressed: () => widget.controller.loadHistory(widget.controller.selectedUser!.id),
-                    child: const Text('Open chat'),
+          ),
+          body: Column(
+            children: [
+              if (!conversationOpen) _searchPanel(),
+              if (widget.controller.error != null)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Text(
+                    widget.controller.error!,
+                    style: const TextStyle(color: Colors.redAccent),
                   ),
                 ),
+              if (widget.controller.isLoading)
+                const LinearProgressIndicator(),
+              Expanded(child: _conversation()),
+              if (conversationOpen) _composer(),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _searchPanel() {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _usernameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Search by username',
+                  ),
+                  onSubmitted: (_) => _searchUser(),
+                ),
               ),
-            if (widget.controller.error != null)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: Text(widget.controller.error!, style: const TextStyle(color: Colors.redAccent)),
+              const SizedBox(width: 8),
+              FilledButton(
+                onPressed: widget.controller.isSearchingUser
+                    ? null
+                    : _searchUser,
+                child: const Text('Search'),
               ),
-            if (widget.controller.isLoading) const LinearProgressIndicator(),
-            Expanded(child: _conversation()),
-            _composer(),
-          ],
+            ],
+          ),
         ),
-      ),
+        if (widget.controller.searchError != null)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Text(
+              widget.controller.searchError!,
+              style: const TextStyle(color: Colors.redAccent),
+            ),
+          ),
+        if (widget.controller.selectedUser != null)
+          Card(
+            margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            child: ListTile(
+              leading: const CircleAvatar(child: Icon(Icons.person)),
+              title: Text(widget.controller.selectedUser!.username),
+              subtitle: const Text('User found'),
+              trailing: FilledButton(
+                onPressed: widget.controller.isLoading
+                    ? null
+                    : () => widget.controller.loadHistory(
+                          widget.controller.selectedUser!.id,
+                        ),
+                child: const Text('Open chat'),
+              ),
+            ),
+          ),
+      ],
     );
   }
 
   Widget _conversation() {
     if (widget.controller.otherUserId == null) {
-      return const Center(child: Text('Search for a username to open a conversation.'));
+      return const Center(
+        child: Text('Search for a username to open a conversation.'),
+      );
     }
     if (widget.controller.messages.isEmpty && !widget.controller.isLoading) {
       return const Center(child: Text('No messages yet.'));
@@ -92,7 +140,8 @@ class _ChatPageState extends State<ChatPage> {
     return ListView.builder(
       padding: const EdgeInsets.all(12),
       itemCount: widget.controller.messages.length,
-      itemBuilder: (_, index) => _messageBubble(widget.controller.messages[index]),
+      itemBuilder: (_, index) =>
+          _messageBubble(widget.controller.messages[index]),
     );
   }
 
@@ -110,7 +159,9 @@ class _ChatPageState extends State<ChatPage> {
             color: mine ? const Color(0xFFB9D97A) : const Color(0xFF263238),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: mine ? const Color(0xFFD9F3A3) : const Color(0xFF546E7A),
+              color: mine
+                  ? const Color(0xFFD9F3A3)
+                  : const Color(0xFF546E7A),
             ),
           ),
           child: Column(
@@ -132,7 +183,9 @@ class _ChatPageState extends State<ChatPage> {
                 _formatDate(message.sentAt),
                 style: TextStyle(
                   fontSize: 11,
-                  color: mine ? const Color(0xFF38521A) : const Color(0xFFCFD8DC),
+                  color: mine
+                      ? const Color(0xFF38521A)
+                      : const Color(0xFFCFD8DC),
                 ),
               ),
             ],
@@ -148,9 +201,23 @@ class _ChatPageState extends State<ChatPage> {
         padding: const EdgeInsets.fromLTRB(12, 4, 12, 12),
         child: Row(
           children: [
-            Expanded(child: TextField(controller: _messageController, minLines: 1, maxLines: 4, decoration: const InputDecoration(hintText: 'Write a message...'))),
+            Expanded(
+              child: TextField(
+                controller: _messageController,
+                minLines: 1,
+                maxLines: 4,
+                decoration: const InputDecoration(
+                  hintText: 'Write a message...',
+                ),
+              ),
+            ),
             const SizedBox(width: 8),
-            IconButton(onPressed: widget.controller.isSending || widget.controller.otherUserId == null ? null : _send, icon: const Icon(Icons.send)),
+            IconButton(
+              onPressed: widget.controller.isSending
+                  ? null
+                  : _send,
+              icon: const Icon(Icons.send),
+            ),
           ],
         ),
       ),
