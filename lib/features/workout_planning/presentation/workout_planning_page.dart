@@ -233,12 +233,16 @@ class _WorkoutPlanningPageState extends State<WorkoutPlanningPage>
               if (_coachController.approvedParticipants.isNotEmpty)
                 DropdownButtonFormField<String>(
                   value: _coachController.approvedParticipants.any((item) => item.id == selectedParticipantId) ? selectedParticipantId : null,
+                  isExpanded: true,
                   decoration: const InputDecoration(labelText: 'Participant'),
                   hint: const Text('Choose a participant you train'),
                   items: _coachController.approvedParticipants
                       .map((participant) => DropdownMenuItem<String>(
                             value: participant.id,
-                            child: Text(participant.username),
+                            child: Text(
+                              participant.username,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ))
                       .toList(growable: false),
                   onChanged: (value) => setDialogState(() => selectedParticipantId = value),
@@ -251,9 +255,20 @@ class _WorkoutPlanningPageState extends State<WorkoutPlanningPage>
               if (_exerciseController.exercises.isNotEmpty) ...[
                 DropdownButtonFormField<String>(
                   value: _exerciseController.exercises.any((item) => item.id == selectedExerciseId) ? selectedExerciseId : null,
+                  isExpanded: true,
                   decoration: const InputDecoration(labelText: 'Exercise for Day 1'),
                   hint: const Text('Choose an exercise'),
-                  items: _exerciseController.exercises.map((exercise) => DropdownMenuItem(value: exercise.id, child: Text(exercise.name))).toList(growable: false),
+                  items: _exerciseController.exercises
+                      .map(
+                        (exercise) => DropdownMenuItem(
+                          value: exercise.id,
+                          child: Text(
+                            exercise.name,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      )
+                      .toList(growable: false),
                   onChanged: (value) => setDialogState(() => selectedExerciseId = value),
                 ),
                 Row(children: [
