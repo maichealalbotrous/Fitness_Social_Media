@@ -204,7 +204,7 @@ class _AuthFormState extends State<AuthForm> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  _isRegistering ? 'Already have an account?' : 'Don't have an account?',
+                  _isRegistering ? 'Already have an account?' : "Don't have an account?",
                   style: const TextStyle(color: AuthTheme.textMuted),
                 ),
                 TextButton(
