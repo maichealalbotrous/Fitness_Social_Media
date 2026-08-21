@@ -121,29 +121,56 @@ class _ProfileInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final actions = <Widget>[
+      const _CircleAction(icon: Icons.share_outlined),
+      const _CircleAction(icon: Icons.settings_outlined),
+      if (onFollowTap != null)
+        _FollowButton(isFollowing: isFollowing, onPressed: onFollowTap!)
+      else
+        _EditProfileButton(onPressed: onBioEdit),
+    ];
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 34),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              _ProfileAvatar(
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final avatar = _ProfileAvatar(
                 base64Image: avatarBase64,
                 imageUrl: avatarUrl,
                 onTap: onAvatarTap,
-              ),
-              const Spacer(),
-              const _CircleAction(icon: Icons.share_outlined),
-              const SizedBox(width: 10),
-              const _CircleAction(icon: Icons.settings_outlined),
-              const SizedBox(width: 12),
-              if (onFollowTap != null)
-                _FollowButton(isFollowing: isFollowing, onPressed: onFollowTap!)
-              else
-                _EditProfileButton(onPressed: onBioEdit),
-            ],
+              );
+              if (constraints.maxWidth < 520) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Align(alignment: Alignment.center, child: avatar),
+                    const SizedBox(height: 14),
+                    Wrap(
+                      alignment: WrapAlignment.end,
+                      spacing: 10,
+                      runSpacing: 10,
+                      children: actions,
+                    ),
+                  ],
+                );
+              }
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  avatar,
+                  const Spacer(),
+                  Wrap(
+                    alignment: WrapAlignment.end,
+                    spacing: 10,
+                    runSpacing: 10,
+                    children: actions,
+                  ),
+                ],
+              );
+            },
           ),
           const SizedBox(height: 36),
           Text(
