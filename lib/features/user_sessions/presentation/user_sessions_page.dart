@@ -396,7 +396,6 @@ class _UserSessionsPageState extends State<UserSessionsPage> {
                         )
                         .toList(growable: false);
 
-                    Navigator.pop(dialogContext);
                     if (session == null) {
                       await widget.controller.create(
                         description: description.text.trim().isEmpty
@@ -417,7 +416,8 @@ class _UserSessionsPageState extends State<UserSessionsPage> {
                         exercises: inputs,
                       );
                     }
-                    if (!mounted || widget.controller.error != null) return;
+                    if (!mounted || widget.controller.error != null || !dialogContext.mounted) return;
+                    Navigator.pop(dialogContext);
                     if (_filter == 'day') {
                       await _loadSelectedDay();
                     } else {

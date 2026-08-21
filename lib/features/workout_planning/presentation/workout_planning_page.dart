@@ -189,8 +189,9 @@ class _WorkoutPlanningPageState extends State<WorkoutPlanningPage>
             onPressed: () async {
               final value = int.tryParse(duration.text) ?? 0;
               if (name.text.trim().isEmpty || value <= 0) return;
-              Navigator.pop(dialogContext);
               await widget.controller.createTemplate(name: name.text.trim(), durationDays: value, isGeneral: false, days: days);
+              if (!mounted || widget.controller.error != null || !dialogContext.mounted) return;
+              Navigator.pop(dialogContext);
             },
             child: const Text('Create'),
           ),
@@ -366,8 +367,25 @@ class _WorkoutPlanningPageState extends State<WorkoutPlanningPage>
             onPressed: () async {
               final minutes = int.tryParse(duration.text) ?? 0;
               if (minutes <= 0) return;
+              await widget.controller.completeDay(
+                planId: plan.id,
+                dayId: day.id,
+                totalDurationMinutes: minutes,
+                description: day.name,
+                muscles: const [],
+                exercises: day.exercises
+                    .map(
+                      (item) => UserExerciseInput(
+                        exerciseId: item.exerciseId,
+                        reps: item.plannedReps,
+                        sets: item.plannedSets,
+                        weight: item.plannedWeight,
+                      ),
+                    )
+                    .toList(growable: false),
+              );
+              if (!mounted || widget.controller.error != null || !dialogContext.mounted) return;
               Navigator.pop(dialogContext);
-              await widget.controller.completeDay(planId: plan.id, dayId: day.id, totalDurationMinutes: minutes, description: day.name, muscles: const [], exercises: day.exercises.map((item) => UserExerciseInput(exerciseId: item.exerciseId, reps: item.plannedReps, sets: item.plannedSets, weight: item.plannedWeight)).toList(growable: false));
             },
             child: const Text('Complete'),
           ),

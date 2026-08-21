@@ -50,20 +50,50 @@ class _CoachPageState extends State<CoachPage> {
   }
   Future<void> _requestTraining(CoachProfile coach) async {
     final messageController = TextEditingController();
+    var isSubmitting = false;
     final message = await showDialog<String>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Request ${coach.username}'),
-        content: TextField(controller: messageController, maxLines: 3, decoration: const InputDecoration(labelText: 'Message (optional)')),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
-          FilledButton(onPressed: () => Navigator.pop(context, messageController.text.trim()), child: const Text('Send request')),
-        ],
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: Text('Request ${coach.username}'),
+          content: TextField(
+            controller: messageController,
+            maxLines: 3,
+            decoration: const InputDecoration(labelText: 'Message (optional)'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: isSubmitting ? null : () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: isSubmitting
+                  ? null
+                  : () async {
+                      final requestMessage = messageController.text.trim();
+                      setDialogState(() => isSubmitting = true);
+                      await widget.controller.createTrainingRequest(
+                        coach.userId,
+                        requestMessage.isEmpty ? null : requestMessage,
+                      );
+                      if (!context.mounted) return;
+                      if (widget.controller.error != null) {
+                        setDialogState(() => isSubmitting = false);
+                        return;
+                      }
+                      Navigator.pop(context, requestMessage);
+                    },
+              child: Text(isSubmitting ? 'Sending...' : 'Send request'),
+            ),
+          ],
+        ),
       ),
     );
     messageController.dispose();
     if (message == null || !mounted) return;
-    await widget.controller.createTrainingRequest(coach.userId, message.isEmpty ? null : message);
+    // The request is submitted inside the dialog so the dialog is closed only
+    // after the controller has finished notifying its listeners.
+    if (widget.controller.error != null) return;
   }
 
   Future<void> _pickCertification() async {
